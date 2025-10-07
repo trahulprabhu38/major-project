@@ -1,0 +1,174 @@
+# # version: "3.7"
+# # services:
+# #   scylla:
+# #     image: scylladb/scylla:5.1.9
+# #     container_name: scylla
+# #     hostname: scylla
+# #     ports:
+# #       - "9042:9042"    # Cassandra CQL
+# #       - "9180:9180"    # Alternator (optional), web UI etc
+# #     volumes:
+# #       - scylla-data:/var/lib/scylla
+# #     environment:
+# #       SCYLLA_CLUSTER_NAME: "local"
+# #     ulimits:
+# #       memlock:
+# #         soft: -1
+# #         hard: -1
+# #     command: --developer-mode 1
+
+# # volumes:
+# #   scylla-data:
+
+
+# version: "3.9"
+
+# services:
+#   # --- PostgreSQL ---
+#   postgres:
+#     image: postgres:16
+#     container_name: postgres
+#     environment:
+#       POSTGRES_DB: edu
+#       POSTGRES_USER: admin
+#       POSTGRES_PASSWORD: password
+#     volumes:
+#       - pg-data:/var/lib/postgresql/data
+#     ports:
+#       - "5432:5432"
+#     networks:
+#       - edu-network
+
+#   # --- ScyllaDB ---
+#   scylla:
+#     image: scylladb/scylla:5.1
+#     container_name: scylla
+#     command: --developer-mode 1
+#     ports:
+#       - "9042:9042"
+#     volumes:
+#       - scylla-data:/var/lib/scylla
+#     networks:
+#       - edu-network
+
+#   # --- Go Backend ---
+#   backend:
+#     build:
+#       context: ./backend
+#       dockerfile: Dockerfile
+#     container_name: go-backend
+#     environment:
+#       - JWT_SECRET=supersecretkey
+#       - SCYLLA_HOST=scylla
+#       - POSTGRES_DSN=postgres://admin:password@postgres:5432/edu?sslmode=disable
+#     depends_on:
+#       - scylla
+#       - postgres
+#     ports:
+#       - "8080:8080"
+#     networks:
+#       - edu-network
+
+#   # --- React Frontend ---
+#   frontend:
+#     build:
+#       context: ./edu-frontend
+#       dockerfile: Dockerfile
+#     container_name: react-frontend
+#     depends_on:
+#       - backend
+#     ports:
+#       - "5173:5173"
+#     networks:
+#       - edu-network
+
+# volumes:
+#   pg-data:
+#   scylla-data:
+
+# networks:
+#   edu-network:
+#     driver: bridge
+
+
+version: "3.9"
+
+services:
+  # --- ScyllaDB (your original setup) ---
+  scylla:
+    image: scylladb/scylla:5.1.9
+    container_name: scylla
+    hostname: scylla
+    ports:
+      - "9042:9042"    # Cassandra CQL port
+      - "9180:9180"    # Alternator / REST API (optional)
+    volumes:
+      - scylla-data:/var/lib/scylla
+    environment:
+      SCYLLA_CLUSTER_NAME: "local"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    command: --developer-mode 1
+    networks:
+      - edu-network
+
+  # --- PostgreSQL ---
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    hostname: postgres
+    environment:
+      POSTGRES_DB: edu
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    networks:
+      - edu-network
+
+  # --- Go Backend ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: go-backend
+    hostname: backend
+    environment:
+      - JWT_SECRET=supersecretkey
+      - SCYLLA_HOST=scylla
+      - POSTGRES_DSN=postgres://admin:password@postgres:5432/edu?sslmode=disable
+    depends_on:
+      - scylla
+      - postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - edu-network
+
+  # --- React Frontend ---
+  frontend:
+    build:
+      context: ./edu-frontend
+      dockerfile: Dockerfile
+    container_name: react-frontend
+    hostname: frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    networks:
+      - edu-network
+
+# --- Persistent Volumes ---
+volumes:
+  scylla-data:
+  pg-data:
+
+# --- Shared Network ---
+networks:
+  edu-network:
+    driver: bridge
