@@ -111,6 +111,8 @@ docker compose logs -f backend
 
 This repository does not include a license file. Add a LICENSE file to clarify reuse terms.
 
+
+
 ---
 
 If you'd like, I can also add a `.env.example`, API endpoint docs, or a minimal CI workflow. Tell me which you'd prefer next.
