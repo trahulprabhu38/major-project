@@ -1,6 +1,6 @@
 ---
 
-## 📘 OBE Automation & Competency Analytics Platform
+## 📘 CO's and PO's Automation & Competency Analytics Platform
 
 This repository contains the **Outcome-Based Education (OBE) Automation Platform**, built using **Golang**, **ScyllaDB**, and a scalable microservices architecture.
 It automates the mapping and evaluation of **Course Outcomes (COs)** and **Program Outcomes (POs)** using NLP and advanced analytics models like **Bayesian Knowledge Tracing** and **Item Response Theory**.
