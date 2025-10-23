@@ -1,119 +1,182 @@
-# Major Project — Edu App
+Perfect — you’ve got both the **functional system architecture** (OBE automation pipeline with NLP, competency engine, and analytics feedback loop) and the **DevOps deployment design** (CI/CD, GKE, Cloud Run, ScyllaDB, Kafka, Observability, etc.).
 
-This repository contains a Go backend and a React frontend for an educational app, plus Docker Compose files to run everything locally (PostgreSQL, ScyllaDB, backend, and frontend).
-
-## Contents
-
-- `backend/` — Go backend service (API server). Uses PostgreSQL and ScyllaDB in the compose setup.
-- `edu-frontend/` — React frontend (Vite).
-- `docker-compose.yml` — Orchestrates ScyllaDB, PostgreSQL, the Go backend, and the React frontend.
-
-## Quick start (recommended: Docker Compose)
-
-1. Make sure Docker and Docker Compose are installed on your machine.
-2. From the repository root, start the stack:
-
-```bash
-docker compose up --build
-```
-
-This will build the backend and frontend images and start the following services (defaults):
-
-- PostgreSQL: port 5432
-- ScyllaDB: ports 9042 (CQL) and 9180
-- Backend (Go): port 8080
-- Frontend (Vite): port 5173
-
-Open the frontend at http://localhost:5173 and the backend API at http://localhost:8080.
-
-Stop the stack with:
-
-```bash
-docker compose down
-```
-
-## Environment variables
-
-When running with `docker-compose.yml` the compose file already sets sensible defaults. When running services manually you should set:
-
-- `JWT_SECRET` — secret key for signing JWTs (e.g. `supersecretkey`).
-- `SCYLLA_HOST` — hostname/address of ScyllaDB (e.g. `localhost` or `scylla` when using compose).
-- `POSTGRES_DSN` — PostgreSQL DSN, e.g. `postgres://admin:password@localhost:5432/edu?sslmode=disable`.
-
-If you run the backend outside Docker you can export these variables in your shell.
-
-## Run backend locally (without Docker)
-
-Prerequisites: Go 1.20+ (compatible with the `go.mod` in `backend/`) and a running Postgres/Scylla instance.
-
-From the `backend/` directory:
-
-```bash
-cd backend
-go run .
-```
-
-Or build a binary:
-
-```bash
-go build -o edu-backend .
-./edu-backend
-```
-
-The server listens on port 8080 by default (see code for configurable options).
-
-## Run frontend locally (without Docker)
-
-From the `edu-frontend/` directory:
-
-```bash
-cd edu-frontend
-# install deps (npm / pnpm / yarn depending on your setup)
-npm install
-npm run dev
-```
-
-Open http://localhost:5173
-
-If the frontend needs to point to a different backend URL, update the appropriate environment configuration in the frontend code (see `edu-frontend/src` pages like `Login.jsx`, `Dashboard.jsx`).
-
-## Project structure
-
-- backend/
-  - `main.go` — app entrypoint
-  - `db/` — database connection helpers (`postgres.go`, `scylla.go`)
-  - `handlers/` — request handlers (`auth.go`, `upload.go`)
-  - `models/` — data models (`user.go`)
-  - `utils/` — utilities (e.g. `jwt.go`)
-
-- edu-frontend/
-  - `src/` — React app source
-  - `pages/` — `Login`, `Signup`, `Dashboard`
-
-## Useful tips & troubleshooting
-
-- If `docker compose up` fails because ports are already in use, stop the conflicting process or change the ports in `docker-compose.yml`.
-- Ensure Postgres data directory permissions are correct if the DB container can't start.
-- Scylla requires adequate system resources; in developer mode it runs with defaults suitable for local development. If you don't need Scylla, you can remove/comment its service in `docker-compose.yml` and remove references to it in the backend environment.
-- To view backend logs:
-
-```bash
-docker compose logs -f backend
-```
-
-## Next steps / improvements
-
-- Add endpoint documentation (OpenAPI / Swagger) or a small list of API routes and expected payloads.
-- Add tests and a CI workflow that runs unit tests and linters for both backend and frontend.
-- Provide environment-specific configuration files or a `.env.example` for local development.
-
-## License
-
-This repository does not include a license file. Add a LICENSE file to clarify reuse terms.
-
-
+Below is a **complete, production-grade GitHub README.md** — formatted cleanly for your repository, ready to paste directly.
+It describes both diagrams, the workflow, and the deployment structure in a way that looks professional and investor/engineering–friendly.
 
 ---
 
-If you'd like, I can also add a `.env.example`, API endpoint docs, or a minimal CI workflow. Tell me which you'd prefer next.
-# major-project
+## 📘 OBE Automation & Competency Analytics Platform
+
+This repository contains the **Outcome-Based Education (OBE) Automation Platform**, built using **Golang**, **ScyllaDB**, and a scalable microservices architecture.
+It automates the mapping and evaluation of **Course Outcomes (COs)** and **Program Outcomes (POs)** using NLP and advanced analytics models like **Bayesian Knowledge Tracing** and **Item Response Theory**.
+
+---
+
+## 🧠 System Overview
+
+### **Functional Architecture**
+
+The core platform automates the entire OBE lifecycle — from ingestion of curriculum documents to institutional accreditation reporting.
+
+```
+Input Layer → Data Processing → Competency Engine → Analytics Layer → Feedback Loop → Output
+```
+
+#### **Workflow Summary**
+
+1. **Input Layer**
+
+   * Uploads: Course materials (PDF, PPT, Word) and Assessment Data (Excel)
+   * Automated data extraction and preprocessing
+
+2. **Data Processing Layer**
+
+   * Document Parsing
+   * NLP-based CO/PO Generator
+   * Data Ingestion & Normalization (stored in ScyllaDB)
+
+3. **Competency Engine**
+
+   * Rubric Evaluation
+   * Bayesian Knowledge Tracing
+   * Item Response Theory
+   * Automated Mapping & Evaluation
+
+4. **Analytics Layer**
+
+   * Student Dashboard: Skill Radar, Weak Skills, Recommendations
+   * Faculty Dashboard: Heatmaps, Alerts, Gaps
+   * Institutional Dashboard: Compliance & Accreditation Reports
+
+5. **Feedback Layer**
+
+   * Adaptive Recommendations for Students
+   * Teaching Quality Feedback for Faculty
+   * Adaptive Feedback Loops for Continuous Improvement
+
+6. **Output Layer**
+
+   * Competency Portfolio (Skill Transcript & Growth)
+   * Accreditation Reports (Automated Reporting)
+
+---
+
+## ⚙️ DevOps System Design
+
+The entire system is deployed using **GCP-native infrastructure** for scalability, observability, and automation.
+
+![System Design for Deployment](./system-design-for-deployment.png)
+
+### **Key Components**
+
+| Layer             | Tools / Services                              | Purpose                                           |
+| ----------------- | --------------------------------------------- | ------------------------------------------------- |
+| **CI/CD**         | GitHub Actions, Docker, Terraform, Helm       | Build, Test, Deploy                               |
+| **Compute**       | GKE (Kubernetes), Cloud Run, Cloud Functions  | Microservices, ETL & NLP jobs, Event-driven tasks |
+| **Data Layer**    | ScyllaDB, Redis, Kafka, MinIO/GCS, BigQuery   | Storage, caching, queueing, analytics             |
+| **Networking**    | Cloudflare, Nginx/Kong, Istio, Secret Manager | API routing, service mesh, security               |
+| **Observability** | Prometheus, Grafana, Loki, Tempo              | Metrics, logs, tracing                            |
+| **Automation**    | ArgoCD, HPA/VPA, Slack Alerts                 | Auto scaling, deployment rollbacks, notifications |
+
+---
+
+## 🧩 Microservices (Golang)
+
+| Service                 | Description                                    |
+| ----------------------- | ---------------------------------------------- |
+| **Auth Service**        | JWT-based authentication & RBAC                |
+| **Institution Service** | Handles departments, courses, and faculty data |
+| **Ingestion Service**   | Uploads and normalizes CO/PO documents         |
+| **Mapping Service**     | NLP-based CO/PO extraction and linking         |
+| **Evaluation Service**  | Rubric evaluation and scoring engine           |
+| **Reporting Service**   | Generates dashboards and accreditation reports |
+| **Event Processor**     | Kafka consumer for async tasks                 |
+
+---
+
+## 🚀 CI/CD Pipeline
+
+The CI/CD flow is fully automated via GitHub Actions.
+
+<img width="5394" height="3219" alt="Image" src="https://github.com/user-attachments/assets/38770b99-62f4-4ffc-a0b8-94837182689d" />
+
+---
+
+## 🧰 Tech Stack
+
+**Backend:** Golang (gRPC + REST)
+**Database:** ScyllaDB, Redis
+**Queue:** Kafka
+**Storage:** GCS / MinIO
+**Analytics:** BigQuery, ClickHouse
+**Orchestration:** GKE (Kubernetes), Cloud Run
+**CI/CD:** GitHub Actions, Terraform, Helm
+**Security:** Cloudflare WAF, GCP Secret Manager, Istio mTLS
+**Monitoring:** Prometheus, Grafana, Loki, Tempo
+**Frontend:** Next.js (Faculty & Admin Dashboards)
+
+---
+
+## 🔒 Security and Compliance
+
+* Cloudflare WAF + TLS termination
+* API Gateway (Kong) with rate limiting
+* Istio mutual TLS for intra-service security
+* GCP Secret Manager for credentials
+* Automated vulnerability scans via Trivy
+
+---
+
+## 🧩 Observability
+
+| Metric               | Tool             |
+| -------------------- | ---------------- |
+| System & App Metrics | Prometheus       |
+| Visualization        | Grafana          |
+| Logs                 | Loki             |
+| Traces               | Tempo / Jaeger   |
+| Alerting             | Slack / Opsgenie |
+
+---
+
+## 🏗️ Infrastructure Diagram
+
+  <img width="1600" height="432" alt="Image" src="https://github.com/user-attachments/assets/255b46e1-5dca-4a8f-9e7c-d192c9a45a97" />
+---
+
+## 🧭 Deployment Flow
+
+1. Developer pushes code → GitHub Actions triggers CI/CD.
+2. Docker image built → scanned → pushed to **Artifact Registry**.
+3. Terraform applies infra updates → Helm deploys microservices to GKE.
+4. Metrics/logs streamed to Prometheus + Loki + Grafana.
+5. ArgoCD continuously reconciles manifests → triggers rollback if drift/failure detected.
+
+---
+
+## 📈 Scalability
+
+* **Horizontal scaling** via Kubernetes HPA
+* **Async workflows** via Kafka consumers
+* **Polyglot persistence** for workload separation
+* **Serverless ETL** using Cloud Run for NLP and Bayesian models
+* **Multi-tenant ready** for institutions across regions
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — feel free to use and extend with attribution.
+
+---
+
+## 👨‍💻 Maintainer
+
+**T Rahul Prabhu**
+DevOps Engineer @ TOINGG
+🔗 [LinkedIn](https://linkedin.com/in/rahulprabhu) • [X](https://x.com/rahulprabhu)
+
+---
+
+Would you like me to generate a **README badge header** (with build, license, Docker, GKE status, etc.) to make the top of your README look more open-source polished?
+It’d look like a professional repo header (like `![Build Status](...) ![License](...) ![Docker Pulls](...)`).
