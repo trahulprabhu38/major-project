@@ -1,118 +1,25 @@
-# # version: "3.7"
-# # services:
-# #   scylla:
-# #     image: scylladb/scylla:5.1.9
-# #     container_name: scylla
-# #     hostname: scylla
-# #     ports:
-# #       - "9042:9042"    # Cassandra CQL
-# #       - "9180:9180"    # Alternator (optional), web UI etc
-# #     volumes:
-# #       - scylla-data:/var/lib/scylla
-# #     environment:
-# #       SCYLLA_CLUSTER_NAME: "local"
-# #     ulimits:
-# #       memlock:
-# #         soft: -1
-# #         hard: -1
-# #     command: --developer-mode 1
-
-# # volumes:
-# #   scylla-data:
-
-
-# version: "3.9"
-
-# services:
-#   # --- PostgreSQL ---
-#   postgres:
-#     image: postgres:16
-#     container_name: postgres
-#     environment:
-#       POSTGRES_DB: edu
-#       POSTGRES_USER: admin
-#       POSTGRES_PASSWORD: password
-#     volumes:
-#       - pg-data:/var/lib/postgresql/data
-#     ports:
-#       - "5432:5432"
-#     networks:
-#       - edu-network
-
-#   # --- ScyllaDB ---
-#   scylla:
-#     image: scylladb/scylla:5.1
-#     container_name: scylla
-#     command: --developer-mode 1
-#     ports:
-#       - "9042:9042"
-#     volumes:
-#       - scylla-data:/var/lib/scylla
-#     networks:
-#       - edu-network
-
-#   # --- Go Backend ---
-#   backend:
-#     build:
-#       context: ./backend
-#       dockerfile: Dockerfile
-#     container_name: go-backend
-#     environment:
-#       - JWT_SECRET=supersecretkey
-#       - SCYLLA_HOST=scylla
-#       - POSTGRES_DSN=postgres://admin:password@postgres:5432/edu?sslmode=disable
-#     depends_on:
-#       - scylla
-#       - postgres
-#     ports:
-#       - "8080:8080"
-#     networks:
-#       - edu-network
-
-#   # --- React Frontend ---
-#   frontend:
-#     build:
-#       context: ./edu-frontend
-#       dockerfile: Dockerfile
-#     container_name: react-frontend
-#     depends_on:
-#       - backend
-#     ports:
-#       - "5173:5173"
-#     networks:
-#       - edu-network
-
-# volumes:
-#   pg-data:
-#   scylla-data:
-
-# networks:
-#   edu-network:
-#     driver: bridge
-
-
 version: "3.9"
 
 services:
-  # --- ScyllaDB (your original setup) ---
-  scylla:
-    image: scylladb/scylla:5.1.9
-    container_name: scylla
-    hostname: scylla
+  # --- MongoDB ---
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    hostname: mongodb
     ports:
-      - "9042:9042"    # Cassandra CQL port
-      - "9180:9180"    # Alternator / REST API (optional)
+      - "27018:27017"
     volumes:
-      - scylla-data:/var/lib/scylla
+      - mongodb-data:/data/db
     environment:
-      SCYLLA_CLUSTER_NAME: "local"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    command: --developer-mode 1
+      MONGO_INITDB_DATABASE: edu_analytics
     networks:
       - edu-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   # --- PostgreSQL ---
   postgres:
@@ -127,27 +34,47 @@ services:
       - "5432:5432"
     volumes:
       - pg-data:/var/lib/postgresql/data
+      - ./backend/migrations/001_initial_schema.sql:/docker-entrypoint-initdb.d/001_initial_schema.sql:ro
     networks:
       - edu-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d edu"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
-  # --- Go Backend ---
+  # --- Node.js Backend ---
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: go-backend
+    container_name: nodejs-backend
     hostname: backend
     environment:
-      - JWT_SECRET=supersecretkey
-      - SCYLLA_HOST=scylla
-      - POSTGRES_DSN=postgres://admin:password@postgres:5432/edu?sslmode=disable
+      NODE_ENV: production
+      PORT: 8080
+      JWT_SECRET: supersecretkey
+      JWT_EXPIRES_IN: 7d
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: edu
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      MONGODB_URI: mongodb://mongodb:27017/edu_analytics
+      MAX_FILE_SIZE: 10485760
     depends_on:
-      - scylla
-      - postgres
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
     ports:
       - "8080:8080"
+    volumes:
+      - ./backend/uploads:/app/uploads
     networks:
       - edu-network
+    restart: unless-stopped
 
   # --- React Frontend ---
   frontend:
@@ -160,13 +87,103 @@ services:
       - backend
     ports:
       - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8080/api
+      - VITE_UPLOAD_SERVICE_URL=http://localhost:8001
+      - VITE_CO_API_URL=http://localhost:8085/api/co
     networks:
       - edu-network
+    restart: unless-stopped
+
+  # --- FastAPI Upload Service (CSV/XLSX → PostgreSQL) ---
+  upload-service:
+    build:
+      context: ./upload-service
+      dockerfile: Dockerfile
+    container_name: fastapi_upload_service
+    hostname: upload-service
+    ports:
+      - "8001:8001"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: edu
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - edu-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # --- ChromaDB Vector Database ---
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:0.4.24
+    container_name: chromadb
+    hostname: chromadb
+    ports:
+      - "8002:8000"
+    environment:
+      - CHROMA_SERVER_AUTH=False
+      - IS_PERSISTENT=True
+      - ALLOW_RESET=True
+      - ANONYMIZED_TELEMETRY=False
+    volumes:
+      - ./chroma-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/heartbeat').read()\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+    networks:
+      - edu-network
+    restart: unless-stopped
+
+  # --- CO Generator Service (Course Outcomes AI) ---
+  co-generator:
+    build:
+      context: ./co-generator
+      dockerfile: Dockerfile
+    container_name: co_generator
+    hostname: co-generator
+    ports:
+      - "8085:8085"
+    environment:
+      POSTGRES_URL: postgresql://admin:password@postgres:5432/edu
+      CHROMA_HOST: chromadb
+      CHROMA_PORT: 8000
+      CHROMA_COLLECTION: syllabus_contexts
+      MODEL_PATH: google/flan-t5-base
+    depends_on:
+      postgres:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    volumes:
+      - ./co-generator/indices:/app/indices
+    networks:
+      - edu-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8085/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
 
 # --- Persistent Volumes ---
 volumes:
-  scylla-data:
+  mongodb-data:
   pg-data:
+  chroma-data:
 
 # --- Shared Network ---
 networks:

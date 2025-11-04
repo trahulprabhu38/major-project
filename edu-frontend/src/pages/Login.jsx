@@ -1,54 +1,152 @@
-import React, {useState} from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import {
+  Box,
+  Container,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
+import { Visibility, VisibilityOff, School } from '@mui/icons-material';
+import { motion } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext';
 
-export default function Login(){
-  const [email,setEmail]=useState('')
-  const [password,setPassword]=useState('')
-  const [error,setError]=useState('')
-  const [loading,setLoading]=useState(false)
-  const nav = useNavigate()
+const MotionPaper = motion(Paper);
+const MotionBox = motion(Box);
 
-  const submit=async e=>{
-    e.preventDefault()
-    setError(''); setLoading(true)
-    try{
-      const res = await fetch('http://localhost:8080/login', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({email,password})
-      })
-      if (!res.ok) {
-        const body = await res.json().catch(()=>({}))
-        setError(body.error || 'Login failed')
-      } else {
-        const json = await res.json()
-        localStorage.setItem('token', json.token)
-        nav('/dashboard')
+export default function Login() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const result = await login(formData);
+
+    if (result.success) {
+      if (result.user.role === 'student') {
+        navigate('/student/dashboard');
+      } else if (result.user.role === 'teacher') {
+        navigate('/teacher/dashboard');
       }
-    } catch(err){
-      setError('Network error')
-    } finally { setLoading(false) }
-  }
+    }
+
+    setLoading(false);
+  };
 
   return (
-    <div className="container">
-      <div style={{maxWidth:420, margin:'48px auto'}} className="card">
-        <h2 style={{margin:0}}>Login</h2>
-        <p className="small-muted">Enter credentials to continue.</p>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        py: 4,
+      }}
+    >
+      <Container maxWidth="sm">
+        <MotionPaper
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          elevation={10}
+          sx={{ p: 4, borderRadius: 4 }}
+        >
+          <MotionBox
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: 'spring' }}
+            sx={{ textAlign: 'center', mb: 3 }}
+          >
+            <School sx={{ fontSize: 60, color: 'primary.main' }} />
+            <Typography variant="h4" fontWeight="bold" gutterBottom>
+              OBE Portal
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Outcome-Based Education Analysis System
+            </Typography>
+          </MotionBox>
 
-        <form onSubmit={submit} className="form" style={{marginTop:12}}>
-          <input className="input" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} type="email" required />
-          <input className="input" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} type="password" required />
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="Email Address"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+              margin="normal"
+              autoComplete="email"
+            />
 
-          <div style={{display:'flex', gap:8, marginTop:6}}>
-            <button className="btn btn-primary" type="submit" disabled={loading}>
-              {loading ? 'Logging in...' : 'Login'}
-            </button>
-            <Link to="/signup" className="btn btn-ghost" style={{textDecoration:'none', display:'inline-flex', alignItems:'center'}}>Sign up</Link>
-          </div>
-          {error && <div className="error-msg" style={{marginTop:8}}>{error}</div>}
-        </form>
-      </div>
-    </div>
-  )
+            <TextField
+              fullWidth
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              required
+              margin="normal"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <Button
+              fullWidth
+              type="submit"
+              variant="contained"
+              size="large"
+              disabled={loading}
+              sx={{
+                mt: 3,
+                py: 1.5,
+                background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+                '&:hover': {
+                  background: 'linear-gradient(45deg, #5568d3 30%, #6a3f8f 90%)',
+                },
+              }}
+            >
+              {loading ? 'Signing In...' : 'Sign In'}
+            </Button>
+
+            <Box sx={{ mt: 2, textAlign: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
+                Don't have an account?{' '}
+                <Link to="/register" style={{ color: '#667eea', textDecoration: 'none', fontWeight: 600 }}>
+                  Register
+                </Link>
+              </Typography>
+            </Box>
+
+            <Alert severity="info" sx={{ mt: 3 }}>
+              <Typography variant="caption">
+                <strong>Demo Credentials:</strong><br />
+                <strong>Teacher:</strong> rajesh.kumar@example.edu / password123<br />
+                <strong>Student:</strong> student1@example.edu / password123
+              </Typography>
+            </Alert>
+          </form>
+        </MotionPaper>
+      </Container>
+    </Box>
+  );
 }

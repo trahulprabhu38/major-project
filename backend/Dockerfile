@@ -1,20 +1,17 @@
-# ---- Build stage ----
-FROM golang:1.23 AS builder
-ENV GOTOOLCHAIN=auto
+FROM node:20-alpine
 
 WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
 
+# Copy dependency manifests first
+COPY package*.json ./
+
+# Install dependencies properly
+RUN npm install --legacy-peer-deps
+
+# Copy your backend code
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server .
 
-# ---- Run stage ----
-FROM gcr.io/distroless/base-debian12
-WORKDIR /app
-COPY --from=builder /app/server .
-
-# Expose backend port
 EXPOSE 8080
 
-CMD ["./server"]
+# Start in dev mode
+CMD ["npm", "run", "dev"]

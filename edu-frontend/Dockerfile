@@ -1,22 +1,16 @@
-# ---- Build Stage ----
-FROM node:20-alpine AS builder
+FROM node:20-alpine
+
 WORKDIR /app
 
+# Copy dependency manifests
 COPY package*.json ./
-RUN npm install
 
+# ✅ Ignore peer dependency errors
+RUN npm install --legacy-peer-deps
+
+# Copy rest of your source code
 COPY . .
-RUN npm run build
 
-# ---- Serve Stage ----
-FROM nginx:stable-alpine
-
-# Copy Vite dist files to nginx html directory
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Replace default nginx.conf
-RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
+# Run dev mode for frontend
 EXPOSE 5173
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "run", "dev", "--", "--host"]

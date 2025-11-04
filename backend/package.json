@@ -1,0 +1,49 @@
+{
+  "name": "obe-backend",
+  "version": "1.0.0",
+  "description": "OBE CO/PO Attainment Analysis System - Node.js Backend",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "migrate": "node migrations/migrate.js",
+    "seed": "node migrations/seed.js"
+  },
+  "keywords": [
+    "obe",
+    "education",
+    "attainment",
+    "co-po"
+  ],
+  "author": "T Rahul Prabhu",
+  "license": "MIT",
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.4",
+    "@mui/material": "^7.3.4",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "framer-motion": "^12.23.24",
+    "helmet": "^7.1.0",
+    "joi": "^17.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.20.0",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "papaparse": "^5.4.1",
+    "pg": "^8.11.3",
+    "react-dropzone": "^14.3.8",
+    "recharts": "^3.3.0",
+    "uuid": "^9.0.1",
+    "xlsx": "^0.18.5",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

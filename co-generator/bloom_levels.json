@@ -1,0 +1,54 @@
+{
+  "Remember": {
+    "description": "Recall facts and basic concepts",
+    "verbs": [
+      "define", "duplicate", "list", "memorize", "recall", "repeat",
+      "reproduce", "state", "identify", "name", "recognize", "select",
+      "describe", "label", "match", "outline", "quote", "cite"
+    ]
+  },
+  "Understand": {
+    "description": "Explain ideas or concepts",
+    "verbs": [
+      "classify", "describe", "discuss", "explain", "identify",
+      "locate", "recognize", "report", "select", "translate",
+      "paraphrase", "summarize", "interpret", "exemplify", "illustrate",
+      "compare", "contrast", "infer", "predict"
+    ]
+  },
+  "Apply": {
+    "description": "Use information in new situations",
+    "verbs": [
+      "execute", "implement", "solve", "use", "demonstrate", "interpret",
+      "operate", "schedule", "sketch", "apply", "calculate", "construct",
+      "develop", "employ", "illustrate", "practice", "relate", "utilize"
+    ]
+  },
+  "Analyze": {
+    "description": "Draw connections among ideas",
+    "verbs": [
+      "analyze", "break down", "compare", "contrast", "diagram",
+      "deconstruct", "differentiate", "discriminate", "distinguish",
+      "examine", "experiment", "identify", "illustrate", "infer",
+      "outline", "relate", "select", "separate", "test", "categorize"
+    ]
+  },
+  "Evaluate": {
+    "description": "Justify a stand or decision",
+    "verbs": [
+      "appraise", "argue", "defend", "judge", "select", "support",
+      "value", "critique", "weigh", "assess", "choose", "compare",
+      "conclude", "criticize", "decide", "evaluate", "justify",
+      "prioritize", "rate", "recommend", "validate"
+    ]
+  },
+  "Create": {
+    "description": "Produce new or original work",
+    "verbs": [
+      "design", "assemble", "construct", "conjecture", "develop",
+      "formulate", "author", "investigate", "compose", "create",
+      "devise", "generate", "hypothesize", "invent", "plan",
+      "produce", "synthesize", "build", "combine", "compile"
+    ]
+  }
+}
