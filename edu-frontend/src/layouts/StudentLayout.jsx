@@ -30,6 +30,7 @@ import {
   Menu as MenuIcon,
   ChevronLeft,
   AccountCircle,
+  TrendingUp,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -80,6 +81,7 @@ const StudentLayout = () => {
     { label: 'Enroll in Course', path: '/student/enroll', icon: <PersonAdd /> },
     { label: 'My Courses', path: '/student/courses', icon: <School /> },
     { label: 'Analytics', path: '/student/analytics', icon: <BarChart /> },
+    { label: 'Analysis', path: '/student/analysis', icon: <TrendingUp /> },
     { label: 'Settings', path: '/student/settings', icon: <Settings /> },
   ];
 

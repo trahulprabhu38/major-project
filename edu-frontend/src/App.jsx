@@ -27,6 +27,7 @@ import StudentEnroll from "./pages/student/Enroll";
 
 // Shared Pages
 import Settings from "./pages/shared/Settings";
+import Analysis from "./pages/shared/Analysis";
 
 // Layouts
 import StudentLayout from "./layouts/StudentLayout";
@@ -130,6 +131,7 @@ const AppContent = () => {
                   <Route path="courses" element={<TeacherCourses />} />
                   <Route path="courses/:id" element={<TeacherCourseDetail />} />
                   <Route path="analytics" element={<TeacherAnalytics />} />
+                  <Route path="analysis" element={<Analysis />} />
                   <Route path="upload" element={<UploadMarksNew />} />
                   <Route path="upload-old" element={<UploadMarks />} />
                   <Route path="co-generator" element={<COGenerator />} />
@@ -149,6 +151,7 @@ const AppContent = () => {
                   <Route path="dashboard" element={<StudentDashboard />} />
                   <Route path="enroll" element={<StudentEnroll />} />
                   <Route path="courses/:courseId/analytics" element={<StudentCourseAnalytics />} />
+                  <Route path="analysis" element={<Analysis />} />
                   <Route path="settings" element={<Settings />} />
                   <Route index element={<Navigate to="dashboard" replace />} />
                 </Route>

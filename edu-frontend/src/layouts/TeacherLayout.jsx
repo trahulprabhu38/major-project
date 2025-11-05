@@ -34,6 +34,7 @@ import {
   Analytics,
   Assessment,
   AutoAwesome,
+  TrendingUp,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -85,6 +86,7 @@ const TeacherLayout = () => {
     { label: 'CO Generator', path: '/teacher/co-generator', icon: <AutoAwesome /> },
     { label: 'Analytics', path: '/teacher/analytics', icon: <BarChart /> },
     { label: 'Courses', path: '/teacher/courses', icon: <School /> },
+    { label: 'Analysis', path: '/teacher/analysis', icon: <TrendingUp /> },
     { label: 'Static Analysis', path: '/teacher/static-analysis', icon: <Analytics /> },
     { label: 'Attainment', path: '/teacher/attainment', icon: <Assessment /> },
     { label: 'Settings', path: '/teacher/settings', icon: <Settings /> },

@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { School, Visibility, VisibilityOff } from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
 const MotionPaper = motion(Paper);
@@ -36,6 +37,19 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate password length
+    if (formData.password.length < 6) {
+      toast.error('Password must be at least 6 characters long');
+      return;
+    }
+
+    // Validate USN for students
+    if (formData.role === 'student' && !formData.usn.trim()) {
+      toast.error('USN is required for students');
+      return;
+    }
+
     setLoading(true);
 
     const result = await register(formData);
@@ -113,6 +127,8 @@ export default function Register() {
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
               margin="normal"
+              inputProps={{ minLength: 6 }}
+              helperText="Minimum 6 characters"
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
