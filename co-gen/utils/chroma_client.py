@@ -85,6 +85,7 @@ class ChromaDBClient:
     ) -> int:
         """
         Ingest a document into ChromaDB.
+        Stores BOTH the full syllabus text AND chunked versions.
         Returns the number of chunks ingested.
         """
         from utils.text_extractor import TextExtractor
@@ -95,12 +96,42 @@ class ChromaDBClient:
         # Get collection for this course
         collection = self.get_or_create_collection(course_code)
 
-        # Chunk the text
+        # FIRST: Store the full syllabus text as a single document
+        # This is critical for accurate CO generation
+        full_syllabus_id = f"{course_code}_FULL_SYLLABUS"
+        full_embedding = self.embedding_model.encode(
+            [text[:8000]],  # Limit to first 8000 chars for embedding
+            show_progress_bar=False,
+            convert_to_numpy=True
+        ).astype('float32')
+
+        # Normalize
+        norm = np.linalg.norm(full_embedding)
+        full_embedding = full_embedding / norm
+
+        try:
+            collection.add(
+                ids=[full_syllabus_id],
+                embeddings=full_embedding.tolist(),
+                documents=[text],  # Store FULL text
+                metadatas=[{
+                    "course_code": course_code,
+                    "course_id": course_id,
+                    "source_file": filename,
+                    "is_full_syllabus": True,
+                    "chunk_index": -1
+                }]
+            )
+            logger.info(f"Stored full syllabus text for {course_code}")
+        except Exception as e:
+            logger.warning(f"Failed to store full syllabus: {e}")
+
+        # SECOND: Also chunk the text for potential future use
         chunks = TextExtractor.chunk_text(text, chunk_size=chunk_size, overlap=overlap)
 
         if not chunks:
             logger.warning(f"No chunks extracted from {filename}")
-            return 0
+            return 1  # Still return 1 for the full syllabus
 
         logger.info(f"Processing {len(chunks)} chunks from {filename}")
 
@@ -123,7 +154,8 @@ class ChromaDBClient:
                 "course_id": course_id,
                 "source_file": filename,
                 "chunk_index": i,
-                "total_chunks": len(chunks)
+                "total_chunks": len(chunks),
+                "is_full_syllabus": False
             }
             for i in range(len(chunks))
         ]
@@ -137,10 +169,52 @@ class ChromaDBClient:
                 metadatas=metadatas
             )
             logger.info(f"Successfully ingested {len(chunks)} chunks for {course_code}")
-            return len(chunks)
+            return len(chunks) + 1  # +1 for full syllabus
         except Exception as e:
             logger.error(f"Failed to add chunks to ChromaDB: {e}")
             raise
+
+    def get_full_syllabus(self, course_code: str) -> Optional[str]:
+        """
+        Retrieve the FULL syllabus text for CO generation.
+        This returns the complete syllabus section, not chunks.
+        """
+        collection = self.get_or_create_collection(course_code)
+
+        try:
+            # Try to get the full syllabus document
+            full_syllabus_id = f"{course_code}_FULL_SYLLABUS"
+            results = collection.get(
+                ids=[full_syllabus_id]
+            )
+
+            if results and results.get('documents') and len(results['documents']) > 0:
+                full_text = results['documents'][0]
+                logger.info(f"Retrieved full syllabus for {course_code} ({len(full_text)} chars)")
+                return full_text
+
+            # Fallback: if full syllabus not found, reconstruct from chunks
+            logger.warning(f"Full syllabus not found for {course_code}, reconstructing from chunks")
+            all_chunks = collection.get(
+                where={"is_full_syllabus": False}
+            )
+
+            if all_chunks and all_chunks.get('documents'):
+                # Sort by chunk_index and concatenate
+                chunk_data = list(zip(
+                    all_chunks['documents'],
+                    all_chunks.get('metadatas', [{}] * len(all_chunks['documents']))
+                ))
+                chunk_data.sort(key=lambda x: x[1].get('chunk_index', 0))
+                reconstructed = '\n'.join([doc for doc, _ in chunk_data])
+                logger.info(f"Reconstructed syllabus from {len(chunk_data)} chunks")
+                return reconstructed
+
+            return None
+
+        except Exception as e:
+            logger.error(f"Failed to retrieve full syllabus: {e}")
+            return None
 
     def retrieve_contexts(
         self,

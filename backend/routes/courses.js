@@ -13,6 +13,8 @@ import {
   getTeacherEnrollments,
   createOrGetCourse,
   getTeacherCourses,
+  saveCourseOutcomes,
+  getCourseOutcomes,
 } from '../controllers/courseController.js';
 
 const router = express.Router();
@@ -32,6 +34,10 @@ router.get('/:id', authenticateToken, getCourseById);
 router.get('/:id/analytics', authenticateToken, getCourseAnalytics);
 router.put('/:id', authenticateToken, updateCourse);
 router.delete('/:id', authenticateToken, deleteCourse);
+
+// Course Outcomes routes
+router.post('/:courseId/outcomes', authenticateToken, saveCourseOutcomes);
+router.get('/:courseId/outcomes', authenticateToken, getCourseOutcomes);
 
 // Enrollment routes
 router.post('/:id/enroll', authenticateToken, enrollStudents);

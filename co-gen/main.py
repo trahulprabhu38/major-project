@@ -204,7 +204,7 @@ async def upload_syllabus(
 async def generate_cos(
     course_id: str = Query(...),
     course_code: str = Query(...),
-    num_cos: int = Query(5, ge=1, le=10)
+    num_cos: int = Query(5, ge=1)
 ):
     """
     Generate Course Outcomes using RAG
@@ -217,28 +217,25 @@ async def generate_cos(
         # Get ChromaDB client
         chroma_client = get_chroma_client()
 
-        # Retrieve contexts from ChromaDB
-        contexts = chroma_client.retrieve_contexts(
-            course_code=course_code,
-            n_results=settings.DEFAULT_RETRIEVAL_K
-        )
+        # Retrieve FULL syllabus text (not chunks) for accurate CO generation
+        full_syllabus = chroma_client.get_full_syllabus(course_code)
 
-        if not contexts:
+        if not full_syllabus:
             raise HTTPException(
                 status_code=404,
                 detail=f"No syllabus data found for course {course_code}. Please upload syllabus first."
             )
 
-        logger.info(f"Retrieved {len(contexts)} contexts from ChromaDB")
+        logger.info(f"Retrieved full syllabus text ({len(full_syllabus)} chars) from ChromaDB")
 
-        # Generate COs using Groq
+        # Generate COs using Groq with FULL syllabus text
         groq_gen = get_groq_generator()
 
         # Get course name (use course_code if not available)
         course_name = course_code
 
-        cos = groq_gen.generate_cos_from_contexts(
-            contexts=contexts,
+        cos = groq_gen.generate_cos_from_full_syllabus(
+            syllabus_text=full_syllabus,
             course_name=course_name,
             num_cos=num_cos
         )
@@ -248,16 +245,23 @@ async def generate_cos(
 
         logger.info(f"Successfully generated {len(cos)} COs")
 
+        # Also retrieve contexts for backward compatibility with frontend
+        contexts = chroma_client.retrieve_contexts(
+            course_code=course_code,
+            n_results=settings.DEFAULT_RETRIEVAL_K
+        )
+
         # Format response to match frontend expectations
         # Frontend expects: { contexts: [...], total_docs: N }
         response = {
             "success": True,
             "course_id": course_id,
             "course_code": course_code,
-            "contexts": contexts,  # Frontend uses this
-            "generated_cos": cos,  # Additional field with structured COs
+            "contexts": contexts,  # Frontend uses this for display
+            "generated_cos": cos,  # Accurate COs generated from full syllabus
             "total_docs": total_docs,
-            "num_generated": len(cos)
+            "num_generated": len(cos),
+            "used_full_syllabus": True  # Flag to indicate we used full syllabus
         }
 
         return response

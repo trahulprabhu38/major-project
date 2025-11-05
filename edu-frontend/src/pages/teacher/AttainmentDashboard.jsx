@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,26 +29,7 @@ import {
   Lightbulb,
   Sparkles,
 } from "lucide-react";
-
-// Mock Data for CO Attainment
-const coAttainmentData = [
-  { co: "CO1", attainment: 78, target: 70 },
-  { co: "CO2", attainment: 82, target: 70 },
-  { co: "CO3", attainment: 65, target: 70 },
-  { co: "CO4", attainment: 88, target: 70 },
-  { co: "CO5", attainment: 75, target: 70 },
-  { co: "CO6", attainment: 91, target: 70 },
-];
-
-// CO-PO Mapping Matrix (0-3 scale: 0=No correlation, 1=Low, 2=Medium, 3=High)
-const coPOMatrix = [
-  { co: "CO1", po1: 3, po2: 2, po3: 1, po4: 2, po5: 1, po6: 0, po7: 1, po8: 2, po9: 1, po10: 0, po11: 1, po12: 2 },
-  { co: "CO2", po1: 2, po2: 3, po3: 2, po4: 1, po5: 2, po6: 1, po7: 0, po8: 1, po9: 2, po10: 1, po11: 0, po12: 1 },
-  { co: "CO3", po1: 1, po2: 2, po3: 3, po4: 2, po5: 1, po6: 2, po7: 1, po8: 0, po9: 1, po10: 2, po11: 1, po12: 0 },
-  { co: "CO4", po1: 2, po2: 1, po3: 2, po4: 3, po5: 2, po6: 1, po7: 2, po8: 1, po9: 0, po10: 1, po11: 2, po12: 1 },
-  { co: "CO5", po1: 1, po2: 2, po3: 1, po4: 2, po5: 3, po6: 2, po7: 1, po8: 2, po9: 1, po10: 0, po11: 1, po12: 2 },
-  { co: "CO6", po1: 3, po2: 2, po3: 2, po4: 1, po5: 2, po6: 3, po7: 2, po8: 1, po9: 2, po10: 1, po11: 0, po12: 1 },
-];
+import { courseAPI, assessmentAPI } from "../../services/api";
 
 // Get color based on attainment level
 const getAttainmentColor = (value) => {
@@ -68,6 +50,75 @@ const getHeatmapColor = (value) => {
 
 const AttainmentDashboard = () => {
   const { isDark } = useTheme();
+  const [courses, setCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [coAttainmentData, setCoAttainmentData] = useState([]);
+  const [coPOMatrix, setCoPOMatrix] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadCourses();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCourse) {
+      loadCOAttainment();
+    }
+  }, [selectedCourse]);
+
+  const loadCourses = async () => {
+    try {
+      const response = await courseAPI.getAll();
+      const coursesData = response.data.data || [];
+      setCourses(coursesData);
+      if (coursesData.length > 0) {
+        setSelectedCourse(coursesData[0].id);
+      }
+    } catch (error) {
+      console.error("Error loading courses:", error);
+    }
+  };
+
+  const loadCOAttainment = async () => {
+    try {
+      setLoading(true);
+      const [coAttainmentRes, cosRes] = await Promise.all([
+        assessmentAPI.getCOAttainment(selectedCourse).catch(() => ({ data: { data: [] } })),
+        courseAPI.getCourseOutcomes(selectedCourse),
+      ]);
+
+      const attainmentData = coAttainmentRes.data?.data || [];
+      const cosData = cosRes.data?.data || [];
+
+      // Map COs to attainment data
+      const mappedData = cosData.map((co, idx) => {
+        const attainment = attainmentData.find(a => a.co_number === co.co_number);
+        return {
+          co: `CO${co.co_number}`,
+          attainment: attainment?.attainment_percentage || 0,
+          target: 70,
+          description: co.description,
+        };
+      });
+
+      setCoAttainmentData(mappedData.length > 0 ? mappedData : [
+        { co: "CO1", attainment: 0, target: 70, description: "No data" }
+      ]);
+
+      // Generate default CO-PO matrix
+      const matrix = mappedData.map((co) => ({
+        co: co.co,
+        po1: 3, po2: 2, po3: 1, po4: 2, po5: 1, po6: 0,
+        po7: 1, po8: 2, po9: 1, po10: 0, po11: 1, po12: 2,
+      }));
+      setCoPOMatrix(matrix.length > 0 ? matrix : [{ co: "CO1", po1: 0, po2: 0, po3: 0, po4: 0, po5: 0, po6: 0, po7: 0, po8: 0, po9: 0, po10: 0, po11: 0, po12: 0 }]);
+    } catch (error) {
+      console.error("Error loading CO attainment:", error);
+      setCoAttainmentData([{ co: "CO1", attainment: 0, target: 70 }]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -89,18 +140,19 @@ const AttainmentDashboard = () => {
   };
 
   // Calculate average attainment
-  const avgAttainment = (
+  const avgAttainment = coAttainmentData.length > 0 ? (
     coAttainmentData.reduce((sum, co) => sum + co.attainment, 0) /
     coAttainmentData.length
-  ).toFixed(1);
+  ).toFixed(1) : 0;
 
   // Find best and worst performing COs
-  const bestCO = coAttainmentData.reduce((max, co) =>
+  const bestCO = coAttainmentData.length > 0 ? coAttainmentData.reduce((max, co) =>
     co.attainment > max.attainment ? co : max
-  );
-  const worstCO = coAttainmentData.reduce((min, co) =>
+  ) : { co: "N/A", attainment: 0 };
+
+  const worstCO = coAttainmentData.length > 0 ? coAttainmentData.reduce((min, co) =>
     co.attainment < min.attainment ? co : min
-  );
+  ) : { co: "N/A", attainment: 0 };
 
   return (
     <motion.div
@@ -131,6 +183,21 @@ const AttainmentDashboard = () => {
           <p className={`mt-2 ${isDark ? 'text-dark-text-secondary' : 'text-gray-600'}`}>
             Comprehensive CO-PO attainment analysis and insights
           </p>
+
+          {/* Course Selector */}
+          {courses.length > 0 && (
+            <select
+              value={selectedCourse || ""}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+              className="mt-4 px-4 py-2 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+            >
+              {courses.map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.code} - {course.name}
+                </option>
+              ))}
+            </select>
+          )}
         </motion.div>
 
         {/* Key Metrics */}

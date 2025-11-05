@@ -58,6 +58,8 @@ export const courseAPI = {
   getAnalytics: (id) => api.get(`/courses/${id}/analytics`),
   getDashboard: () => api.get('/courses/dashboard'),
   getEnrollments: () => api.get('/courses/enrollments'),
+  saveCourseOutcomes: (courseId, outcomes) => api.post(`/courses/${courseId}/outcomes`, { course_outcomes: outcomes }),
+  getCourseOutcomes: (courseId) => api.get(`/courses/${courseId}/outcomes`),
 };
 
 // Assessment APIs

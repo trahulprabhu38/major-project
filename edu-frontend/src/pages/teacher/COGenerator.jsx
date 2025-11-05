@@ -31,9 +31,12 @@ import {
   Description,
   TrendingUp,
   School,
+  Edit,
+  Save,
 } from "@mui/icons-material";
 import { useAuth } from "../../contexts/AuthContext";
 import { coGeneratorAPI } from "../../services/coGeneratorAPI";
+import { courseAPI } from "../../services/api";
 import axios from "axios";
 
 const MotionCard = motion(Card);
@@ -62,6 +65,8 @@ const COGenerator = () => {
   const [generatedCOs, setGeneratedCOs] = useState([]);
   const [stats, setStats] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [editingCoId, setEditingCoId] = useState(null);
+  const [editedCoText, setEditedCoText] = useState("");
 
   // Handle file selection
   const handleFileChange = (e) => {
@@ -193,9 +198,10 @@ const COGenerator = () => {
     }
 
     // Create course if needed
-    if (!courseId) {
-      const createdCourseId = await createOrGetCourse();
-      if (!createdCourseId) return;
+    let currentCourseId = courseId;
+    if (!currentCourseId) {
+      currentCourseId = await createOrGetCourse();
+      if (!currentCourseId) return;
     }
 
     try {
@@ -203,11 +209,45 @@ const COGenerator = () => {
       setGeneratedCOs([]);
 
       // Generate with course_id and course_code
-      const response = await coGeneratorAPI.generateCOs(courseId, courseCode, numCOs);
+      const response = await coGeneratorAPI.generateCOs(currentCourseId, courseCode, numCOs);
 
-      // Backend returns { contexts: [...], total_docs: N }
-      if (response.data.contexts && response.data.contexts.length > 0) {
-        // Convert contexts to CO format for display
+      // Backend returns { generated_cos: [...], contexts: [...], total_docs: N }
+      if (response.data.generated_cos && response.data.generated_cos.length > 0) {
+        // Use the accurately generated COs from full syllabus
+        const cos = response.data.generated_cos.map((co) => ({
+          co_number: co.co_number,
+          co_text: co.co_text,
+          bloom_level: co.bloom_level || "Apply",
+          verified: co.verified || false,
+          source: co.source,
+          model: co.model
+        }));
+
+        // Save COs to database
+        try {
+          await courseAPI.saveCourseOutcomes(currentCourseId, cos);
+
+          // Reload from database to get proper IDs
+          await loadExistingCOs();
+
+          fetchStats();
+          setSnackbar({
+            open: true,
+            message: `Successfully generated and saved ${cos.length} accurate Course Outcomes! ${response.data.used_full_syllabus ? '(Using full syllabus)' : ''}`,
+            severity: "success",
+          });
+        } catch (saveError) {
+          console.error("Failed to save COs:", saveError);
+          // Still display the COs even if save fails
+          setGeneratedCOs(cos.map((co, idx) => ({ ...co, id: `temp_${idx}` })));
+          setSnackbar({
+            open: true,
+            message: `Generated ${cos.length} COs but failed to save to database`,
+            severity: "warning",
+          });
+        }
+      } else if (response.data.contexts && response.data.contexts.length > 0) {
+        // Fallback to contexts if generated_cos not available
         const cos = response.data.contexts.map((ctx, idx) => ({
           id: `temp_${idx}`,
           co_number: idx + 1,
@@ -220,13 +260,13 @@ const COGenerator = () => {
         fetchStats();
         setSnackbar({
           open: true,
-          message: `Retrieved ${cos.length} contexts from ChromaDB! (Total docs: ${response.data.total_docs})`,
-          severity: "success",
+          message: `Retrieved ${cos.length} contexts from ChromaDB (fallback mode)`,
+          severity: "warning",
         });
       } else {
         setSnackbar({
           open: true,
-          message: "No contexts found. Please upload syllabus first.",
+          message: "No syllabus data found. Please upload syllabus first.",
           severity: "warning",
         });
       }
@@ -286,6 +326,44 @@ const COGenerator = () => {
     }
   };
 
+  // Handle CO editing
+  const handleEdit = (coId, coText) => {
+    setEditingCoId(coId);
+    setEditedCoText(coText);
+  };
+
+  // Handle CO save after editing
+  const handleSave = async (coId) => {
+    try {
+      // Update locally
+      setGeneratedCOs((prev) =>
+        prev.map((co) => (co.id === coId ? { ...co, co_text: editedCoText } : co))
+      );
+
+      setSnackbar({
+        open: true,
+        message: "CO updated successfully",
+        severity: "success",
+      });
+
+      setEditingCoId(null);
+      setEditedCoText("");
+    } catch (error) {
+      console.error("Save error:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to save CO",
+        severity: "error",
+      });
+    }
+  };
+
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setEditingCoId(null);
+    setEditedCoText("");
+  };
+
   // Load existing COs when course ID changes
   useEffect(() => {
     if (courseId) {
@@ -298,8 +376,15 @@ const COGenerator = () => {
     if (!courseId) return;
 
     try {
-      const response = await coGeneratorAPI.listCOsByCourse(courseId, false);
-      setGeneratedCOs(response.data.cos || []);
+      const response = await courseAPI.getCourseOutcomes(courseId);
+      const cos = (response.data.data || []).map(co => ({
+        id: co.id,
+        co_number: co.co_number,
+        co_text: co.description,
+        bloom_level: co.bloom_level,
+        verified: false
+      }));
+      setGeneratedCOs(cos);
     } catch (error) {
       console.error("Failed to load COs:", error);
     }
@@ -518,10 +603,10 @@ const COGenerator = () => {
               type="number"
               label="Number of COs"
               value={numCOs}
-              onChange={(e) => setNumCOs(Math.max(1, Math.min(10, parseInt(e.target.value) || 5)))}
-              inputProps={{ min: 1, max: 10 }}
+              onChange={(e) => setNumCOs(Math.max(1, parseInt(e.target.value) || 5))}
+              inputProps={{ min: 1 }}
               sx={{ width: 150 }}
-              helperText="1-10 COs"
+              helperText="Enter any number"
             />
 
             <Button
@@ -684,9 +769,21 @@ const COGenerator = () => {
                       </Box>
                     </Box>
 
-                    <Typography variant="body1" sx={{ my: 2, lineHeight: 1.7, fontWeight: 500 }}>
-                      {co.co_text}
-                    </Typography>
+                    {editingCoId === co.id ? (
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={3}
+                        value={editedCoText}
+                        onChange={(e) => setEditedCoText(e.target.value)}
+                        variant="outlined"
+                        sx={{ my: 2 }}
+                      />
+                    ) : (
+                      <Typography variant="body1" sx={{ my: 2, lineHeight: 1.7, fontWeight: 500 }}>
+                        {co.co_text}
+                      </Typography>
+                    )}
 
                     <Divider sx={{ my: 1.5 }} />
 
@@ -704,39 +801,91 @@ const COGenerator = () => {
                         </Typography>
                       </Box>
 
-                      <Box>
-                        {!co.verified ? (
-                          <Tooltip title="Verify CO">
-                            <IconButton
-                              size="small"
-                              color="success"
-                              onClick={() => handleVerify(co.id, true)}
-                              sx={{
-                                "&:hover": {
-                                  transform: "scale(1.1)",
-                                  transition: "transform 0.2s",
-                                },
-                              }}
-                            >
-                              <CheckCircle />
-                            </IconButton>
-                          </Tooltip>
+                      <Box sx={{ display: "flex", gap: 1 }}>
+                        {editingCoId === co.id ? (
+                          <>
+                            <Tooltip title="Save Changes">
+                              <IconButton
+                                size="small"
+                                color="primary"
+                                onClick={() => handleSave(co.id)}
+                                sx={{
+                                  "&:hover": {
+                                    transform: "scale(1.1)",
+                                    transition: "transform 0.2s",
+                                  },
+                                }}
+                              >
+                                <Save />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Cancel">
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={handleCancelEdit}
+                                sx={{
+                                  "&:hover": {
+                                    transform: "scale(1.1)",
+                                    transition: "transform 0.2s",
+                                  },
+                                }}
+                              >
+                                <Cancel />
+                              </IconButton>
+                            </Tooltip>
+                          </>
                         ) : (
-                          <Tooltip title="Unverify CO">
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => handleVerify(co.id, false)}
-                              sx={{
-                                "&:hover": {
-                                  transform: "scale(1.1)",
-                                  transition: "transform 0.2s",
-                                },
-                              }}
-                            >
-                              <Cancel />
-                            </IconButton>
-                          </Tooltip>
+                          <>
+                            <Tooltip title="Edit CO">
+                              <IconButton
+                                size="small"
+                                color="info"
+                                onClick={() => handleEdit(co.id, co.co_text)}
+                                sx={{
+                                  "&:hover": {
+                                    transform: "scale(1.1)",
+                                    transition: "transform 0.2s",
+                                  },
+                                }}
+                              >
+                                <Edit />
+                              </IconButton>
+                            </Tooltip>
+                            {!co.verified ? (
+                              <Tooltip title="Verify CO">
+                                <IconButton
+                                  size="small"
+                                  color="success"
+                                  onClick={() => handleVerify(co.id, true)}
+                                  sx={{
+                                    "&:hover": {
+                                      transform: "scale(1.1)",
+                                      transition: "transform 0.2s",
+                                    },
+                                  }}
+                                >
+                                  <CheckCircle />
+                                </IconButton>
+                              </Tooltip>
+                            ) : (
+                              <Tooltip title="Unverify CO">
+                                <IconButton
+                                  size="small"
+                                  color="error"
+                                  onClick={() => handleVerify(co.id, false)}
+                                  sx={{
+                                    "&:hover": {
+                                      transform: "scale(1.1)",
+                                      transition: "transform 0.2s",
+                                    },
+                                  }}
+                                >
+                                  <Cancel />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                          </>
                         )}
                       </Box>
                     </Box>

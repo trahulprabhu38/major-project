@@ -677,3 +677,93 @@ export const getTeacherCourses = async (req, res) => {
     });
   }
 };
+
+/**
+ * Save course outcomes for a course
+ * Replaces existing COs or creates new ones
+ */
+export const saveCourseOutcomes = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const { course_outcomes } = req.body;
+    const teacherId = req.user.id;
+
+    if (!course_outcomes || !Array.isArray(course_outcomes)) {
+      return res.status(400).json({
+        success: false,
+        message: 'course_outcomes array is required'
+      });
+    }
+
+    // Verify course belongs to teacher
+    const courseCheck = await query(
+      'SELECT id FROM courses WHERE id = $1 AND teacher_id = $2',
+      [courseId, teacherId]
+    );
+
+    if (courseCheck.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Course not found or access denied'
+      });
+    }
+
+    // Delete existing COs for this course
+    await query('DELETE FROM course_outcomes WHERE course_id = $1', [courseId]);
+
+    // Insert new COs
+    const insertPromises = course_outcomes.map((co, index) => {
+      return query(
+        `INSERT INTO course_outcomes (course_id, co_number, description, bloom_level)
+         VALUES ($1, $2, $3, $4)
+         RETURNING *`,
+        [courseId, co.co_number || (index + 1), co.co_text || co.description, co.bloom_level || 'Apply']
+      );
+    });
+
+    const results = await Promise.all(insertPromises);
+    const savedCOs = results.map(r => r.rows[0]);
+
+    res.json({
+      success: true,
+      message: `Saved ${savedCOs.length} course outcomes`,
+      data: savedCOs
+    });
+  } catch (error) {
+    console.error('Save course outcomes error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to save course outcomes',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Get course outcomes for a course
+ */
+export const getCourseOutcomes = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+
+    const result = await query(
+      `SELECT * FROM course_outcomes
+       WHERE course_id = $1
+       ORDER BY co_number`,
+      [courseId]
+    );
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows
+    });
+  } catch (error) {
+    console.error('Get course outcomes error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get course outcomes',
+      error: error.message
+    });
+  }
+};
