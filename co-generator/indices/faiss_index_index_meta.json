@@ -1,7 +1,0 @@
-{
-  "model_name": "sentence-transformers/all-MiniLM-L6-v2",
-  "embedding_dim": 384,
-  "total_vectors": 0,
-  "total_documents": 0,
-  "similarity_threshold": 0.3
-}

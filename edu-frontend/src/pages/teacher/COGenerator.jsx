@@ -132,11 +132,20 @@ const COGenerator = () => {
       return;
     }
 
-    // Ensure course exists
-    let activeCourseId = courseId;
-    if (!activeCourseId) {
-      activeCourseId = await createOrGetCourse();
-      if (!activeCourseId) return;
+    // Ensure course code and name are provided
+    if (!courseCode || !courseName) {
+      setSnackbar({
+        open: true,
+        message: "Please enter both course code and course name",
+        severity: "warning",
+      });
+      return;
+    }
+
+    // Create course if needed
+    if (!courseId) {
+      const createdCourseId = await createOrGetCourse();
+      if (!createdCourseId) return;
     }
 
     try {
@@ -147,21 +156,23 @@ const COGenerator = () => {
         setUploadProgress((prev) => (prev >= 90 ? prev : prev + 10));
       }, 300);
 
-      await coGeneratorAPI.uploadSyllabus(file, activeCourseId, user.id);
+      // Upload with course_id, course_code, and teacher_id
+      await coGeneratorAPI.uploadSyllabus(file, courseId, courseCode, user.id);
 
       clearInterval(progressInterval);
       setUploadProgress(100);
 
       setSnackbar({
         open: true,
-        message: "Syllabus uploaded successfully! Ready to generate COs.",
+        message: "Syllabus uploaded successfully! Ingestion started in background.",
         severity: "success",
       });
     } catch (error) {
       console.error("Upload error:", error);
+      const errorMsg = error.response?.data?.detail || error.message || "Upload failed";
       setSnackbar({
         open: true,
-        message: error.response?.data?.detail || "Upload failed",
+        message: typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg),
         severity: "error",
       });
     } finally {
@@ -171,33 +182,60 @@ const COGenerator = () => {
 
   // Handle CO generation
   const handleGenerate = async () => {
-    // Ensure course exists
-    let activeCourseId = courseId;
-    if (!activeCourseId) {
-      activeCourseId = await createOrGetCourse();
-      if (!activeCourseId) return;
+    // Ensure course code and name are provided
+    if (!courseCode || !courseName) {
+      setSnackbar({
+        open: true,
+        message: "Please enter both course code and course name",
+        severity: "warning",
+      });
+      return;
+    }
+
+    // Create course if needed
+    if (!courseId) {
+      const createdCourseId = await createOrGetCourse();
+      if (!createdCourseId) return;
     }
 
     try {
       setGenerating(true);
       setGeneratedCOs([]);
 
-      const response = await coGeneratorAPI.generateCOs(activeCourseId, user.id, numCOs);
+      // Generate with course_id and course_code
+      const response = await coGeneratorAPI.generateCOs(courseId, courseCode, numCOs);
 
-      if (response.data.success) {
-        setGeneratedCOs(response.data.cos);
+      // Backend returns { contexts: [...], total_docs: N }
+      if (response.data.contexts && response.data.contexts.length > 0) {
+        // Convert contexts to CO format for display
+        const cos = response.data.contexts.map((ctx, idx) => ({
+          id: `temp_${idx}`,
+          co_number: idx + 1,
+          co_text: ctx.document || ctx.text || "Generated CO",
+          bloom_level: ctx.metadata?.bloom_level || "Apply",
+          confidence: 1 - (ctx.distance || 0),
+          verified: false
+        }));
+        setGeneratedCOs(cos);
         fetchStats();
         setSnackbar({
           open: true,
-          message: `Successfully generated ${response.data.cos.length} Course Outcomes!`,
+          message: `Retrieved ${cos.length} contexts from ChromaDB! (Total docs: ${response.data.total_docs})`,
           severity: "success",
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: "No contexts found. Please upload syllabus first.",
+          severity: "warning",
         });
       }
     } catch (error) {
       console.error("Generation error:", error);
+      const errorMsg = error.response?.data?.detail || error.message || "CO generation failed";
       setSnackbar({
         open: true,
-        message: error.response?.data?.detail || "CO generation failed",
+        message: typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg),
         severity: "error",
       });
     } finally {
@@ -207,11 +245,16 @@ const COGenerator = () => {
 
   // Fetch CO statistics
   const fetchStats = async () => {
-    if (!courseId) return;
+    if (!courseId || !courseCode) return;
 
     try {
-      const response = await coGeneratorAPI.getCOStats(courseId);
-      setStats(response.data);
+      const response = await coGeneratorAPI.getCOStats(courseId, courseCode);
+      // Backend returns { course_id, course_code, chroma_doc_count }
+      setStats({
+        total_cos: response.data.chroma_doc_count || 0,
+        verified_cos: 0,
+        bloom_distribution: {}
+      });
     } catch (error) {
       console.error("Failed to fetch stats:", error);
     }

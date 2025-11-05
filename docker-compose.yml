@@ -9,7 +9,7 @@ services:
     ports:
       - "27018:27017"
     volumes:
-      - mongodb-data:/data/db
+      - ./data/mongodb-data:/data/db
     environment:
       MONGO_INITDB_DATABASE: edu_analytics
     networks:
@@ -33,7 +33,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pg-data:/var/lib/postgresql/data
+      - ./data/pg-data:/var/lib/postgresql/data
       - ./backend/migrations/001_initial_schema.sql:/docker-entrypoint-initdb.d/001_initial_schema.sql:ro
     networks:
       - edu-network
@@ -42,6 +42,30 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+
+  # --- ChromaDB Vector Database ---
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:0.4.24
+    container_name: chromadb
+    hostname: chromadb
+    ports:
+      - "8000:8000"  # Internal port 8000, mapped to external 8000
+    environment:
+      - CHROMA_SERVER_AUTH=False
+      - IS_PERSISTENT=True
+      - ALLOW_RESET=True
+      - ANONYMIZED_TELEMETRY=False
+    volumes:
+      - ./data/chroma-data:/chroma/chroma
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/heartbeat').read()\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+    networks:
+      - edu-network
     restart: unless-stopped
 
   # --- Node.js Backend ---
@@ -123,61 +147,65 @@ services:
       retries: 3
       start_period: 40s
 
-  # --- ChromaDB Vector Database ---
-  chromadb:
-    image: ghcr.io/chroma-core/chroma:0.4.24
-    container_name: chromadb
-    hostname: chromadb
-    ports:
-      - "8002:8000"
-    environment:
-      - CHROMA_SERVER_AUTH=False
-      - IS_PERSISTENT=True
-      - ALLOW_RESET=True
-      - ANONYMIZED_TELEMETRY=False
-    volumes:
-      - ./chroma-data:/data
-    healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/heartbeat').read()\" || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 8
-      start_period: 30s
-    networks:
-      - edu-network
-    restart: unless-stopped
 
-  # --- CO Generator Service (Course Outcomes AI) ---
+  # --- CO Generator Service (Course Outcomes AI with Groq) ---
   co-generator:
     build:
-      context: ./co-generator
+      context: ./co-gen
       dockerfile: Dockerfile
     container_name: co_generator
     hostname: co-generator
     ports:
       - "8085:8085"
     environment:
-      POSTGRES_URL: postgresql://admin:password@postgres:5432/edu
+      # Service config
+      PORT: 8085
+      LOG_LEVEL: INFO
+      ALLOW_RESET: true  # Set to false in production
+
+      # PostgreSQL (for course data and CO storage)
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: edu
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+
+      # ChromaDB (for vector storage and RAG)
       CHROMA_HOST: chromadb
       CHROMA_PORT: 8000
       CHROMA_COLLECTION: syllabus_contexts
-      MODEL_PATH: google/flan-t5-base
+
+      # Groq API (LLM)
+      GROQ_API_KEY: 
+      GROQ_MODEL: llama-3.1-8b-instant
+
+      # Embedding model
+      EMBEDDING_MODEL: sentence-transformers/all-MiniLM-L6-v2
+
+      # Generation defaults
+      DEFAULT_RETRIEVAL_K: 6
+      DEFAULT_SEED: 42
+      DEFAULT_TEMPERATURE: 0.3
+
+      # Chunking
+      CHUNK_SIZE: 400
+      CHUNK_OVERLAP: 80
     depends_on:
       postgres:
         condition: service_healthy
       chromadb:
         condition: service_healthy
     volumes:
-      - ./co-generator/indices:/app/indices
+      - ./co-gen/uploads:/app/uploads
     networks:
       - edu-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8085/health')"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8085/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 90s
+      start_period: 60s
 
 # --- Persistent Volumes ---
 volumes:
