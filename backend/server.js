@@ -81,25 +81,30 @@ const startServer = async () => {
 
     // Test PostgreSQL connection
     logger.info('📊 Connecting to PostgreSQL...');
-    const pgConnected = await testPostgres();
-
-    if (!pgConnected) {
-      logger.error('❌ Failed to connect to PostgreSQL');
-      process.exit(1);
+    try {
+      const pgConnected = await testPostgres();
+      if (pgConnected) {
+        logger.info('✅ PostgreSQL connected');
+      } else {
+        logger.warn('⚠️ PostgreSQL connection failed - server will start anyway');
+        logger.warn('   Some features may not work without database connection');
+        logger.warn('   To fix: docker-compose up -d postgres mongodb');
+      }
+    } catch (err) {
+      logger.warn('⚠️ PostgreSQL connection error:', err.message);
+      logger.warn('   Server will start anyway, but database features will be unavailable');
     }
-
-    logger.info('✅ PostgreSQL connected');
 
     // Connect to MongoDB
     logger.info('📊 Connecting to MongoDB...');
-    const mongoConnected = await connectMongoDB();
-
-    if (!mongoConnected) {
-      logger.error('❌ Failed to connect to MongoDB');
-      process.exit(1);
+    try {
+      await connectMongoDB();
+      logger.info('✅ MongoDB connected');
+    } catch (err) {
+      logger.warn('⚠️ MongoDB connection failed:', err.message);
+      logger.warn('   Server will start anyway, but some features may not work');
+      logger.warn('   To fix: docker-compose up -d mongodb');
     }
-
-    logger.info('✅ MongoDB connected');
 
     // Start Express server
     app.listen(PORT, () => {

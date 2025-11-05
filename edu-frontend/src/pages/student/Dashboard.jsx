@@ -24,8 +24,8 @@ import { PageLoader } from '../../components/shared/Loading';
 import { ErrorState, EmptyState } from '../../components/shared/ErrorState';
 import StatsCard from '../../components/shared/StatsCard';
 
-const MotionCard = motion(Card);
-const MotionBox = motion(Box);
+const MotionCard = motion.create(Card);
+const MotionBox = motion.create(Box);
 
 const StudentDashboard = () => {
   const { user } = useAuth();

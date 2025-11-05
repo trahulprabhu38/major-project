@@ -17,6 +17,7 @@ import {
   getCourseOutcomes,
 } from '../controllers/courseController.js';
 
+
 const router = express.Router();
 
 // Teacher dashboard route - must come before /:id routes

@@ -62,23 +62,33 @@ export const register = async (req, res) => {
 
     // === If teacher, also create a MongoDB profile ===
     if (role === 'teacher') {
-      const existingTeacher = await findOne('teachers', { email: normalizedEmail });
-      if (!existingTeacher) {
-        await insertOne('teachers', {
-          email: normalizedEmail,
-          name,
-          department: department || null,
-          postgres_user_id: user.id, // Store PostgreSQL UUID for cross-DB linking
-          created_at: new Date(),
-        });
-      } else {
-        // Update existing teacher with postgres_user_id if not set
+      try {
         const { getDB } = await import('../config/mongodb.js');
         const db = getDB();
-        await db.collection('teachers').updateOne(
-          { email: normalizedEmail },
-          { $set: { postgres_user_id: user.id, name, department: department || null } }
-        );
+
+        if (db) {
+          const existingTeacher = await findOne('teachers', { email: normalizedEmail });
+          if (!existingTeacher) {
+            await insertOne('teachers', {
+              email: normalizedEmail,
+              name,
+              department: department || null,
+              postgres_user_id: user.id, // Store PostgreSQL UUID for cross-DB linking
+              created_at: new Date(),
+            });
+          } else {
+            // Update existing teacher with postgres_user_id if not set
+            await db.collection('teachers').updateOne(
+              { email: normalizedEmail },
+              { $set: { postgres_user_id: user.id, name, department: department || null } }
+            );
+          }
+        } else {
+          console.warn('⚠️ MongoDB not available - teacher profile not created in analytics DB');
+        }
+      } catch (mongoErr) {
+        console.warn('⚠️ Failed to create MongoDB teacher profile:', mongoErr.message);
+        // Continue - user is still registered in PostgreSQL
       }
     }
 
@@ -95,6 +105,27 @@ export const register = async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Register error:', error);
+
+    // Check for database connection errors
+    if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+      return res.status(503).json({
+        success: false,
+        message: 'Database service unavailable. Please ensure PostgreSQL and MongoDB are running.',
+        error: 'Database connection failed',
+        hint: 'Run: docker-compose up -d postgres mongodb',
+      });
+    }
+
+    // Check for missing table errors
+    if (error.code === '42P01') {
+      return res.status(500).json({
+        success: false,
+        message: 'Database schema not initialized. Please run migrations.',
+        error: 'Database table does not exist',
+        hint: 'Run: docker exec postgres psql -U admin -d edu -f /docker-entrypoint-initdb.d/001_initial_schema.sql',
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: 'Registration failed',
@@ -147,6 +178,27 @@ export const login = async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Login error:', error);
+
+    // Check for database connection errors
+    if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+      return res.status(503).json({
+        success: false,
+        message: 'Database service unavailable. Please ensure PostgreSQL and MongoDB are running.',
+        error: 'Database connection failed',
+        hint: 'Run: docker-compose up -d postgres mongodb',
+      });
+    }
+
+    // Check for missing table errors
+    if (error.code === '42P01') {
+      return res.status(500).json({
+        success: false,
+        message: 'Database schema not initialized. Please run migrations.',
+        error: 'Database table does not exist',
+        hint: 'Run: docker exec postgres psql -U admin -d edu -f /docker-entrypoint-initdb.d/001_initial_schema.sql',
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: 'Login failed',

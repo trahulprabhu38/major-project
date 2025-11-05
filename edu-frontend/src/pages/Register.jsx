@@ -19,7 +19,7 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
-const MotionPaper = motion(Paper);
+const MotionPaper = motion.create(Paper);
 
 export default function Register() {
   const navigate = useNavigate();

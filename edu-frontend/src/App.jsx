@@ -150,7 +150,7 @@ const AppContent = () => {
                 <Route element={<StudentLayout />}>
                   <Route path="dashboard" element={<StudentDashboard />} />
                   <Route path="enroll" element={<StudentEnroll />} />
-                  <Route path="courses/:courseId/analytics" element={<StudentCourseAnalytics />} />
+                  <Route path="courses" element={<StudentCourseAnalytics />} />
                   <Route path="analysis" element={<Analysis />} />
                   <Route path="settings" element={<Settings />} />
                   <Route index element={<Navigate to="dashboard" replace />} />

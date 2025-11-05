@@ -16,7 +16,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import FilterListIcon from "@mui/icons-material/FilterList";
 
-const MotionCard = motion(Card);
+const MotionCard = motion.create(Card);
 
 const DatasetTable = ({ data, columns }) => {
   const [searchText, setSearchText] = useState("");

@@ -15,8 +15,8 @@ import { Visibility, VisibilityOff, School } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 
-const MotionPaper = motion(Paper);
-const MotionBox = motion(Box);
+const MotionPaper = motion.create(Paper);
+const MotionBox = motion.create(Box);
 
 export default function Login() {
   const navigate = useNavigate();

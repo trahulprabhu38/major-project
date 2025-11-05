@@ -34,7 +34,7 @@ import {
 const overviewStats = [
   {
     title: "Total Students",
-    value: "1,234",
+    value: "234",
     change: "+12%",
     icon: Users,
     gradient: "from-blue-500 to-blue-600",

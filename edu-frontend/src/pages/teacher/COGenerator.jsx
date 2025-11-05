@@ -39,8 +39,8 @@ import { coGeneratorAPI } from "../../services/coGeneratorAPI";
 import { courseAPI } from "../../services/api";
 import axios from "axios";
 
-const MotionCard = motion(Card);
-const MotionBox = motion(Box);
+const MotionCard = motion.create(Card);
+const MotionBox = motion.create(Box);
 
 // Bloom's Taxonomy color mapping
 const bloomColors = {
@@ -599,11 +599,27 @@ const COGenerator = () => {
           </Typography>
 
           <Stack direction="row" spacing={2} sx={{ mt: 2 }} alignItems="center" flexWrap="wrap">
-            <TextField
+            {/* <TextField
               type="number"
               label="Number of COs"
               value={numCOs}
               onChange={(e) => setNumCOs(Math.max(1, parseInt(e.target.value) || 5))}
+              inputProps={{ min: 1 }}
+              sx={{ width: 150 }}
+              helperText="Enter any number"
+            /> */}
+            <TextField
+              type="number"
+              label="Number of COs"
+              value={numCOs}
+              onChange={(e) => {
+                const val = e.target.value;
+                setNumCOs(val === '' ? '' : Number(val));
+              }}
+              onBlur={() => {
+                // On blur, enforce min = 1 if empty or invalid
+                if (!numCOs || numCOs < 1) setNumCOs(1);
+              }}
               inputProps={{ min: 1 }}
               sx={{ width: 150 }}
               helperText="Enter any number"

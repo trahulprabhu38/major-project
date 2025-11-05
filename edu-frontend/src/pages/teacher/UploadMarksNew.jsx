@@ -22,7 +22,7 @@ import DatasetTable from "../../components/upload/DatasetTable";
 
 const UPLOAD_SERVICE_URL = import.meta.env.VITE_UPLOAD_SERVICE_URL || "http://localhost:8001";
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);
 
 const UploadMarksNew = () => {
   const [file, setFile] = useState(null);

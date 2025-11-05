@@ -6,7 +6,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);
 
 const UploadZone = ({ onFileSelect, selectedFile, uploading }) => {
   const onDrop = useCallback(

@@ -31,7 +31,8 @@ export const connectMongoDB = async () => {
     return db;
   } catch (error) {
     console.error('❌ MongoDB connection error:', error.message);
-    throw new Error('MongoDB connection failed');
+    // Don't throw - let server start without MongoDB
+    return null;
   }
 };
 
@@ -83,7 +84,10 @@ const createCollections = async () => {
 
 // === Utility Wrappers ===
 export const getDB = () => {
-  if (!db) throw new Error('MongoDB not connected. Call connectMongoDB() first.');
+  if (!db) {
+    console.warn('⚠️ MongoDB not connected - some features may not work');
+    return null;
+  }
   return db;
 };
 

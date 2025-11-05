@@ -19,8 +19,8 @@ import DownloadIcon from "@mui/icons-material/Download";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
-const MotionCard = motion(Card);
-const MotionBox = motion(Box);
+const MotionCard = motion.create(Card);
+const MotionBox = motion.create(Box);
 
 const StatCard = ({ icon: Icon, label, value, color }) => (
   <MotionBox

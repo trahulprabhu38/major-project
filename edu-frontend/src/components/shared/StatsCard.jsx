@@ -14,7 +14,7 @@ const StatsCard = ({
   trend,
   onClick,
 }) => {
-  const MotionCard = motion(Card);
+  const MotionCard = motion.create(Card);
 
   return (
     <MotionCard

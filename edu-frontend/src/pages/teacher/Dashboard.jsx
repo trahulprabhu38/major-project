@@ -24,8 +24,8 @@ import { courseAPI } from '../../services/api';
 import { PageLoader } from '../../components/shared/Loading';
 import { ErrorState } from '../../components/shared/ErrorState';
 
-const MotionCard = motion(Card);
-const MotionBox = motion(Box);
+const MotionCard = motion.create(Card);
+const MotionBox = motion.create(Box);
 
 const TeacherDashboard = () => {
   const { user } = useAuth();

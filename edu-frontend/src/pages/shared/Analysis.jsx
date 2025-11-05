@@ -1,5 +1,5 @@
 import { Box, Container, Grid, Paper, Typography, Card, CardContent } from '@mui/material';
-import { BarChart2, PieChart, TrendingUp, Award } from '@mui/icons-material';
+import { BarChart as BarChartIcon, PieChart as PieChartIcon, TrendingUp, EmojiEvents } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import {
   BarChart,
@@ -18,8 +18,8 @@ import {
 } from 'recharts';
 import PageLayout from '../../components/shared/PageLayout';
 
-const MotionPaper = motion(Paper);
-const MotionCard = motion(Card);
+const MotionPaper = motion.create(Paper);
+const MotionCard = motion.create(Card);
 
 // Sample data for CO Attainment
 const coAttainmentData = [
@@ -63,7 +63,7 @@ const Analysis = () => {
     <PageLayout
       title="Analysis Dashboard"
       subtitle="A comprehensive overview of CO and PO performance metrics (Static Preview)"
-      icon={BarChart2}
+      icon={BarChartIcon}
     >
       <Container maxWidth="xl" sx={{ py: 2 }}>
         {/* Summary Cards */}
@@ -88,7 +88,7 @@ const Analysis = () => {
                       Total COs
                     </Typography>
                   </Box>
-                  <Award sx={{ fontSize: 48, opacity: 0.8 }} />
+                  <EmojiEvents sx={{ fontSize: 48, opacity: 0.8 }} />
                 </Box>
               </CardContent>
             </MotionCard>
@@ -140,7 +140,7 @@ const Analysis = () => {
                       Total POs
                     </Typography>
                   </Box>
-                  <BarChart2 sx={{ fontSize: 48, opacity: 0.8 }} />
+                  <BarChartIcon sx={{ fontSize: 48, opacity: 0.8 }} />
                 </Box>
               </CardContent>
             </MotionCard>
@@ -166,7 +166,7 @@ const Analysis = () => {
                       Avg PO Attainment
                     </Typography>
                   </Box>
-                  <PieChart sx={{ fontSize: 48, opacity: 0.8 }} />
+                  <PieChartIcon sx={{ fontSize: 48, opacity: 0.8 }} />
                 </Box>
               </CardContent>
             </MotionCard>

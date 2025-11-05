@@ -1,6 +1,5 @@
 import { query } from '../config/db.js';
 
-
 import { find,findMany } from '../config/mongodb.js'; 
 
 // recentActivity = await find(
@@ -12,11 +11,68 @@ import { find,findMany } from '../config/mongodb.js';
 /**
  * Create a new course (Teacher only)
  */
+
+
+// export const createCourse = async (req, res) => {
+//   try {
+//     const teacherId = req.user.id;
+//     const { code, name, description, semester, year, credits } = req.body;
+
+//     if (!code || !name || !semester || !year) {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Code, name, semester, and year are required'
+//       });
+//     }
+
+//     // Check if course code already exists
+//     const existing = await query('SELECT id FROM courses WHERE code = $1', [code]);
+//     if (existing.rows.length > 0) {
+//       return res.status(409).json({
+//         success: false,
+//         message: 'Course code already exists'
+//       });
+//     }
+
+//     const result = await query(
+//       `INSERT INTO courses (code, name, description, semester, year, credits, teacher_id)
+//        VALUES ($1, $2, $3, $4, $5, $6, $7)
+//        RETURNING *`,
+//       [code, name, description, semester, year, credits || 3, teacherId]
+//     );
+
+//     res.status(201).json({
+//       success: true,
+//       message: 'Course created successfully',
+//       data: result.rows[0]
+//     });
+//   } catch (error) {
+//     console.error('Create course error:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Failed to create course',
+//       error: error.message
+//     });
+//   }
+// };
+
 export const createCourse = async (req, res) => {
   try {
-    const teacherId = req.user.id;
-    const { code, name, description, semester, year, credits } = req.body;
+    const teacherId = req.user?.id;
+    const userRole = req.user?.role;
 
+    // Only teachers may create courses
+    if (userRole !== 'teacher') {
+      return res.status(403).json({ success: false, message: 'Only teachers can create courses' });
+    }
+
+    // ensure teacher exists in users table
+    const teacherCheck = await query('SELECT id FROM users WHERE id = $1 AND role = $2', [teacherId, 'teacher']);
+    if (teacherCheck.rows.length === 0) {
+      return res.status(403).json({ success: false, message: 'Invalid or missing teacher account' });
+    }
+
+    const { code, name, description, semester, year, credits } = req.body;
     if (!code || !name || !semester || !year) {
       return res.status(400).json({
         success: false,
@@ -37,7 +93,7 @@ export const createCourse = async (req, res) => {
       `INSERT INTO courses (code, name, description, semester, year, credits, teacher_id)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
-      [code, name, description, semester, year, credits || 3, teacherId]
+      [code, name, description || null, semester, year, credits || 3, teacherId]
     );
 
     res.status(201).json({
@@ -54,7 +110,6 @@ export const createCourse = async (req, res) => {
     });
   }
 };
-
 /**
  * Get all courses (with optional filters)
  */

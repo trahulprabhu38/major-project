@@ -14,7 +14,8 @@ const pool = new Pool({
   password: process.env.POSTGRES_PASSWORD || 'password',
   max: 20, // Maximum number of clients in the pool
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 5000,
+  ssl: false,
 });
 
 // Test connection
@@ -23,8 +24,8 @@ pool.on('connect', () => {
 });
 
 pool.on('error', (err) => {
-  console.error('❌ Unexpected error on idle PostgreSQL client', err);
-  process.exit(-1);
+  console.error('❌ Unexpected error on idle PostgreSQL client', err.message);
+  // Don't exit process on connection errors - let app handle gracefully
 });
 
 // Query helper function
