@@ -10,26 +10,42 @@ const runMigrations = async () => {
   try {
     console.log('🔄 Starting database migrations...\n');
 
-    // Read and execute the initial schema
-    const schemaPath = path.join(__dirname, '001_initial_schema.sql');
-    const schemaSql = fs.readFileSync(schemaPath, 'utf-8');
+    // Get all SQL files in migrations directory
+    const files = fs.readdirSync(__dirname)
+      .filter(file => file.endsWith('.sql'))
+      .sort(); // This will run them in order: 001, 002, etc.
 
-    // Split by semicolon and execute each statement
-    const statements = schemaSql
-      .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'));
+    console.log(`Found ${files.length} migration file(s):\n`);
+    files.forEach(file => console.log(`   - ${file}`));
+    console.log();
 
-    for (const statement of statements) {
-      try {
-        await query(statement);
-      } catch (error) {
-        console.error('Error executing statement:', error.message);
-        // Continue with other statements
+    // Execute each migration file
+    for (const file of files) {
+      console.log(`\n📄 Running migration: ${file}`);
+      const filePath = path.join(__dirname, file);
+      const sql = fs.readFileSync(filePath, 'utf-8');
+
+      // Split by semicolon and execute each statement
+      const statements = sql
+        .split(';')
+        .map(s => s.trim())
+        .filter(s => s.length > 0 && !s.startsWith('--') && !s.startsWith('\\echo'));
+
+      for (const statement of statements) {
+        try {
+          await query(statement);
+        } catch (error) {
+          // Only show error if it's not an "already exists" error
+          if (!error.message.includes('already exists')) {
+            console.error('   ⚠️  Error:', error.message);
+          }
+          // Continue with other statements
+        }
       }
+      console.log(`   ✅ ${file} completed`);
     }
 
-    console.log('\n✅ Database migrations completed successfully!\n');
+    console.log('\n✅ All database migrations completed successfully!\n');
 
     // Verify tables were created
     const result = await query(`

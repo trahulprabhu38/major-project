@@ -107,4 +107,14 @@ export const studentAPI = {
   getAnalytics: (courseId) => api.get(`/students/courses/${courseId}/analytics`),
 };
 
+// Marksheet APIs
+export const marksheetAPI = {
+  create: (data) => api.post('/marksheets', data),
+  getByCourse: (courseId) => api.get(`/marksheets/course/${courseId}`),
+  getById: (id) => api.get(`/marksheets/${id}`),
+  getData: (id, params) => api.get(`/marksheets/${id}/data`, { params }),
+  delete: (id) => api.delete(`/marksheets/${id}`),
+  update: (id, data) => api.put(`/marksheets/${id}`, data),
+};
+
 export default api;

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Box,
   Container,
@@ -9,18 +9,28 @@ import {
   Alert,
   alpha,
   LinearProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Card,
+  CardContent,
+  TextField,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import SchoolIcon from "@mui/icons-material/School";
 
 // Import our new components
 import UploadZone from "../../components/upload/UploadZone";
 import UploadSummary from "../../components/upload/UploadSummary";
 import DatasetTable from "../../components/upload/DatasetTable";
+import { courseAPI } from "../../services/api";
 
 const UPLOAD_SERVICE_URL = import.meta.env.VITE_UPLOAD_SERVICE_URL || "http://localhost:8001";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 const MotionBox = motion.create(Box);
 
@@ -32,6 +42,34 @@ const UploadMarksNew = () => {
   const [error, setError] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const tableRef = useRef(null);
+
+  // Course selection states
+  const [courses, setCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [loadingCourses, setLoadingCourses] = useState(true);
+  const [assessmentName, setAssessmentName] = useState("");
+
+  // Load courses on component mount
+  useEffect(() => {
+    loadCourses();
+  }, []);
+
+  const loadCourses = async () => {
+    try {
+      setLoadingCourses(true);
+      const response = await courseAPI.getAll();
+      setCourses(response.data.data || []);
+    } catch (err) {
+      console.error("Error loading courses:", err);
+      setSnackbar({
+        open: true,
+        message: "Failed to load courses",
+        severity: "error",
+      });
+    } finally {
+      setLoadingCourses(false);
+    }
+  };
 
   const handleFileSelect = (selectedFile) => {
     setFile(selectedFile);
@@ -49,6 +87,24 @@ const UploadMarksNew = () => {
       return;
     }
 
+    if (!selectedCourse) {
+      setSnackbar({
+        open: true,
+        message: "Please select a course first",
+        severity: "error",
+      });
+      return;
+    }
+
+    if (!assessmentName.trim()) {
+      setSnackbar({
+        open: true,
+        message: "Please enter an assessment name",
+        severity: "error",
+      });
+      return;
+    }
+
     try {
       setUploading(true);
       setUploadProgress(0);
@@ -56,6 +112,8 @@ const UploadMarksNew = () => {
 
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("courseId", selectedCourse);
+      formData.append("assessmentName", assessmentName);
 
       // Simulate progress for better UX
       const progressInterval = setInterval(() => {
@@ -65,25 +123,46 @@ const UploadMarksNew = () => {
         });
       }, 200);
 
-      const response = await axios.post(`${UPLOAD_SERVICE_URL}/upload`, formData, {
+      // First upload to the upload service
+      const uploadResponse = await axios.post(`${UPLOAD_SERVICE_URL}/upload`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round(
-            (progressEvent.loaded * 90) / progressEvent.total
+            (progressEvent.loaded * 80) / progressEvent.total
           );
           setUploadProgress(percentCompleted);
         },
       });
 
+      // Then save the mark sheet metadata to our main API
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `${API_URL}/marksheets`,
+        {
+          courseId: selectedCourse,
+          assessmentName: assessmentName,
+          fileName: file.name,
+          tableName: uploadResponse.data.table_name,
+          columns: uploadResponse.data.columns,
+          rowCount: uploadResponse.data.row_count,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       clearInterval(progressInterval);
       setUploadProgress(100);
 
-      setResult(response.data);
+      setResult(uploadResponse.data);
       setSnackbar({
         open: true,
-        message: "File uploaded successfully! 🎉",
+        message: "Marks uploaded and saved successfully! 🎉",
         severity: "success",
       });
 
@@ -95,7 +174,7 @@ const UploadMarksNew = () => {
       }, 1000);
     } catch (err) {
       console.error("Upload error:", err);
-      const errorMessage = err.response?.data?.detail || err.message || "Upload failed";
+      const errorMessage = err.response?.data?.detail || err.response?.data?.message || err.message || "Upload failed";
       setError(errorMessage);
       setSnackbar({
         open: true,
@@ -113,6 +192,7 @@ const UploadMarksNew = () => {
     setResult(null);
     setError(null);
     setUploadProgress(0);
+    setAssessmentName("");
   };
 
   const handleViewTable = () => {
@@ -208,6 +288,98 @@ const UploadMarksNew = () => {
               </Typography>
             </Box>
           </Box>
+        </MotionBox>
+
+        {/* Course Selection Card */}
+        <MotionBox
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          sx={{ mb: 4 }}
+        >
+          <Card
+            sx={{
+              borderRadius: 3,
+              boxShadow: (theme) => `0 8px 24px ${alpha(theme.palette.primary.main, 0.15)}`,
+              border: '2px solid',
+              borderColor: selectedCourse ? 'primary.main' : 'divider',
+              transition: 'all 0.3s ease',
+            }}
+          >
+            <CardContent sx={{ p: 4 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                <SchoolIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+                <Typography variant="h5" fontWeight="bold">
+                  Select Course & Assessment Details
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <FormControl fullWidth required>
+                  <InputLabel id="course-select-label">Select Course</InputLabel>
+                  <Select
+                    labelId="course-select-label"
+                    id="course-select"
+                    value={selectedCourse}
+                    label="Select Course"
+                    onChange={(e) => setSelectedCourse(e.target.value)}
+                    disabled={loadingCourses || uploading}
+                    sx={{
+                      borderRadius: 2,
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderWidth: 2,
+                      },
+                    }}
+                  >
+                    {courses.length === 0 ? (
+                      <MenuItem disabled>No courses available</MenuItem>
+                    ) : (
+                      courses.map((course) => (
+                        <MenuItem key={course.id} value={course.id}>
+                          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                            <Typography variant="body1" fontWeight={600}>
+                              {course.code} - {course.name}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              Semester {course.semester} | {course.year}
+                            </Typography>
+                          </Box>
+                        </MenuItem>
+                      ))
+                    )}
+                  </Select>
+                </FormControl>
+
+                <TextField
+                  fullWidth
+                  required
+                  label="Assessment Name"
+                  value={assessmentName}
+                  onChange={(e) => setAssessmentName(e.target.value)}
+                  placeholder="e.g., Internal Assessment 1, Mid Term Exam, Assignment 1"
+                  disabled={uploading}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      '& fieldset': {
+                        borderWidth: 2,
+                      },
+                    },
+                  }}
+                />
+
+                {selectedCourse && assessmentName && (
+                  <Alert severity="info" sx={{ borderRadius: 2 }}>
+                    <Typography variant="body2">
+                      <strong>Ready to upload:</strong> Marks will be saved for{' '}
+                      <strong>{courses.find((c) => c.id === selectedCourse)?.code}</strong> -{' '}
+                      <strong>{assessmentName}</strong>
+                    </Typography>
+                  </Alert>
+                )}
+              </Box>
+            </CardContent>
+          </Card>
         </MotionBox>
 
         {/* Upload Zone */}

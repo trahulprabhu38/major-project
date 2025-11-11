@@ -414,7 +414,7 @@ const COGenerator = () => {
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
             <AutoAwesome sx={{ fontSize: 48 }} />
             <Typography variant="h4" fontWeight="bold">
-              📘 Course Outcome Generator
+               Course Outcome Generator
             </Typography>
           </Box>
           <Typography variant="body1" sx={{ opacity: 0.95 }}>

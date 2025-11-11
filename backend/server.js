@@ -13,6 +13,7 @@ import courseRoutes from './routes/courses.js';
 import assessmentRoutes from './routes/assessments.js';
 import uploadRoutes from './routes/upload.js';
 import studentRoutes from './routes/students.js';
+import marksheetRoutes from './routes/marksheets.js';
 
 // Load environment variables
 dotenv.config();
@@ -43,6 +44,7 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/assessments', assessmentRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/students', studentRoutes);
+app.use('/api/marksheets', marksheetRoutes);
 app.use('/api/teacher', courseRoutes);
 
 

@@ -22,6 +22,7 @@ import AttainmentDashboard from "./pages/teacher/AttainmentDashboard";
 
 // Student Pages
 import StudentDashboard from "./pages/student/Dashboard";
+import StudentCourses from "./pages/student/Courses";
 import StudentCourseAnalytics from "./pages/student/CourseAnalytics";
 import StudentEnroll from "./pages/student/Enroll";
 
@@ -150,7 +151,8 @@ const AppContent = () => {
                 <Route element={<StudentLayout />}>
                   <Route path="dashboard" element={<StudentDashboard />} />
                   <Route path="enroll" element={<StudentEnroll />} />
-                  <Route path="courses" element={<StudentCourseAnalytics />} />
+                  <Route path="courses" element={<StudentCourses />} />
+                  <Route path="courses/:courseId/analytics" element={<StudentCourseAnalytics />} />
                   <Route path="analysis" element={<Analysis />} />
                   <Route path="settings" element={<Settings />} />
                   <Route index element={<Navigate to="dashboard" replace />} />
