@@ -1,0 +1,2901 @@
+Unit 2 :ER Model and Relational Data 
+Model
+
+Dr. Aruna M G
+Associate Professor 
+Dept. of AI&ML, DSCE
+
+• Data Modelling using the Entity-Relationship(ER) model: 
+• Using High-Level Conceptual Data Models for Database 
+
+Design, A sample Database Application, Entity types, Entity 
+Sets, Attributes, and Keys, Relationship Types, Relationship 
+Sets, Roles and Structural Constraints, Weak Entity types, 
+Refining the ER Design, ER Diagrams, Naming Conventions 
+and Design Issues, Relationship Types of Degree Higher than 
+two, Relational Database Design using ER-to-Relational 
+Mapping.
+
+Requirements Collection
+& Analysis
+
+Data Requirements
+
+Functional Requirements
+
+Conceptual Design
+
+User Defined Operations 
+Data Flow Diagrams
+Sequence Diagrams, Scenarios
+
+Entity Types, Constraints , Relationships
+No Implementation Details.
+
+Logical Design
+
+Ensures Requirements 
+Meets the Design
+
+Data Model Mapping – Type of Database is identified 
+
+Physical Design
+
+Internal Storage Structures / Access Path / File Organizations
+
+Entity-relationship Model
+       Typically used for conceptual
+        database design
+
+Relational Model
+       Typically used for logical 
+       database design
+
+Mini-World
+
+Conceptual Data Model
+
+Logical Data Model
+
+Physical Data Model
+
+Relation 
+
+• A relational database is made up of a collection of 
+
+tables or relation.
+
+Common terms        DBMS 
+1. Database
+2. Table
+3. Column
+ Row
+4.
+
+   Table
+   Table
+   Field
+  record
+
+          RDBMS
+Database
+Relation
+Attribute
+tuple
+
+Relation 
+
+Tuples  
+
+EMPLOYEE 
+SSN 
+123467 
+123469 
+123468 
+123567 
+
+Name 
+Aruna 
+Thunga 
+Nimi 
+Sur 
+
+Figure2.3Employee Relation 
+
+    Attributes 
+
+Age 
+25 
+26 
+27 
+28 
+
+Address 
+#45,Bangalore 
+#35,hassan 
+#23,Bangalore 
+Null 
+
+Salary 
+20000 
+12000 
+15000 
+20000 
+
+ 
+ 
+ 
+ 
+Regular
+
+Weak
+
+• ER Model (Entity Relationship Model)
+• The ER model describes data as entities, relationships, and 
+
+attributes
+
+Attributes
+
+ssn
+
+name
+
+lot
+
+Employee
+
+SSN 
+
+NAME
+
+LOT
+
+123- 22- 3666 Attishoo
+
+231- 31- 5368 Smiley
+
+48
+
+22
+
+131- 24- 3650 Smethurst 35
+
+Entity Set
+
+CREATE TABLE Employees
+(ssn CHAR (11),
+name CHAR (20),
+lot INTEGER,
+PRIMARY KEY (ssn))
+
+• Attribute Type:
+•
+
+It is the property of entity type instance is called attribute type
+
+• Attribute Instance:
+•
+• –A specific entity will have a value for each of its attributes.
+
+It is the property of entity instance is called attribute instance.
+
+For example a specific employee entity may have 
+• Name='John Smith', SSN='123456789', Address ='731, Fondren, 
+
+Houston, TX', Sex='M', BirthDate='09-JAN-55‘
+
+•
+
+ 
+cust-name
+
+access-date
+
+number
+
+cust-id
+
+cust-street
+
+customer
+
+has
+
+account
+
+cust-city
+
+balance
+
+cust-name
+
+access-date
+
+number
+
+age
+
+cust-id
+
+date-of-birth
+
+customer
+
+has
+
+account
+
+cust-street
+
+month
+
+day
+
+cust-city
+year
+
+phone no.
+
+balance
+
+Composite Attribute
+
+cust-name
+
+access-date
+
+number
+
+age
+
+cust-id
+
+date-of-birth
+
+customer
+
+has
+
+account
+
+cust-street
+
+cust-city
+
+phone no.
+
+balance
+
+Complex
+
+• The composite and multi-valued attributes may be nested 
+
+arbitrarily to any number of levels although this is rare.
+
+• Or 
+• The combination of composite and multivalued attribute is also 
+
+called complex attribute.
+
+• Composite attribute between denoted by parentheses ( ) and 
+
+multivalued attributes between braces { }.   
+
+• Example1: PreviousDegrees of a STUDENT is a composite multi-
+valued attribute denoted by {PreviousDegrees (College, Year, 
+Degree, Field)}.
+
+• Example2:
+
+Null Attirbute
+
+• An entity may not have any applicable value for an 
+
+attribute. A special value is used in such situation called 
+NULL.
+
+• Example: PhoneNo or Degree attribute of EMPLOYEE 
+
+entity.
+
+The unknown category of Null is classified into two cases:
+1. The first case arises when it is know that the attribute 
+
+value exists but is missing.
+
+2. The second case, when it is not known whether the 
+
+attribute value exist or not.
+
+• An entity type has an attribute whose values can be used to 
+
+identify each entity uniquely is called a key attribute.
+
+• Keys are one of the basic requirements of a relational database 
+model. It is widely used to identify the tuples(rows) uniquely in 
+the table. We also use keys to set up relations amongst various 
+columns and tables of a relational database.
+
+SSN
+
+Age
+
+EMPLOYEE
+
+Different Types of Database Keys
+
+• Candidate Key
+• Primary Key
+• Super Key
+• Alternate Key
+• Foreign Key
+• Composite Key
+
+Super Key
+
+• The set of attributes that can uniquely identify a tuple is 
+
+known as Super Key. For Example, STUD_NO, 
+(STUD_NO, STUD_NAME), 
+
+• A super key is a group of single or multiple keys that 
+
+identifies rows in a table. 
+• It supports NULL values. 
+• Adding zero or more attributes to the candidate key 
+
+generates the super key.
+
+• A candidate key is a super key but vice versa is not 
+
+true.
+
+• Super Key values may also be NULL.
+
+An entity type may have more than one key called candidate key.  
+Or
+
+The minimal set of attributes that can uniquely identify a tuple is known 
+as a candidate key. 
+For example, the CAR entity type may have two keys:
+–VehicleIdentificationNumber (popularly called VIN) and
+–VehicleTagNumber (Number, State), also known as license_plate 
+number.
+
+RegNo
+
+State 
+
+Model 
+
+Make 
+
+Reg 
+
+VID
+
+Year 
+
+CAR
+
+Color 
+
+ 
+ 
+For Example, STUD_NO in STUDENT relation. 
+It is a minimal super key.
+•
+It is a super key with no repeated data is called a candidate key.
+•
+• The minimal set of attributes that can uniquely identify a record.
+•
+•
+• Every table must have at least a single candidate key.
+• A table can have multiple candidate keys but only one primary 
+
+It must contain unique values.
+It can contain NULL values.
+
+key.
+
+• The value of the Candidate Key is unique and may be null for a 
+
+tuple.
+
+• There can be more than one candidate key in a relationship. 
+
+• There can be more than one candidate key in relation out of which 
+
+one can be chosen as the primary key. 
+It is a unique key.
+It can identify only one tuple (a record) at a time.
+It has no duplicate values, it has unique values.
+It cannot be NULL.
+
+•
+•
+•
+•
+• Primary keys are not necessarily to be a single column; more than 
+
+one column can also be a primary key for a table.
+
+• STUD_NO, as well as STUD_PHONE, are candidate keys 
+for relation STUDENT but STUD_NO can be chosen as 
+the primary key (only one out of many candidate 
+keys). 
+
+• STUDENT table -> Student(STUD_NO, SNAME, 
+ADDRESS, PHONE) , STUD_NO is a primary key.
+
+Table STUDENT
+
+STUD_NO           
+
+SNAME            
+
+ADDRESS           
+
+PHONE                      
+
+1
+
+2
+
+3
+
+Shyam
+
+Rakesh
+
+Suraj
+
+Delhi
+
+123456789
+
+Kolkata
+
+223365796
+
+Delhi
+
+175468965
+
+ 
+Composite Key (CK)
+A key attribute may be composite. Such attribute is composite key. 
+Or 
+A table might not have a single column/attribute that uniquely 
+identifies all the records of a table. To uniquely identify rows of a 
+table, a combination of two or more columns/attributes can be used.
+
+For example, VehicleTagNumber is a key of the CAR entity type with 
+components (Number, State).
+Example2: Flight table Flight_ID is composite key 
+
+•
+
+It still can give duplicate values in rare cases. So, we need to find 
+the optimal set of attributes that can uniquely identify rows in a 
+table.
+•
+It acts as a primary key if there is no primary key in a table
+• Two or more attributes are used together to make a composite 
+
+key.
+
+• Different combinations of attributes may give different accuracy 
+
+in terms of identifying the rows uniquely.
+
+•
+
+If an attribute can only take the values which are present as values 
+of some other attribute, it will be a foreign key to the attribute to 
+which it refers. 
+
+• The relation which is being referenced is called referenced 
+relation and the corresponding attribute is called referenced 
+attribute the relation which refers to the referenced relation is 
+called referencing relation and the corresponding attribute is called 
+referencing attribute. 
+
+• The referenced attribute of the referenced relation should be the 
+
+primary key to it.
+
+•
+
+It is a key it acts as a primary key in one table and it acts as 
+secondary key in another table.
+It combines two or more relations (tables) at a time.
+
+•
+• They act as a cross-reference between the tables.
+
+•
+
+ 
+date-of-birth
+
+cust-name
+
+cust-id
+
+Possible Keys:
+{cust-id}
+
+{cust-name, cust-city, cust-street}
+
+ {cust-id, age}
+
+  cust-name ?? Probably not.
+
+age
+
+customer
+
+Domain knowledge dependent !!
+
+cust-street
+
+cust-city
+
+phone no.
+
+date-of-birth
+
+cust-name
+
+cust-id
+
+age
+
+customer
+
+cust-street
+
+cust-city
+
+phone no.
+
+Value set (or Domain) of attributes
+
+• The domain of an attribute is the set of all possible values from 
+
+which the attributes can take its values.
+
+• Value sets are not displayed in ER diagrams. It is specified during 
+
+creating entity type.
+
+Example1: Season attribute have the possible values are Spring, 
+Summer, Autumn, Winter.
+Example2 :Gender attribute can have Female or Male.
+
+Mathematically Definition of value sets of attribute: 
+• An attribute A of entity type E whose vale set is V can be defined as 
+
+a function from E to the power set P(V) of  V;
+
+• A : E→ P(V)
+
+Express the number of entities to which another entity can be 
+associated via a relationship set.
+
+customer
+
+has
+
+account
+
+customer
+
+has
+
+account
+
+customer
+
+has
+
+account
+
+customer
+
+has
+
+account
+
+Relationship Type
+
+• A relationship type between two entity types defines the set of all 
+
+association between these entity types. A relationship relates two or 
+more distinct entities with a specific meaning.  
+
+• or
+• A relationship type R among n entity types E1,E2, ,……., En defines a 
+
+set of associations.
+
+Relationship set
+• An instance of a relationship set is a set of relationship.
+
+Relationship instance
+• Each instance of the relationship between members of these entity 
+
+types is called a relationship instance.
+
+• ri = ( e1,…., en )
+
+ 
+Mathematically, the relationship set R is a set of relationship 
+instance ri , where each ri  associates n individual entities ( e1,…., en ) 
+and each entity ei in ri is a member of entity type Ej ,1<=j<=n.
+
+Where R be the relationship type. E1,E2,….En be the entity type. e1 
+through en, are entity set and ri is the relationship instances.
+
+ 
+Degree of a relationship types
+
+Degree
+
+Multiplicity
+
+cust-name
+
+access-date
+
+number
+
+cust-id
+
+cust-street
+
+customer
+
+has
+
+account
+
+cust-city
+
+balance
+
+ER Model: Another Example
+
+ssn
+
+name
+
+lot
+
+did
+
+dname
+
+budget
+
+Employee
+
+Works_in
+
+Department
+
+supervisor
+
+Sub-
+ordinate
+
+Reports_To
+
+Ternary Relationships
+
+ssn
+
+name
+
+lot
+
+since
+
+did
+
+dname
+
+budget
+
+Employee
+
+Works_in
+
+Department
+
+Location
+
+address
+
+capacity
+
+ER Model (Contd.)
+
+Works_ In
+
+SSN 
+
+DID SINCE
+
+123-22-3666 51
+
+123-22-3666 56
+
+231-31-5368 51
+
+1/1/91
+
+3/3/93
+
+2/2/92
+
+CREATE TABLE Works_ In(
+ssn CHAR (11),
+did INTEGER,
+since DATE,
+PRIMARY KEY (ssn, did),
+FOREIGN KEY (ssn)
+REFERENCES Employees,
+FOREIGN KEY (did)
+REFERENCES Departments)
+
+Role names
+
+• Each entity type that participates in a relationship type plays a particular role in 
+
+the relationship.
+
+• Role names may be added to make the meaning more explicit.
+When to use role name?
+• The participating entity types are distinct, no need to mention role name. 
+•
+
+If the same entity type participates more than once in an r/n type in different 
+roles.
+ In such cases the role name becomes essential for distinguishing the meaning 
+of each participation. Such r/n types are called recursive relationship.
+
+•
+
+Subordinate 
+
+EMPLOYEE 
+
+Manages 
+
+                                    Manager 
+
+ 
+ 
+  
+Attributes of relationship types
+
+• Relationship types can also have attribute similar to those of 
+
+entity type.
+
+cust-id
+
+access-date
+
+number
+
+customer
+
+has
+
+account
+
+• Note: Placing the attribute in relationship type i.e 1:1, 1:N 
+
+and M:M . Representing this attribute in one of the entity type.
+
+cust-id
+
+access-date
+
+number
+
+customer
+
+has
+
+account
+
+cust-id
+
+access-date
+
+number
+
+customer
+
+has
+
+account
+
+cust-id
+
+access-date
+
+number
+
+customer
+
+has
+
+account
+
+•
+
+If one-to-one relationship, either {cust-id} or {account-number} 
+sufficient
+• Since a given customer can only have one account, He / She 
+
+can only participate in one relationship
+
+• Ditto account
+
+cust-id
+
+access-date
+
+number
+
+customer
+
+has
+
+account
+
+•
+
+If one-to-many relationship (as shown), {account-number} 
+is a candidate key
+• A given customer can have many accounts, but at most 
+
+one account holder per account allowed
+
+Constraints on Relationships Types (constraints means 
+restriction or limitation)
+
+• Relationship types have certain constraints that limit the 
+
+possible combination of entities that may participate in the 
+corresponding relationship set.
+
+• Example: a company has a rule that each employee must work 
+
+•
+
+for exactly one department.
+ There two main types of relationship constraints 
+– Cardinality ratio (Maximum Cardinality constraint )
+– Participation (also called Minimum Cardinality or 
+
+participation constraint or existence dependency constraints)
+
+Constraints ratio for binary Relationship 
+Types
+
+•
+•
+
+(Also known as ratio constraints)
+ Cardinality ratio (Maximum Cardinality) for a binary relationship 
+specifies the maximum number of relationship instances that an 
+entity can participate in.
+•  One-to-one (1:1)
+•    One-to-many (1:N)
+•    Many-to-one (N:1)
+•    Many-to-many (M:N)
+
+•
+
+It specifies whether the existence of an entity depends on its being 
+related to another entity the relationship types.
+
+• This constraint specifies the minimum number of relationship 
+instances that each entity can participate in. This type is called 
+Minimum Cardinality constraint.
+
+There are two types of Participation constraint
+1.Total Participation constraint (or existence dependency):
+2.Partial Participation constraint
+
+cust-name
+
+access-date
+
+number
+
+cust-id
+
+cust-street
+
+customer
+
+has
+
+account
+
+cust-city
+
+balance
+
+Total 
+participation
+
+name
+name
+
+ssn
+
+Employees
+
+since
+since
+
+Manages
+
+lot
+
+0,M
+
+did
+did
+
+1,M
+
+dname
+dname
+
+budget
+budget
+
+Departments
+
+1,1
+
+Works_In
+
+1,M
+
+since
+
+How many relationships can an entity participate in ?
+
+cust-id
+
+access-date
+
+number
+
+customer
+
+0..*
+
+has
+
+1..1
+
+account
+
+Minimum - 0
+Maximum – no limit
+
+Minimum - 1 
+Maximum - 1
+
+emp-name
+
+emp-id
+
+emp-street
+
+employee
+
+manager
+
+worker
+
+works-for
+
+emp-city
+
+SID
+
+Name Addr
+
+MID
+
+Title
+
+Student
+
+Register
+
+Module
+
+(0,8)
+
+(1,n)
+
+Grade
+
+name
+
+ssn
+
+lot
+
+cost
+
+Partial 
+Key
+pname
+
+age
+
+Employees
+
+Policy
+
+Dependents
+
+number
+
+trans-date
+
+account
+
+has
+
+Transaction
+
+balance
+
+trans-amt
+
+Partial 
+Key
+
+trans-number
+
+trans-type
+
+ 
+ 
+l
+e
+d
+o
+M
+R
+E
+n
+
+i
+
+s
+n
+o
+i
+t
+a
+t
+o
+N
+
+f
+o
+
+y
+r
+a
+m
+m
+u
+S
+
+ 
+ 
+ 
+ 
+ 
+Entity vs. Attribute
+
+Works_In does not allow an employee to work in a department for 
+two or more periods (why?)
+
+ssn
+
+name
+
+lot
+
+from
+
+to
+
+did
+
+dname
+
+budget
+
+Employee
+
+Works_in
+
+Department
+
+Entity vs. Attribute (Contd.)
+
+ssn
+
+name
+
+lot
+
+did
+
+dname
+
+budget
+
+Employee
+
+Works_in
+
+Department
+
+from
+
+Duration
+
+to
+
+Binary vs. Ternary Relationships
+
+ssn
+
+name
+
+lot
+
+pname
+
+age
+
+Employee
+
+covers
+
+Policy
+
+Dependent
+
+policyid
+
+cost
+
+Binary vs. Ternary Relationships
+
+Better Design
+
+ssn
+
+name
+
+lot
+
+pname
+
+age
+
+Employee
+
+Dependent
+
+purchaser
+
+Beneficiary
+
+policyid
+
+Policy
+
+cost
+
+Constraints Beyond the ER Model
+
+• Some constraints cannot be captured in ER diagrams:
+
+• Functional dependencies
+
+•
+
+Inclusion dependencies
+
+• General constraints
+
+DEPARTMENT
+
+1
+
+DEPT_
+EMP
+
+M
+
+M
+
+EMPLOYEE
+
+1
+
+1
+
+EMP_
+DEP
+
+M
+
+DEPENDENT
+
+PROJ_
+WORK
+
+PROJ_
+MGR
+
+M
+
+M
+
+M
+
+PROJECT
+
+M
+
+SUPPLIER
+
+M
+
+SUPP_
+PART_
+PROJ
+
+M
+
+PART
+
+PART_
+STRUC
+TURE
+
+M
+
+SUPP_
+PART
+
+M
+
+M
+
+DEPARTMENT 
+( Name, Number, { Locations }, Manager, Start Date )
+
+PROJECT
+( Name, Number, Location, Controlling Department )
+
+EMPLOYEE
+(Name (Fname, Lname), SSN, Gender, Address, Salary 
+Birthdate, Department, Supervisor, (Workson ( Project , Hrs))
+
+DEPENDENT 
+( Employee, Name, Gender,  Birthdate, Relationship )
+
+Lname
+
+Fname
+
+Sex
+
+SSN
+
+Employee
+
+Name
+
+Bdate
+
+Sal
+
+Work
+s For
+
+Address
+
+Sdate
+
+manages
+
+Supe
+rvise
+s
+
+Hours
+
+Work
+s On
+
+Depend On
+
+Name
+
+No
+
+Loc
+
+Department
+
+Controls
+
+Project
+
+Name
+
+No
+
+Loc
+
+Dependent
+
+Relationship
+
+Name
+
+Sex
+
+Bdate
+
+ID
+
+Name
+
+Student
+
+DOB
+
+M
+
+CID
+
+Cname
+
+N
+
+Enroll
+
+Course
+
+Date
+
+Status
+
+ER to Relational 
+mapping
+
+Student
+
+ID Name DOB
+
+PK
+
+Enroll
+
+Course
+
+CID Cname
+PK
+
+ID CID Date Status
+
+FK
+
+FK
+
+Foreign Keys
+
+ssn
+
+name
+
+123-22-3666 Attishoo
+
+231-31-5368 Smiley
+
+lot
+
+48
+
+22
+
+131-24-3650 Smethurst 35
+
+ssn
+
+name
+
+lot
+
+Employees
+
+ CREATE TABLE Employees 
+  (ssn CHAR(11),
+   name CHAR(20),
+   lot  INTEGER,
+   PRIMARY KEY  (ssn))
+
+CREATE TABLE Works_In(
+  ssn  CHAR(1),
+  did  INTEGER,
+  since  DATE,
+ PRIMARY KEY (ssn, did),
+    FOREIGN KEY (ssn) 
+    REFERENCES Employees,
+ FOREIGN KEY (did) 
+  REFERENCES Departments)
+
+did since
+
+ssn
+123-22-3666 51
+123-22-3666 56
+231-31-5368 51
+
+1/1/91
+3/3/93
+2/2/92
+
+name
+
+dname
+
+since
+
+ssn
+
+lot
+
+did
+
+budget
+
+Employees
+
+Manages
+
+Departments
+
+CREATE TABLE  Manages(
+ ssn  CHAR(11),
+ did  INTEGER,
+ since  DATE,
+ PRIMARY KEY  (did),
+ FOREIGN KEY (ssn)   
+REFERENCES Employees,
+   FOREIGN KEY (did) 
+REFERENCES Departments)
+
+CREATE TABLE  Dept_Mgr(
+ did  INTEGER,
+ dname  CHAR(20),
+ budget  REAL,
+ ssn  CHAR(11),
+ since  DATE,
+ PRIMARY KEY  (did),
+ FOREIGN KEY (ssn) 
+  REFERENCES Employees)
+
+Vs.
+
+CREATE TABLE  Dep_Policy (
+   pname  CHAR(20),
+   age  INTEGER,
+   cost  REAL,
+   ssn  CHAR(11) NOT NULL,
+   PRIMARY KEY  (pname, ssn),
+   FOREIGN KEY  (ssn) REFERENCES Employees,
+      ON DELETE CASCADE)
+
+Introduction
+
+• The Relational Model is based on the concept of a Relation.
+
+• Represents Database as a collection of Relations
+
+• A Relation is a mathematical concept based on the ideas of 
+sets. The strength of the relational approach to data 
+management comes from the formal foundation provided by 
+the theory of relations.
+
+• The model was first proposed by Dr. E F Codd of IBM in 1970 
+
+in the following paper:
+
+"A Relational Model for Large Shared Data Banks," 
+Communications of the ACM, June 1970.
+
+• The above paper caused a major revolution in the field of 
+Database management and earned Ted Codd the coveted ACM 
+Turing Award.
+
+• RELATION:  A table of values
+• A relation may be thought of as a set of rows OR set of 
+
+columns.
+
+• Each row represents a fact that corresponds to a real-world 
+
+entity or relationship. Also called as Tuple
+
+• Each row has a value of an item or set of items that uniquely 
+
+identifies that row in the table
+
+• Each column typically is called by its column name represents 
+
+attribute
+
+• Relation schema R is defined over attributes R(A1, A2, ...,An)
+• Relational Database Schema: A set S of relation schemas that 
+
+belong to the same database. S = {R1, R2, ..., Rn}
+
+• The degree of a relation  is the  number of attributes ‘n’
+
+ Composite and multi-valued attributes are not allowed.
+
+• Constraints are conditions that must hold on all valid relation 
+
+instances.
+
+• There are three main types of constraints:
+
+– Key constraints
+
+– Entity integrity constraints
+
+– Referential integrity constraints 
+
+Key Constraints
+
+• Super key of R: 
+
+– A set of attributes SK of R such that no two tuples in any valid 
+relation instance r(R) will have the same value for SK.  That is, 
+for any distinct tuples t1 and t2 in r(R), t1[SK]  t2[SK].
+
+• Key of R:
+
+– A "minimal" super key; that is, a super key K such that removal 
+of any attribute from K results in a set of attributes that is not a 
+super key.
+
+• Example: The CAR relation schema: CAR(State, Reg#, SerialNo, 
+Make, Model, Year) has two keys Key1 = {State, Reg#}, Key2 = 
+{SerialNo}, which are also super keys. {SerialNo, Make} is a super 
+key but not a key.
+
+• Note: If a relation has several candidate keys (a relation schema may 
+have more than one key) , one is chosen arbitrarily to be the primary 
+key. The primary key attributes are underlined.
+
+Entity Integrity
+
+• The primary key attributes PK of each relation schema R 
+
+cannot have null values in any tuple of r(R).
+
+• No primary key value can be NULL. 
+
+•
+
+t[PK]  null for any tuple t in r(R)
+
+• This is because primary key values are used to identify the 
+
+individual tuples
+
+Referential Integrity (
+
+• Used to specify a relationship among tuples in two relations: 
+
+The referencing relation and the referenced relation.
+
+• Tuples in the referencing relation R1 have attributes FK 
+(called foreign key attributes) that reference the primary key 
+attributes PK of the referenced relation R2.
+
+•
+
+i.e.,  A tuple t1 in R1 is said to reference a tuple t2 in R2 if 
+t1[FK] = t2[PK]. 
+
+• A referential integrity constraint is displayed in a relational 
+
+database schema as a directed arc from R1.FK to R2.PK
+
+Referential Integrity Constraints on 
+COMPANY Schema
+
+Enrolled
+
+Student
+
+sid
+cid
+53666 carnatic101
+53688 reggae203
+53650 topology112
+53666 history105
+
+grade
+C
+B
+A
+B
+
+sid
+
+name
+
+login
+
+age
+
+gpa
+
+53666 Jones
+
+Jones@cs
+
+53688 Smith
+
+Smith@eecs
+
+53650 Smith
+
+Smith@math
+
+18
+
+18
+
+19
+
+3.4
+
+3.2
+
+3.8
+
+Foreign key referring to
+sid of STUDENT relation
+
+Primary key
+
+Update Operations on Relations
+
+•
+
+INSERT a tuple.   
+– Ex: Insert <  Ceilia, F, Kolonsky,’677678984’,…. > into 
+           EMPLOYEE
+
+• DELETE a tuple.  
+
+– Ex : Delete the EMPLOYEE tuple with SSN=’9987’.
+
+• MODIFY a tuple. 
+
+– E x   :   m o d i f y   S A L A R Y   o f   t h e   E M P L O Y E E   t u p l e 
+
+SSN=’998877’ to 28000.
+
+•
+
+Integrity constraints should not be violated by the update 
+operations.
+
+• Several update operations may have to be grouped together.
+• Updates may propagate to cause other updates automatically. 
+
+This may be necessary to maintain integrity constraints.
+
+• Consider the following relations for a database that keeps 
+track of student enrollment in courses and the books adopted 
+for each course:
+STUDENT(SSN, Name, Major, Bdate)
+COURSE(Course#, Cname, Dept)
+ENROLL(SSN, Course#, Quarter, Grade)
+BOOK_ADOPTION(Course#, Quarter, Book_ISBN)
+TEXT(Book_ISBN, Book_Title, Publisher, Author)
+
+• Draw a relational schema diagram specifying the foreign 
+
+keys for this schema.
+
+• The Attribute SSN of relation ENROLL that references 
+
+relation STUDENT
+
+• The Attribute Course# of relation ENROLL that references 
+
+relation COURSE
+
+• The Attribute Course# of relation BOOK_ADOPTION that 
+
+references relation COURSE
+
+• The Attribute Book_ISBN of relation BOOK_ADOPTION 
+
+that references relation TEXT
+
+• Relational Algebra is the query language for Relational Data 
+Model enable the user to specify basic retrieval requests 
+(queries).
+
+               Relational Algebra operations: 
+
+Set theory operations (Mathematical) 
+{ Union, Intersection, Difference, 
+ Cartesian product } 
+
+              Relational database operations. 
+    {Select, project, Join} 
+
+All operations may operate on one or more relations and the 
+result is in the form of a relation.
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+SELECT Operation ()
+
+• Used to select a subset of the tuples from a relation that satisfy 
+
+a selection condition
+
+• Gives the horizontal subset ( selected tuples) of a Relation
+
+• Syntax: <selection condition> (R) where  (sigma) is used to denote 
+the select operator, and the selection condition is a Boolean 
+expression specified on the attributes of relation R
+
+• Example1: To select the EMPLOYEE tuples whose department 
+
+number is four     
+
+– DNO = 4 (EMPLOYEE)     
+
+• Example 2: To select the EMPLOYEE tuples whose salary is 
+
+greater than $30,000  
+
+–  SALARY > 30,000 (EMPLOYEE)
+
+SELECT Operation Properties
+
+– The SELECT operation  <selection condition>(R) produces a 
+
+relation S that has the same schema as R
+
+– The SELECT operation s is commutative
+
+        <condition1>( < condition2> (R)) =  <condition2> ( < condition1> (R))
+
+– A cascaded SELECT operation may be applied in any order;
+
+<cond1>(<cond2> (<cond3> (R)) = <cond2> (<cond3> (<cond1> ( R)))
+
+– A cascaded SELECT operation may be replaced by a single 
+
+selection with a conjunction of all the conditions; i.e., 
+
+     <cond1>(< cond2> (<cond3>(R)) =<cond1> AND < cond2> AND < cond3>(R)))
+
+PROJECT Operation ()
+
+• Projects certain columns from the relation/table and discards the 
+
+other columns.
+
+• Gives the vertical subset (selected columns) of a relation
+
+• Creates a vertical partitioning – one with the needed columns 
+(attributes) containing results of the operation and other containing 
+the discarded Columns.
+
+• Syntax: <attribute list>(R) , where  (pi) is the symbol used to 
+represent the project operation and <attribute list> is the desired list 
+of attributes from the attributes of relation R. 
+
+•
+
+removes any duplicate tuples, so the result of the project operation 
+is a set of tuples and hence a valid relation.
+
+• Example: To list each employee’s first and last name and salary, the 
+
+following is used:
+
+– LNAME, FNAME, SALARY (EMPLOYEE)
+
+PROJECT Operation Properties
+
+– If the list of attributes includes a key of R, then the number of 
+tuples in the result of projection <list>(R) is always less or 
+equal to the number of tuples in R. 
+
+–  <list1> ( <list2> (R) ) = <list1> (R) as long as <list2> contains 
+
+the attributes in <list1> 
+
+Sequence of SELECT and PROJECT 
+operations
+
+• Several operations can be combined to form a relational algebra 
+
+expression (query)
+
+• Example:   Retrieve the names and salaries of employees who 
+
+work in department 4:
+–  FNAME, LNAME, SALARY ( DNO=4  (EMPLOYEE) )
+
+• Alternatively, we specify explicit intermediate relations for each 
+
+step:
+           DEPT4_EMPS   DNO=4 (EMPLOYEE) 
+               R  FNAME, LNAME, SALARY (DEPT4_EMPS )
+
+Set theory Operations
+
+• Binary operations from mathematical set theory:
+
+   UNION: R1∪R2,
+
+INTERSECTION: R1 ∩ R2,
+SET DIFFERENCE: R1 － R2,
+   CARTESIAN PRODUCT: R1 × R2.
+
+• For ∪, ∩, －, the operand relations R1(A1,A2,…,An) and   
+R2(B1,B2,…,Bn) must have the same number of attributes, 
+and   the domains of corresponding attributes must be 
+compatible;   
+
+that is, dom(Ai)=dom(Bi) for i=1,2,…, n. This condition 
+is called union compatibility.
+
+• The resulting relation for ∪, ∩, or － has the same attribute 
+
+names as the first operand R1 (by convention).
+
+  
+  
+JOIN Operation
+
+• The sequence of Cartesian product followed by select is used 
+quite commonly to identify and select related tuples from two 
+relations, a special operation, called JOIN. It is denoted by  
+– This operation is very important for any relational database 
+with more than a single relation, because it allows us to 
+process relationships among relations. 
+
+– The general form of a join operation on two relations R(A1, 
+A2, . . ., An) and S(B1, B2, . . ., Bm) is:   R     <join condition>    S 
+where R and S can be any relations that result from general 
+relational algebra expressions.
+
+• Types
+
+– Equijoin
+– Natural Join
+– Theta Join
+
+R1
+
+sid
+
+22
+
+58
+
+bid
+
+101
+
+103
+
+day
+
+10/10/99
+
+11/12/99
+
+S1
+
+sid
+
+22
+
+31
+
+58
+
+sname
+
+Deepa
+
+Laxmi
+
+Roopa
+
+S2
+
+rating
+
+7
+
+8
+
+10
+
+age
+
+45.0
+
+55.5
+
+35.0
+
+sid
+
+28
+
+31
+
+44
+
+58
+
+sname
+
+Yamuna
+
+Laxmi
+
+Geeta
+
+Roopa
+
+rating
+
+9
+
+8
+
+5
+
+10
+
+age
+
+35.0
+
+55.5
+
+35.0
+
+35.0
+
+sname
+
+Yamuna
+
+Laxmi
+
+Geeta
+
+Roopa
+
+rating
+
+9
+
+8
+
+5
+
+10
+
+sname, rating(S2)
+
+age
+
+35.0
+
+55.5
+
+age(S2)
+
+sid
+
+28
+
+58
+
+sname
+
+Yamuna
+
+Roopa
+
+rating
+
+9
+
+10
+
+age
+
+35.0
+
+35.0
+
+rating > 8(S2)
+
+sname
+
+Yamuna
+
+Roopa
+
+rating
+
+9
+
+10
+
+sname, rating(S2) (rating > 8(S2))
+
+sid
+
+22
+
+31
+
+58
+
+44
+
+28
+
+sid
+
+31
+
+58
+
+sid
+
+22
+
+sname
+
+Deepa
+
+Laxmi
+
+Roopa
+
+Geeta
+
+Yamuna
+
+sname
+
+Laxmi
+
+Roopa
+
+sname
+
+Deepa
+
+rating
+
+7
+
+8
+
+10
+
+5
+
+9
+
+rating
+
+8
+
+10
+
+rating
+
+7
+
+age
+
+45.0
+
+55.5
+
+35.0
+
+35.0
+
+35.0
+
+age
+
+55.5
+
+35.0
+
+age
+
+45.0
+
+S1  S2
+
+S1  S2
+
+S1  S2
+
+(sid)
+
+sname
+
+rating
+
+22
+
+22
+
+31
+
+31
+
+58
+
+58
+
+Deepa
+
+Deepa
+
+Laxmi
+
+Laxmi
+
+Roopa
+
+Roopa
+
+7
+
+7
+
+8
+
+8
+
+10
+
+10
+
+age
+
+45.0
+
+45.0
+
+55.5
+
+55.5
+
+35.0
+
+35.0
+
+(sid)
+
+22
+
+58
+
+22
+
+58
+
+22
+
+58
+
+bid
+
+101
+
+103
+
+101
+
+103
+
+101
+
+103
+
+day
+
+10/10/99
+
+11/12/99
+
+10/10/99
+
+11/12/99
+
+10/10/99
+
+11/12/99
+
+Condition Join :
+
+(sid)
+
+sname
+
+rating
+
+22
+
+31
+
+Deepa
+
+Laxmi
+
+7
+
+8
+
+age
+
+45.0
+
+55.5
+
+(sid)
+
+58
+
+58
+
+bid
+
+103
+
+103
+
+day
+
+11/12/99
+
+11/12/99
+
+(sid)
+
+sname
+
+rating
+
+22
+
+58
+
+Deepa
+
+Roopa
+
+7
+
+10
+
+age
+
+45.0
+
+35.0
+
+bid
+
+101
+
+103
+
+day
+
+10/10/99
+
+11/12/99
+
+•Not supported as a primitive operator, but useful for 
+expressing queries like:
+
+•Find sailors who have reserved all boats .
+
+A
+
+sno pno
+s1
+s1
+s1
+s1
+s2
+s2
+s3
+s4
+s4
+
+p1
+p2
+p3
+p4
+p1
+p2
+p2
+p2
+p4
+
+pno
+p2
+
+B1
+
+sno
+s1
+s2
+s3
+s4
+A/B1
+
+pno
+p2
+p4
+
+B2
+
+sno
+
+s1
+
+s4
+
+pno
+
+p1
+
+p2
+
+p4
+
+B3
+
+sno
+
+s1
+
+A/B2
+
+A/B3
+
+A       B
+
+
+
+
+2
+3
+
+s
+
+A       B
+
+
+
+
+
+1
+2
+1
+
+r
+
+A       B
+
+      2
+
+A
+
+
+
+
+
+
+
+C D
+
+
+
+
+
+
+
+a
+a
+b
+a
+b
+
+B
+
+1
+2
+4
+1
+2
+
+r
+
+n r        s
+
+B
+
+D
+
+E
+
+
+
+
+
+
+
+a
+a
+a
+b
+b
+
+s
+
+1
+3
+1
+2
+3
+
+E
+
+
+
+
+
+
+
+A
+
+
+
+
+
+
+
+B
+
+1
+1
+1
+1
+2
+
+C D
+
+
+
+
+
+
+
+a
+a
+a
+a
+b
+
+n    Notation:  r     s
+
+r.A, r.B, r.C, r.D, s.E (r.B = s.B  r.D = s.D (r  x  s))
+
+ 
+
+G
+,
+n
+
+GG
+,
+1
+2
+
+,
+
+AFAF
+),
+1
+1
+2
+
+2
+
+(
+
+(
+
+
+,
+AF
+(
+,
+n
+
+En
+()
+
+)
+
+A
+
+B
+
+C
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7
+
+7
+
+3
+
+10
+
+sum(c )
+
+27
+
+g sum(c) (r)
+
+Question: Which aggregate operations cannot be expressed using 
+basic relational operations?
+
+branch_name
+
+account_number
+
+balance
+
+Perryridge
+Perryridge
+Brighton
+Brighton
+Redwood
+
+A-102
+A-201
+A-217
+A-215
+A-222
+
+400
+900
+750
+750
+700
+
+branch_name g sum(balance) (account)
+
+branch_name
+
+sum(balance)
+
+Perryridge
+Brighton
+Redwood
+
+1300
+1500
+700
+
+loan_number
+
+branch_name
+
+amount
+
+L-170
+L-230
+L-260
+
+Downtown
+Redwood
+Perryridge
+
+3000
+4000
+1700
+
+n Relation borrower
+
+customer_name
+
+loan_number
+
+Jones
+Smith
+Hayes
+
+L-170
+L-230
+L-155
+
+loan_number
+
+branch_name
+
+amount
+
+customer_name
+
+L-170
+L-230
+
+Downtown
+Redwood
+
+3000
+4000
+
+Jones
+Smith
+
+Left Outer Join
+loan 
+
+                    borrower
+
+loan_number
+
+branch_name
+
+amount
+
+customer_name
+
+L-170
+L-230
+L-260
+
+Downtown
+Redwood
+Perryridge
+
+3000
+4000
+1700
+
+Jones
+Smith
+null
+
+Right Outer Join
+
+    loan        borrower
+
+loan_number
+
+branch_name
+
+amount
+
+customer_name
+
+L-170
+L-230
+L-155
+
+Downtown
+Redwood
+null
+
+3000
+4000
+null
+
+Jones
+Smith
+Hayes
+
+Full Outer Join
+
+    loan        borrower
+
+loan_number
+
+branch_name
+
+amount
+
+customer_name
+
+L-170
+L-230
+L-260
+L-155
+
+Downtown
+Redwood
+Perryridge
+null
+
+3000
+4000
+1700
+null
+
+Jones
+Smith
+null
+Hayes
+
+Question: can outerjoins be expressed using basic relational algebra operations
+
+amount > 1200 (loan)
+
+Find the loan number for each loan of an amount greater than                             
+
+loan_number (amount > 1200 (loan))
+
+$1200
+
+Find the names of all customers who have a loan, an account, or both, from the 
+bank
+
+customer_name (borrower)  customer_name (depositor)
+
+                     
+customer_name (branch_name=“Perryridge”
+    (borrower.loan_number = loan.loan_number(borrower x loan)))
+
+n  Find the names of all customers who have a loan at the 
+    Perryridge branch but do not have an account at any branch of   
+    the bank.
+
+customer_name (branch_name = “Perryridge”
+
+ (borrower.loan_number = loan.loan_number(borrower x loan)))  –           
+
+     customer_name(depositor)
+
+l
+
+  customer_name (branch_name = “Perryridge” (
+  borrower.loan_number = loan.loan_number (borrower x loan)))
+
+l
+
+  customer_name(loan.loan_number = borrower.loan_number 
+(
+             (branch_name = “Perryridge” (loan)) x  borrower))
+
+1. D a t a b a s e   s y s t e m s   M o d e l s ,   L a n g u a g e s ,   D e s i g n   a n d 
+Application Programming, RamezElmasri and Shamkant B. 
+Navathe, 7th Edition, 2017, Pearson. 
+
+2. Database Management Systems, Ramakrishnan, and Gehrke, 
+
+3rd Edition, 2014, McGraw Hill
+
+3. Database System Concepts, Silberschatz Korth and 
+
+Sudharshan,, 6th  Edition, McGrawHill, 2013. 
+
+4. Database Principles Fundamentals of Design, Implementation 
+and Management, Coronel, Morris, and Rob, Cengage 
+Learning, 2012.
+
+

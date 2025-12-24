@@ -1,0 +1,30 @@
+Transaction 
+Module-5 
+
+Prepared by, 
+Dr Aruna M G 
+
+4.Phantom Read Problem 
+ • It occurs when a transaction reads a variable 
+once from the buffer and when it tries to read 
+that same variable again, an error occurs saying 
+that the variable does not exist.  
+– T1 reads X. 
+– T2 reads X. 
+– T1 deletes X. 
+– T2 tries reading X but does not find it.  
+
+  
+ 
+5. Incorrect Summary Problem:  
+
+• Consider a situation, where one transaction is applying the aggregate function 
+on  some  records  while  another  transaction  is  updating  these  records.  The 
+aggregate  function  may  calculate  some  values  before  the  values  have  been 
+updated and others after they are updated.  
+
+• Example: 
+
+ 
+ 
+

@@ -95,7 +95,7 @@ export default function Register() {
               Create Account
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Join the OBE Portal
+              Join the Skill-Sync
             </Typography>
           </Box>
 

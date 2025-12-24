@@ -41,14 +41,23 @@ import {
   Assignment,
   Delete,
   Visibility,
+  AutoAwesome,
+  CheckCircle,
+  Star,
+  TrendingUp,
+  Science,
+  Verified,
+  Add,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { courseAPI, marksheetAPI } from '../../services/api';
+import { courseAPI, marksheetAPI, aiCOAPI, courseOutcomesAPI } from '../../services/api';
 import PageLayout from '../../components/shared/PageLayout';
 import { PageLoader } from '../../components/shared/Loading';
 import { ErrorState, EmptyState } from '../../components/shared/ErrorState';
 import StatsCard from '../../components/shared/StatsCard';
+import COMappingUpload from '../../components/upload/COMappingUpload';
+import ManualCOManager from '../../components/teacher/ManualCOManager';
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -67,9 +76,37 @@ const CourseDetail = () => {
   const [dataPage, setDataPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  // AI-generated COs state
+  const [aiCOs, setAICOs] = useState([]);
+  const [loadingAICOs, setLoadingAICOs] = useState(false);
+  const [coStatistics, setCOStatistics] = useState(null);
+  const [calculating, setCalculating] = useState(false);
+
+  // Manual CO Manager state
+  const [manualCOModalOpen, setManualCOModalOpen] = useState(false);
+
   useEffect(() => {
     loadCourseDetails();
+    loadAICOs();
   }, [id]);
+
+  const loadAICOs = async () => {
+    try {
+      setLoadingAICOs(true);
+      // Fetch all course outcomes (both manual and AI-generated)
+      const [cosRes, statsRes] = await Promise.all([
+        courseOutcomesAPI.getByCourse(id),
+        aiCOAPI.getStatistics(id).catch(() => ({ data: { statistics: null } })),
+      ]);
+      setAICOs(cosRes.data.cos || []);
+      setCOStatistics(statsRes.data.statistics);
+    } catch (err) {
+      console.error('Error loading COs:', err);
+      // Don't show error, just log it
+    } finally {
+      setLoadingAICOs(false);
+    }
+  };
 
   const loadCourseDetails = async () => {
     try {
@@ -90,6 +127,33 @@ const CourseDetail = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCalculateAttainment = async () => {
+    try {
+      setCalculating(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8080/api/attainment/course/${id}/recalculate`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Calculation failed');
+      }
+
+      toast.success('Attainment calculations completed successfully!');
+      // Reload course details to refresh stats
+      await loadCourseDetails();
+    } catch (err) {
+      console.error('Calculation error:', err);
+      toast.error('Failed to calculate attainment. Please ensure marksheets are uploaded.');
+    } finally {
+      setCalculating(false);
     }
   };
 
@@ -172,6 +236,14 @@ const CourseDetail = () => {
             Back
           </Button>
           <Button
+            variant="outlined"
+            startIcon={<BarChart />}
+            onClick={() => navigate(`/teacher/attainment/${id}`)}
+            sx={{ color: 'success.main', borderColor: 'success.main' }}
+          >
+            View Dashboard
+          </Button>
+          <Button
             variant="contained"
             startIcon={<Upload />}
             onClick={() => navigate('/teacher/upload')}
@@ -223,6 +295,7 @@ const CourseDetail = () => {
           />
         </Grid>
       </Grid>
+
 
       {/* Course Information Card */}
       <motion.div
@@ -301,6 +374,315 @@ const CourseDetail = () => {
         </Card>
       </motion.div>
 
+      {/* AI-Generated Course Outcomes Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
+        <Card
+          sx={{
+            borderRadius: 3,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+            mb: 4,
+            border: '2px solid',
+            borderColor: aiCOs.length > 0 ? 'primary.main' : 'divider',
+            background: aiCOs.length > 0
+              ? 'linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, rgba(124, 58, 237, 0.02) 100%)'
+              : 'background.paper',
+          }}
+        >
+          <CardContent sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                  }}
+                >
+                  <AutoAwesome sx={{ color: 'white', fontSize: 28 }} />
+                </Box>
+                <Box>
+                  <Typography variant="h6" fontWeight="bold">
+                    Course Outcomes
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {aiCOs.length > 0
+                      ? `${aiCOs.length} COs defined • ${aiCOs.filter(co => co.is_ai_generated).length} AI-generated • ${aiCOs.filter(co => !co.is_ai_generated).length} Manual`
+                      : 'Add course outcomes using AI generation or manually'}
+                  </Typography>
+                </Box>
+              </Box>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                {aiCOs.length === 0 && (
+                  <>
+                    <Button
+                      variant="contained"
+                      startIcon={<AutoAwesome />}
+                      onClick={() => navigate('/teacher/co-generator')}
+                      sx={{
+                        background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%)',
+                        },
+                      }}
+                    >
+                      Generate with AI
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Add />}
+                      onClick={() => setManualCOModalOpen(true)}
+                    >
+                      Add Manually
+                    </Button>
+                  </>
+                )}
+                {aiCOs.length > 0 && (
+                  <>
+                    <Button
+                      variant="outlined"
+                      startIcon={<AutoAwesome />}
+                      onClick={() => navigate('/teacher/co-generator')}
+                      size="small"
+                    >
+                      Regenerate with AI
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Add />}
+                      onClick={() => setManualCOModalOpen(true)}
+                      size="small"
+                    >
+                      Edit Manually
+                    </Button>
+                  </>
+                )}
+              </Box>
+            </Box>
+
+            {loadingAICOs ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                <CircularProgress />
+              </Box>
+            ) : aiCOs.length === 0 ? (
+              <Box
+                sx={{
+                  textAlign: 'center',
+                  py: 6,
+                  px: 3,
+                  borderRadius: 2,
+                  border: '2px dashed',
+                  borderColor: 'divider',
+                  bgcolor: 'background.default',
+                }}
+              >
+                <Science sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+                <Typography variant="h6" color="text.secondary" gutterBottom>
+                  No Course Outcomes Yet
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  Add course outcomes using our AI-powered generator or create them manually.
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                  <Button
+                    variant="contained"
+                    startIcon={<AutoAwesome />}
+                    onClick={() => navigate('/teacher/co-generator')}
+                    sx={{
+                      background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                    }}
+                  >
+                    Generate with AI
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Add />}
+                    onClick={() => setManualCOModalOpen(true)}
+                  >
+                    Add Manually
+                  </Button>
+                </Box>
+              </Box>
+            ) : (
+              <>
+                {/* Statistics Banner */}
+                {coStatistics && (
+                  <Box
+                    sx={{
+                      mb: 3,
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: 'background.default',
+                      display: 'flex',
+                      gap: 3,
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">Total COs</Typography>
+                      <Typography variant="h6" fontWeight="bold">{coStatistics.total_cos}</Typography>
+                    </Box>
+                    <Divider orientation="vertical" flexItem />
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">Approved</Typography>
+                      <Typography variant="h6" fontWeight="bold" color="success.main">
+                        {coStatistics.approved_cos}
+                      </Typography>
+                    </Box>
+                    <Divider orientation="vertical" flexItem />
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">Avg Quality</Typography>
+                      <Typography variant="h6" fontWeight="bold" color="primary.main">
+                        {((coStatistics.avg_quality || 0) * 100).toFixed(0)}%
+                      </Typography>
+                    </Box>
+                    {coStatistics.bloom_levels && coStatistics.bloom_levels.length > 0 && (
+                      <>
+                        <Divider orientation="vertical" flexItem />
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">Bloom Levels</Typography>
+                          <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5 }}>
+                            {coStatistics.bloom_levels.map((level) => (
+                              <Chip key={level} label={level} size="small" variant="outlined" />
+                            ))}
+                          </Box>
+                        </Box>
+                      </>
+                    )}
+                  </Box>
+                )}
+
+                {/* COs Grid */}
+                <Grid container spacing={2}>
+                  {aiCOs.map((co, index) => {
+                    const getBloomColor = (level) => {
+                      const colors = {
+                        Apply: '#3b82f6',
+                        Analyze: '#8b5cf6',
+                        Evaluate: '#ec4899',
+                        Create: '#10b981',
+                      };
+                      return colors[level] || '#6b7280';
+                    };
+
+                    const getQualityColor = (score) => {
+                      if (score >= 0.8) return 'success';
+                      if (score >= 0.6) return 'warning';
+                      return 'error';
+                    };
+
+                    return (
+                      <Grid item xs={12} md={6} key={co.id}>
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                        >
+                          <Card
+                            sx={{
+                              height: '100%',
+                              border: '1px solid',
+                              borderColor: co.approved ? 'success.main' : 'divider',
+                              bgcolor: 'background.paper',
+                              transition: 'all 0.3s ease',
+                              '&:hover': {
+                                boxShadow: 3,
+                                transform: 'translateY(-2px)',
+                              },
+                            }}
+                          >
+                            <CardContent>
+                              {/* Header */}
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                  <Chip
+                                    label={`CO${co.co_number}`}
+                                    sx={{
+                                      bgcolor: getBloomColor(co.bloom_level),
+                                      color: 'white',
+                                      fontWeight: 'bold',
+                                      fontSize: '0.85rem',
+                                    }}
+                                  />
+                                  <Chip
+                                    label={co.bloom_level}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{
+                                      borderColor: getBloomColor(co.bloom_level),
+                                      color: getBloomColor(co.bloom_level),
+                                    }}
+                                  />
+                                  {co.is_ai_generated ? (
+                                    <Chip
+                                      label="AI"
+                                      size="small"
+                                      icon={<AutoAwesome sx={{ fontSize: 14 }} />}
+                                      sx={{
+                                        bgcolor: 'primary.light',
+                                        color: 'primary.dark',
+                                        fontWeight: 'bold',
+                                      }}
+                                    />
+                                  ) : (
+                                    <Chip
+                                      label="Manual"
+                                      size="small"
+                                      variant="outlined"
+                                      sx={{
+                                        borderColor: 'text.secondary',
+                                        color: 'text.secondary',
+                                      }}
+                                    />
+                                  )}
+                                </Box>
+                                {co.approved && (
+                                  <Chip
+                                    label="Approved"
+                                    size="small"
+                                    color="success"
+                                    icon={<Verified />}
+                                  />
+                                )}
+                              </Box>
+
+                              {/* Description */}
+                              <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.6 }}>
+                                {co.description}
+                              </Typography>
+
+                              {/* Footer */}
+                              <Box sx={{ pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <TrendingUp sx={{ fontSize: 14 }} />
+                                  PO Mappings: {co.po_mappings_raw || co.po_numbers?.join(', ') || 'N/A'}
+                                </Typography>
+                                {co.generation_date && (
+                                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                                    Generated: {new Date(co.generation_date).toLocaleDateString()}
+                                  </Typography>
+                                )}
+                              </Box>
+                            </CardContent>
+                          </Card>
+                        </motion.div>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+
       {/* Tabs for different sections */}
       <Card sx={{ borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
         <Tabs
@@ -313,12 +695,6 @@ const CourseDetail = () => {
           }}
         >
           <Tab label="Enrolled Students" icon={<People />} iconPosition="start" />
-          <Tab
-            label="Course Outcomes"
-            icon={<BarChart />}
-            iconPosition="start"
-            disabled={!course?.course_outcomes?.length}
-          />
           <Tab label="Uploaded Marksheets" icon={<Assignment />} iconPosition="start" />
         </Tabs>
 
@@ -386,39 +762,8 @@ const CourseDetail = () => {
           </CardContent>
         )}
 
-        {/* Course Outcomes Tab */}
-        {activeTab === 1 && (
-          <CardContent sx={{ p: 3 }}>
-            {course?.course_outcomes?.length === 0 ? (
-              <EmptyState title="No Course Outcomes" message="Course outcomes have not been defined yet." />
-            ) : (
-              <Grid container spacing={2}>
-                {course?.course_outcomes?.map((co) => (
-                  <Grid item xs={12} key={co.id}>
-                    <Paper
-                      elevation={0}
-                      sx={{
-                        p: 2,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        borderRadius: 2,
-                        '&:hover': { bgcolor: 'grey.50' },
-                      }}
-                    >
-                      <Box sx={{ display: 'flex', gap: 2 }}>
-                        <Chip label={`CO${co.co_number}`} color="primary" sx={{ fontWeight: 600 }} />
-                        <Typography variant="body2">{co.description}</Typography>
-                      </Box>
-                    </Paper>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </CardContent>
-        )}
-
         {/* Uploaded Marksheets Tab */}
-        {activeTab === 2 && (
+        {activeTab === 1 && (
           <CardContent sx={{ p: 3 }}>
             {marksheets.length === 0 ? (
               <EmptyState
@@ -541,6 +886,11 @@ const CourseDetail = () => {
                             </Box>
                           </Box>
 
+                          {/* CO Mapping Upload */}
+                          <Box sx={{ mt: 2 }}>
+                            <COMappingUpload courseId={id} marksheet={marksheet} />
+                          </Box>
+
                           <Box
                             sx={{
                               mt: 2,
@@ -596,9 +946,9 @@ const CourseDetail = () => {
           }}
         >
           <Assignment />
-          <Typography variant="h6" fontWeight="bold">
+          <Box component="span" sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
             Marksheet Details
-          </Typography>
+          </Box>
         </DialogTitle>
 
         <DialogContent sx={{ mt: 3 }}>
@@ -868,6 +1218,17 @@ const CourseDetail = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Manual CO Manager Modal */}
+      <ManualCOManager
+        open={manualCOModalOpen}
+        onClose={() => setManualCOModalOpen(false)}
+        courseId={id}
+        onSuccess={() => {
+          loadAICOs();
+          loadCourseDetails();
+        }}
+      />
     </PageLayout>
   );
 };

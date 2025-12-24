@@ -1,0 +1,61 @@
+resource_id,title,url,type,CO,topic,estimated_time_min,difficulty,description
+r001,Database Design Full Course - freeCodeCamp,https://www.youtube.com/watch?v=ztHopE5Wnpc,video,CO1,database design,120,medium,Comprehensive database design course covering ER diagrams schemas and best practices
+r002,ER Model Introduction,https://www.youtube.com/watch?v=xsg9BDiwiJE,video,CO1,database design,15,easy,Clear introduction to Entity-Relationship modeling concepts
+r003,Database Design Tutorial - Lucidchart,https://www.lucidchart.com/pages/database-diagram/database-design,website,CO1,database design,20,easy,Visual guide to database design with interactive examples
+r004,Database Design in DBMS - GeeksforGeeks,https://www.geeksforgeeks.org/database-design-in-dbms/,article,CO1,database design,15,easy,Comprehensive guide to database design principles and techniques
+r005,Database Normalization Tutorial - StudyTonight,https://www.studytonight.com/dbms/database-design.php,website,CO1,database design,25,easy,Step-by-step database design tutorial with examples
+r006,SQL Database Design - W3Schools,https://www.w3schools.com/sql/sql_create_db.asp,website,CO1,database design,20,easy,Practical SQL database creation and design fundamentals
+r007,ER Diagrams Explained,https://www.geeksforgeeks.org/introduction-of-er-model/,article,CO1,database design,15,medium,Detailed explanation of ER model components and relationships
+r008,Database Schema Design - JavaTpoint,https://www.javatpoint.com/dbms-schema,article,CO1,database design,18,medium,Understanding database schemas types and design considerations
+r009,Normalization in DBMS - Complete Guide,https://www.youtube.com/watch?v=GFQaEYEc8_8,video,CO2,normalization,45,medium,Complete normalization tutorial from 1NF to BCNF with examples
+r010,Database Normalization 1NF 2NF 3NF BCNF,https://www.youtube.com/watch?v=UrYLYV7WSHM,video,CO2,normalization,30,easy,Step-by-step explanation of all normal forms with clear examples
+r011,Normalization - Neso Academy,https://www.youtube.com/watch?v=xoTyrdT9SZI,video,CO2,normalization,50,medium,Detailed lecture on normalization theory and practice
+r012,Functional Dependencies in DBMS,https://www.youtube.com/watch?v=3xFfmtYbXjU,video,CO2,normalization,20,medium,Understanding functional dependencies and their importance
+r013,Normal Forms Tutorial,https://www.geeksforgeeks.org/normal-forms-in-dbms/,article,CO2,normalization,20,medium,Comprehensive guide to 1NF 2NF 3NF BCNF with examples
+r014,Database Normalization - StudyTonight,https://www.studytonight.com/dbms/database-normalization.php,website,CO2,normalization,25,easy,Interactive normalization tutorial with practice exercises
+r015,Functional Dependencies Explained,https://www.geeksforgeeks.org/types-of-functional-dependencies-in-dbms/,article,CO2,normalization,18,medium,Types of functional dependencies with detailed examples
+r016,Normalization Examples - JavaTpoint,https://www.javatpoint.com/dbms-normalization,article,CO2,normalization,22,medium,Step-by-step normalization examples and solutions
+r017,BCNF in DBMS,https://www.geeksforgeeks.org/boyce-codd-normal-form-bcnf/,article,CO2,normalization,15,medium,Understanding Boyce-Codd Normal Form with examples
+r018,Decomposition in DBMS,https://www.youtube.com/watch?v=TXN0FMP2SfI,video,CO3,normalization,25,medium,Lossless and lossy decomposition explained with examples
+r019,Advanced Normalization Concepts,https://www.geeksforgeeks.org/introduction-of-4th-and-5th-normal-form-in-dbms/,article,CO3,normalization,20,medium,4NF and 5NF multivalued dependencies explained
+r020,Canonical Cover Tutorial,https://www.geeksforgeeks.org/canonical-cover-of-functional-dependencies-in-dbms/,article,CO3,normalization,18,medium,Finding canonical cover step-by-step algorithm
+r021,Attribute Closure in DBMS,https://www.geeksforgeeks.org/finding-attribute-closure-and-candidate-keys-using-functional-dependencies/,article,CO3,normalization,20,medium,Computing attribute closure and finding candidate keys
+r022,Database Normalization Practice,https://www.javatpoint.com/dbms-functional-dependency,article,CO3,normalization,25,medium,Practice problems for functional dependencies
+r023,Dependency Preservation,https://www.geeksforgeeks.org/dependency-preservation-in-dbms/,article,CO3,normalization,15,medium,Understanding dependency preservation in decomposition
+r024,Normalization Solved Examples,https://www.studytonight.com/dbms/database-normalization.php,website,CO3,normalization,30,easy,Collection of solved normalization problems
+r025,Transaction Management in DBMS,https://www.youtube.com/watch?v=P80Js_qClUE,video,CO4,transaction management,40,medium,Complete tutorial on transaction management and ACID properties
+r026,ACID Properties Explained,https://www.youtube.com/watch?v=pomxJOFVcQs,video,CO4,transaction management,18,easy,Clear explanation of Atomicity Consistency Isolation Durability
+r027,Concurrency Control in DBMS,https://www.youtube.com/watch?v=9QJ5bWao7K4,video,CO4,transaction management,30,medium,Lock-based and timestamp-based concurrency control
+r028,Transaction States in DBMS,https://www.geeksforgeeks.org/transaction-states-in-dbms/,article,CO4,transaction management,15,easy,Understanding different states of transactions
+r029,Serializability in DBMS,https://www.geeksforgeeks.org/conflict-serializability/,article,CO4,transaction management,20,medium,Conflict and view serializability with examples
+r030,Concurrency Control - GeeksforGeeks,https://www.geeksforgeeks.org/concurrency-control-in-dbms/,article,CO4,transaction management,22,medium,Comprehensive guide to concurrency control techniques
+r031,Two-Phase Locking Protocol,https://www.geeksforgeeks.org/two-phase-locking-protocol/,article,CO4,transaction management,18,medium,Understanding 2PL strict 2PL and rigorous 2PL
+r032,Deadlock in DBMS,https://www.geeksforgeeks.org/deadlock-in-dbms/,article,CO4,transaction management,20,medium,Deadlock detection prevention and recovery methods
+r033,Transaction Management - StudyTonight,https://www.studytonight.com/dbms/concurrency-control.php,website,CO4,transaction management,25,easy,Easy to understand transaction management concepts
+r034,ACID Properties - JavaTpoint,https://www.javatpoint.com/dbms-transaction-property,article,CO4,transaction management,15,easy,Simple explanation of ACID properties with examples
+r035,Transaction Schedules,https://www.geeksforgeeks.org/types-of-schedules-in-dbms/,article,CO4,transaction management,18,medium,Serial concurrent and serializable schedules explained
+r036,Recovery System in DBMS,https://www.geeksforgeeks.org/recovery-system-in-dbms/,article,CO4,transaction management,22,medium,Log-based recovery and checkpoint mechanisms
+r037,Timestamp Ordering Protocol,https://www.geeksforgeeks.org/timestamp-based-concurrency-control/,article,CO4,transaction management,20,medium,Understanding timestamp-based concurrency control
+r038,MySQL Complete Tutorial - Programming with Mosh,https://www.youtube.com/watch?v=7S_tz1z_5bA,video,CO5,MySQL,180,easy,Complete MySQL course from basics to advanced for beginners
+r039,SQL Tutorial - Full Course,https://www.youtube.com/watch?v=HXV3zeQKqGY,video,CO5,MySQL,240,medium,Comprehensive SQL and database fundamentals course
+r040,MySQL Crash Course,https://www.youtube.com/watch?v=9ylj9NR0Lcg,video,CO5,MySQL,120,easy,Quick MySQL crash course covering essential concepts
+r041,SQL Joins Explained,https://www.youtube.com/watch?v=9yeOJ0ZMUYw,video,CO5,MySQL,25,medium,Clear explanation of INNER LEFT RIGHT and FULL JOINS
+r042,MySQL Aggregate Functions,https://www.youtube.com/watch?v=JLeXM4hKzmA,video,CO5,MySQL,20,easy,Understanding COUNT SUM AVG MIN MAX and GROUP BY
+r043,SQL Subqueries Tutorial,https://www.youtube.com/watch?v=nJIEIzF7tDw,video,CO5,MySQL,30,medium,Nested queries and correlated subqueries explained
+r044,MySQL Tutorial - W3Schools,https://www.w3schools.com/mysql/,website,CO5,MySQL,60,easy,Interactive MySQL tutorial with try-it-yourself examples
+r045,SQL Tutorial - W3Schools,https://www.w3schools.com/sql/,website,CO5,MySQL,50,easy,Complete SQL reference with interactive exercises
+r046,MySQL Official Documentation,https://dev.mysql.com/doc/,website,CO5,MySQL,90,medium,Official MySQL documentation and reference manual
+r047,SQL Basics - GeeksforGeeks,https://www.geeksforgeeks.org/sql-tutorial/,article,CO5,MySQL,40,easy,Comprehensive SQL tutorial covering all basics
+r048,MySQL Commands - JavaTpoint,https://www.javatpoint.com/mysql-tutorial,article,CO5,MySQL,35,easy,Complete MySQL command reference with examples
+r049,SQL Practice - HackerRank,https://www.hackerrank.com/domains/sql,website,CO5,MySQL,120,medium,Practice SQL problems from basic to advanced levels
+r050,SQL Interactive Tutorial - SQLZoo,https://sqlzoo.net/,website,CO5,MySQL,90,easy,Interactive SQL tutorial with instant feedback
+r051,SQL Practice - LeetCode,https://leetcode.com/problemset/database/,website,CO5,MySQL,100,medium,Database problems for interview preparation
+r052,MySQL Joins Tutorial,https://www.geeksforgeeks.org/sql-join-set-1-inner-left-right-and-full-joins/,article,CO5,MySQL,18,medium,Detailed guide to SQL joins with examples
+r053,SQL Aggregate Functions,https://www.geeksforgeeks.org/aggregate-functions-in-sql/,article,CO5,MySQL,15,easy,Guide to using aggregate functions in SQL queries
+r054,MySQL Indexing,https://www.geeksforgeeks.org/indexing-in-databases-set-1/,article,CO5,MySQL,20,medium,Understanding database indexes and optimization
+r055,SQL Views Tutorial,https://www.geeksforgeeks.org/sql-views/,article,CO5,MySQL,15,medium,Creating and using views in SQL databases
+r056,MySQL Stored Procedures,https://www.geeksforgeeks.org/stored-procedures-in-sql/,article,CO5,MySQL,22,medium,Creating stored procedures and functions
+r057,SQL Constraints,https://www.w3schools.com/sql/sql_constraints.asp,website,CO5,MySQL,15,easy,Understanding PRIMARY KEY FOREIGN KEY and constraints
+r058,MySQL Transactions,https://www.geeksforgeeks.org/sql-transactions/,article,CO5,MySQL,18,medium,Implementing transactions in MySQL with examples
+r059,Database Design Complete Tutorial,https://www.youtube.com/watch?v=e7Pr1VgPK4w,video,CO1,database design,45,easy,Beginner-friendly complete database design guide
+r060,Normalization Practice Problems,https://www.youtube.com/watch?v=M8x0BC4dFfE,video,CO2,normalization,35,medium,Solving normalization problems step by step

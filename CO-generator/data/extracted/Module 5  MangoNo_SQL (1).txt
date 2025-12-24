@@ -1,0 +1,169 @@
+the name Mongo comes from “humongous”—with performance and easy data access as core design goals. 
+
+NoSQL Databases:MongoDB 
+
+Comparison of Mongo with MySQL 
+
+the name Mongo comes from “humongous”—with performance and easy data access as core design goals. 
+
+NoSQL Databases:MongoDB 
+
+Comparison of Mongo with MySQL 
+
+Aggregations 
+
+Replication can be simply understood as the duplication of the data-set whereas sharding is partitioning the 
+data-set into discrete parts.By sharding, we divided your collection into different parts. 
+
+Replication and Sharding 
+
+Replicating your database means you make imagers of your data-set. In terms of functionality delivered.  
+
+Replication 
+
+Replication is the method of duplication of data across multiple servers. For example, we have an application 
+and it reads and writes data to a database and says this server A has a name and balance which will be 
+copied/replicate to two other servers in two different locations. 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Replication 
+
+By doing this, will get 
+redundancy and increases 
+data availability with 
+multiple copies of data on 
+different database servers.  
+
+So, it will increase the 
+performance of reading 
+scaling. The set of servers 
+that maintain the same 
+copy of data is known as 
+replica servers or 
+MongoDB instances 
+
+ 
+Replication 
+
+Sharding 
+
+Sharding is a method for allocating data across multiple machines. MongoDB used sharding to help deployment 
+with very big data sets and large throughput the operation. By sharding, you combine more devices to carry data 
+extension and the needs of read and write operations. 
+
+Why Sharding? 
+• Database systems having big data sets or high throughput requests can doubt the ability of a single server. 
+• For example, High query flows can drain the CPU limit of the server. 
+• The working set sizes are larger than the system’s RAM to stress the I/O capacity of the disk drive. 
+
+ 
+ 
+ 
+ 
+Sharding 
+
+How does Sharding work? 
+Sharding determines the problem with horizontal scaling breaking the system dataset and store over 
+multiple servers, adding new servers to increase the volume as needed. 
+
+Now, instead of one signal as primary, 
+we have multiple servers called Shard. 
+We have different routing servers that 
+will route data to the shard servers. For 
+example: Let say we have Data 1, Data 
+2, and Data 3 this will be going to the 
+routing server which will route the data 
+(i.e, Different Data will go to a particular 
+Shard ) Each Shard holds some pieces 
+of data. Here the configuration server will 
+hold the metadata and it will configure 
+the routing server to integrate the 
+particular data to a shard however 
+configure server is the MongoDB 
+instance if it goes down then the entire 
+server will go down, So it again has 
+Replica Configure database 
+
+Sharding 
+
+How does Sharding work? 
+Sharding determines the problem with horizontal scaling breaking the system dataset and store over 
+multiple servers, adding new servers to increase the volume as needed. 
+
+Advantages of Sharding :  
+• Sharding adds more server to a data field 
+automatically adjust data loads across various 
+servers. 
+• The number of operations each shard manage 
+got reduced. 
+• It also increases the write capacity by splitting 
+the write load over multiple instances. 
+• It gives high availability due to the deployment 
+of replica servers for shard and config. 
+• Total capacity will get increased by adding 
+multiple shards. 
+
+GeoSpatial Queries 
+
+MongoDB provides the functionality to store locations under the object type geoJSON and their coordinates 
+against the coordinate field in [longitude, latitude] form where longitude must lie between [-180, 180] and latitude 
+must lie between [-90,90], both inclusive. 
+
+geoJSON types that are provided by MongoDB 
+
+1. POINT: 
+Represents a single location point, declared as below, 
+{  
+type: "Point",  
+coordinates: [ 27, 67 ]  
+} 
+
+2. LINESTRING: 
+The LineString coordinates field is an array of two or more points that represent a 
+path in the real world. 
+It is declared as- 
+{  
+type: "LineString",  
+coordinates: [ [ 27, 67 ], [ 52, 4 ] ]  
+} 
+
+ 
+ 
+geoJSON types that are provided by MongoDB 
+
+GeoSpatial Queries 
+
+3. POLYGON: 
+The Polygon coordinates field is an array of linear rings. Linear rings have at least four coordinates, 
+and the first coordinate is the same as the last, making a loop.  
+
+Polygon coordinates may contain a single linear ring or multiple rings. 
+
+In the case of a single ring, polygon can be declared as, 
+
+{  
+type: "Polygon",  
+coordinates: [[[2, 1], [3, 4], [5, 1], [2, 1]]]  
+} 
+
+ 
+ 
+ 
+geoJSON types that are provided by MongoDB 
+
+GeoSpatial Queries 
+
+geoJSON types that are provided by MongoDB 
+
+GeoSpatial Queries 
+
+GeoSpatial Queries 
+
+

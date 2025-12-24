@@ -30,7 +30,6 @@ import DatasetTable from "../../components/upload/DatasetTable";
 import { courseAPI } from "../../services/api";
 
 const UPLOAD_SERVICE_URL = import.meta.env.VITE_UPLOAD_SERVICE_URL || "http://localhost:8001";
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 const MotionBox = motion.create(Box);
 
@@ -123,38 +122,18 @@ const UploadMarksNew = () => {
         });
       }, 200);
 
-      // First upload to the upload service
+      // Upload to the upload service (this handles everything: table creation, enrollment, marksheet record)
       const uploadResponse = await axios.post(`${UPLOAD_SERVICE_URL}/upload`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round(
-            (progressEvent.loaded * 80) / progressEvent.total
+            (progressEvent.loaded * 100) / progressEvent.total
           );
           setUploadProgress(percentCompleted);
         },
       });
-
-      // Then save the mark sheet metadata to our main API
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `${API_URL}/marksheets`,
-        {
-          courseId: selectedCourse,
-          assessmentName: assessmentName,
-          fileName: file.name,
-          tableName: uploadResponse.data.table_name,
-          columns: uploadResponse.data.columns,
-          rowCount: uploadResponse.data.row_count,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
 
       clearInterval(progressInterval);
       setUploadProgress(100);

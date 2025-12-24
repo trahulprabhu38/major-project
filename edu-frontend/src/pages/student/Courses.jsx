@@ -86,7 +86,7 @@ const StudentCourses = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.4 }}
                 whileHover={{ scale: 1.02, y: -4 }}
-                onClick={() => navigate(`/student/courses/${course.id}/analytics`)}
+                onClick={() => navigate(`/student/courses/${course.id}`)}
                 sx={{
                   cursor: 'pointer',
                   borderRadius: 3,

@@ -14,6 +14,15 @@ import assessmentRoutes from './routes/assessments.js';
 import uploadRoutes from './routes/upload.js';
 import studentRoutes from './routes/students.js';
 import marksheetRoutes from './routes/marksheets.js';
+import aiCORoutes from './routes/aiCourseOutcomes.js';
+import courseOutcomesRoutes from './routes/courseOutcomes.js';
+import attainmentRoutes from './routes/attainment.js';
+import detailedCalculationsRoutes from './routes/detailedCalculations.js';
+import coMappingRoutes from './routes/coMapping.js';
+import seeMarksRoutes from './routes/seeMarks.js';
+import gradesRoutes from './routes/grades.js';
+import cgpaRoutes from './routes/cgpa.js';
+import progressionRoutes from './routes/progression.js';
 
 // Load environment variables
 dotenv.config();
@@ -45,6 +54,15 @@ app.use('/api/assessments', assessmentRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/marksheets', marksheetRoutes);
+app.use('/api/ai-cos', aiCORoutes);
+app.use('/api/course-outcomes', courseOutcomesRoutes);
+app.use('/api/attainment', attainmentRoutes);
+app.use('/api/detailed-calculations', detailedCalculationsRoutes);
+app.use('/api/co-mapping', coMappingRoutes);
+app.use('/api/see-marks', seeMarksRoutes);
+app.use('/api/grades', gradesRoutes);
+app.use('/api/cgpa', cgpaRoutes);
+app.use('/api/progression', progressionRoutes);
 app.use('/api/teacher', courseRoutes);
 
 

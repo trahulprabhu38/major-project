@@ -106,7 +106,7 @@ const Navbar = () => {
                 display: { xs: 'none', sm: 'block' },
               }}
             >
-              OBE System
+              Skill-Sync
             </Typography>
             <Typography
               variant="caption"

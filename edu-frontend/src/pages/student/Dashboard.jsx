@@ -7,6 +7,7 @@ import {
   Typography,
   Chip,
   Button,
+  LinearProgress,
 } from '@mui/material';
 import {
   School,
@@ -38,12 +39,43 @@ const StudentDashboard = () => {
     loadDashboardData();
   }, []);
 
+  const [coursePerformance, setCoursePerformance] = useState({});
+
   const loadDashboardData = async () => {
     try {
       setLoading(true);
       setError(null);
       const response = await studentAPI.getCourses();
-      setCourses(response.data.data || []);
+      const coursesData = response.data.data || [];
+      setCourses(coursesData);
+
+      // Load performance data for each course
+      const performanceData = {};
+      for (const course of coursesData) {
+        try {
+          const [marksRes, analyticsRes] = await Promise.all([
+            studentAPI.getMarks(course.id).catch(() => ({ data: { data: [] } })),
+            studentAPI.getAnalytics(course.id).catch(() => ({ data: { data: {} } })),
+          ]);
+
+          const marks = marksRes.data.data || [];
+          const totalMarks = marks.reduce((sum, m) => sum + m.totalMarks, 0);
+          const totalMaxMarks = marks.reduce((sum, m) => sum + m.maxMarks, 0);
+          const overallPercentage = totalMaxMarks > 0 ? (totalMarks / totalMaxMarks) * 100 : 0;
+
+          performanceData[course.id] = {
+            percentage: overallPercentage,
+            totalMarks,
+            totalMaxMarks,
+            assessmentCount: marks.length,
+            rank: analyticsRes.data.data?.rank,
+            totalStudents: analyticsRes.data.data?.totalStudents,
+          };
+        } catch (err) {
+          console.error(`Error loading performance for course ${course.id}:`, err);
+        }
+      }
+      setCoursePerformance(performanceData);
     } catch (err) {
       console.error('Error loading dashboard:', err);
       setError(err.message);
@@ -60,6 +92,12 @@ const StudentDashboard = () => {
   const currentSemesterCourses = courses.filter(
     (c) => c.semester === Math.max(...courses.map((course) => course.semester))
   );
+  
+  const avgPerformance = courses.length > 0
+    ? courses.reduce((sum, c) => sum + (coursePerformance[c.id]?.percentage || 0), 0) / courses.length
+    : 0;
+  
+  const coursesWithMarks = courses.filter(c => coursePerformance[c.id]?.assessmentCount > 0).length;
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, pl: { md: 2 } }}>
@@ -84,7 +122,7 @@ const StudentDashboard = () => {
               <School sx={{ fontSize: 48, opacity: 0.9 }} />
               <Box>
                 <Typography variant="h4" fontWeight="bold" gutterBottom>
-                  Welcome, {user?.name?.split(' ')[0]}! 🎓
+                  Welcome, {user?.name?.split(' ')[0]}! 
                 </Typography>
                 <Typography variant="body1" sx={{ opacity: 0.95 }}>
                   {totalCourses > 0
@@ -161,7 +199,7 @@ const StudentDashboard = () => {
           >
             <StatsCard
               title="Avg Performance"
-              value="--"
+              value={`${avgPerformance.toFixed(1)}%`}
               icon={TrendingUp}
               color="secondary.main"
               bgColor="secondary.light"
@@ -260,7 +298,7 @@ const StudentDashboard = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.4 }}
                   whileHover={{ scale: 1.02, y: -4 }}
-                  onClick={() => navigate(`/student/courses/${course.id}/analytics`)}
+                  onClick={() => navigate(`/student/courses/${course.id}`)}
                   sx={{
                     cursor: 'pointer',
                     borderRadius: 3,
@@ -306,6 +344,45 @@ const StudentDashboard = () => {
 
                   <CardContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                      {coursePerformance[course.id] && (
+                        <Box sx={{ mb: 1 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              Performance
+                            </Typography>
+                            <Chip
+                              label={`${coursePerformance[course.id].percentage.toFixed(1)}%`}
+                              size="small"
+                              color={
+                                coursePerformance[course.id].percentage >= 60
+                                  ? 'success'
+                                  : coursePerformance[course.id].percentage >= 40
+                                  ? 'warning'
+                                  : 'error'
+                              }
+                              sx={{ fontWeight: 600 }}
+                            />
+                          </Box>
+                          <LinearProgress
+                            variant="determinate"
+                            value={coursePerformance[course.id].percentage}
+                            sx={{
+                              height: 6,
+                              borderRadius: 3,
+                              bgcolor: 'grey.200',
+                              '& .MuiLinearProgress-bar': {
+                                borderRadius: 3,
+                                bgcolor:
+                                  coursePerformance[course.id].percentage >= 60
+                                    ? 'success.main'
+                                    : coursePerformance[course.id].percentage >= 40
+                                    ? 'warning.main'
+                                    : 'error.main',
+                              },
+                            }}
+                          />
+                        </Box>
+                      )}
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="body2" color="text.secondary">
                           Credits
@@ -322,14 +399,11 @@ const StudentDashboard = () => {
                       </Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="body2" color="text.secondary">
-                          Status
+                          Assessments
                         </Typography>
-                        <Chip
-                          label={course.status || 'Active'}
-                          size="small"
-                          color="success"
-                          sx={{ fontWeight: 600 }}
-                        />
+                        <Typography variant="body2" fontWeight={600}>
+                          {coursePerformance[course.id]?.assessmentCount || 0}
+                        </Typography>
                       </Box>
                     </Box>
 

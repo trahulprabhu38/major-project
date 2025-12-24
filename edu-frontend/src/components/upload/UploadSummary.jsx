@@ -122,7 +122,7 @@ const UploadSummary = ({ result, onViewTable, onExport }) => {
           <StatCard
             icon={StorageIcon}
             label="Table Name"
-            value={result.table_name}
+            value={result.table_name || 'N/A'}
             color="#3b82f6"
           />
         </Grid>
@@ -130,7 +130,7 @@ const UploadSummary = ({ result, onViewTable, onExport }) => {
           <StatCard
             icon={TableRowsIcon}
             label="Total Rows"
-            value={result.row_count.toLocaleString()}
+            value={result.row_count ? result.row_count.toLocaleString() : '0'}
             color="#8b5cf6"
           />
         </Grid>
@@ -138,7 +138,7 @@ const UploadSummary = ({ result, onViewTable, onExport }) => {
           <StatCard
             icon={ViewColumnIcon}
             label="Total Columns"
-            value={result.column_count}
+            value={result.columns ? result.columns.length : '0'}
             color="#06b6d4"
           />
         </Grid>
@@ -257,9 +257,24 @@ const UploadSummary = ({ result, onViewTable, onExport }) => {
               </Button>
             </Box>
 
-            <Typography variant="caption" color="text.secondary">
-              Action: {result.if_exists_action}
-            </Typography>
+            {result.enrollment && (
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Students Created:</strong> {result.enrollment.created || 0}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Students Enrolled:</strong> {result.enrollment.enrolled || 0}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Already Enrolled:</strong> {result.enrollment.already_enrolled || 0}
+                </Typography>
+              </Box>
+            )}
+            {result.scores_processed !== undefined && (
+              <Typography variant="body2" color="success.main" fontWeight="bold">
+                ✅ Processed {result.scores_processed} score records
+              </Typography>
+            )}
           </Box>
         </CardContent>
       </MotionCard>

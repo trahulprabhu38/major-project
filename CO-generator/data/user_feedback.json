@@ -1,0 +1,47 @@
+{
+  "timestamp": "2025-11-29T12:21:52.393757",
+  "cos": [
+    {
+      "co_num": 1,
+      "text": "CO1 Apply ER modeling and database design concepts to design and implement database solutions for real-world applications",
+      "bloom_level": "Apply",
+      "approved": true,
+      "feedback": "make it longer"
+    },
+    {
+      "co_num": 2,
+      "text": "CO2 Analyse given scenarios and apply suitable database techniques including normalization and functional dependencies",
+      "bloom_level": "Analyze",
+      "approved": false,
+      "feedback": ""
+    },
+    {
+      "co_num": 3,
+      "text": "CO3 Analyse scenarios involving transaction management and concurrency control using ACID properties",
+      "bloom_level": "Analyze",
+      "approved": false,
+      "feedback": ""
+    },
+    {
+      "co_num": 4,
+      "text": "CO4 Analyse query optimization techniques and execution plans for database performance improvement",
+      "bloom_level": "Analyze",
+      "approved": false,
+      "feedback": ""
+    },
+    {
+      "co_num": 5,
+      "text": "CO5 Ability to conduct experiments as individual or team using modern tools like MySQL and MongoDB and Oracle",
+      "bloom_level": "Evaluate",
+      "approved": false,
+      "feedback": ""
+    },
+    {
+      "co_num": 6,
+      "text": "CO6 Write clear and concise experiment reports that detail the methods, results, and conclusions of DBMS experiments",
+      "bloom_level": "Create",
+      "approved": false,
+      "feedback": ""
+    }
+  ]
+}

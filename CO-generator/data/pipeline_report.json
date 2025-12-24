@@ -1,0 +1,424 @@
+{
+  "timestamp": "2025-11-28T13:20:44.812582",
+  "architecture": "Enhanced Multi-Stage AI Pipeline",
+  "components": {
+    "document_intelligence": "Semantic chunking + embedding",
+    "knowledge_graph": "Neo4j-ready with in-memory fallback",
+    "retrieval": "Graph-RAG hybrid (vector + graph)",
+    "generation": "Fine-tuned Qwen with LoRA",
+    "refinement": "RLHF-style reward scoring"
+  },
+  "results": {
+    "cos": [
+      {
+        "co_text": "CO1 at Apply level.",
+        "bloom_level": "Apply",
+        "po_mappings": "PO1, PO2, PO3",
+        "reward_score": 0.64,
+        "individual_scores": {
+          "conciseness": 0.325,
+          "vtu_compliance": 0.5,
+          "obe_alignment": 1.0,
+          "bloom_accuracy": 1.0,
+          "specificity": 0.0
+        },
+        "approved": false,
+        "justification": {
+          "source_nodes": [],
+          "retrieval_sources": [
+            "vector_search",
+            "vector_search",
+            "vector_search"
+          ],
+          "graph_paths": [],
+          "score_breakdown": {
+            "conciseness": 0.32499999999999996,
+            "vtu_compliance": 0.5,
+            "obe_alignment": 1.0,
+            "bloom_accuracy": 1.0,
+            "specificity": 0.0
+          }
+        },
+        "vtu_checks": {
+          "proper_format": false,
+          "has_action_verb": true,
+          "correct_bloom_verb": true,
+          "specific_content": false
+        }
+      },
+      {
+        "co_text": "CO2 at Apply level.",
+        "bloom_level": "Apply",
+        "po_mappings": "PO1, PO2, PO3",
+        "reward_score": 0.64,
+        "individual_scores": {
+          "conciseness": 0.325,
+          "vtu_compliance": 0.5,
+          "obe_alignment": 1.0,
+          "bloom_accuracy": 1.0,
+          "specificity": 0.0
+        },
+        "approved": false,
+        "justification": {
+          "source_nodes": [],
+          "retrieval_sources": [
+            "vector_search",
+            "vector_search",
+            "vector_search"
+          ],
+          "graph_paths": [],
+          "score_breakdown": {
+            "conciseness": 0.32499999999999996,
+            "vtu_compliance": 0.5,
+            "obe_alignment": 1.0,
+            "bloom_accuracy": 1.0,
+            "specificity": 0.0
+          }
+        },
+        "vtu_checks": {
+          "proper_format": false,
+          "has_action_verb": true,
+          "correct_bloom_verb": true,
+          "specific_content": false
+        }
+      },
+      {
+        "co_text": "CO3 at Analyze level.",
+        "bloom_level": "Analyze",
+        "po_mappings": "PO1, PO2, PO3",
+        "reward_score": 0.64,
+        "individual_scores": {
+          "conciseness": 0.325,
+          "vtu_compliance": 0.5,
+          "obe_alignment": 1.0,
+          "bloom_accuracy": 1.0,
+          "specificity": 0.0
+        },
+        "approved": false,
+        "justification": {
+          "source_nodes": [],
+          "retrieval_sources": [
+            "vector_search",
+            "vector_search",
+            "vector_search"
+          ],
+          "graph_paths": [],
+          "score_breakdown": {
+            "conciseness": 0.32499999999999996,
+            "vtu_compliance": 0.5,
+            "obe_alignment": 1.0,
+            "bloom_accuracy": 1.0,
+            "specificity": 0.0
+          }
+        },
+        "vtu_checks": {
+          "proper_format": false,
+          "has_action_verb": true,
+          "correct_bloom_verb": true,
+          "specific_content": false
+        }
+      },
+      {
+        "co_text": "CO4 at Analyze level.",
+        "bloom_level": "Analyze",
+        "po_mappings": "PO1, PO2, PO3",
+        "reward_score": 0.64,
+        "individual_scores": {
+          "conciseness": 0.325,
+          "vtu_compliance": 0.5,
+          "obe_alignment": 1.0,
+          "bloom_accuracy": 1.0,
+          "specificity": 0.0
+        },
+        "approved": false,
+        "justification": {
+          "source_nodes": [],
+          "retrieval_sources": [
+            "vector_search",
+            "vector_search",
+            "vector_search"
+          ],
+          "graph_paths": [],
+          "score_breakdown": {
+            "conciseness": 0.32499999999999996,
+            "vtu_compliance": 0.5,
+            "obe_alignment": 1.0,
+            "bloom_accuracy": 1.0,
+            "specificity": 0.0
+          }
+        },
+        "vtu_checks": {
+          "proper_format": false,
+          "has_action_verb": true,
+          "correct_bloom_verb": true,
+          "specific_content": false
+        }
+      },
+      {
+        "co_text": "CO5 at Evaluate level.",
+        "bloom_level": "Evaluate",
+        "po_mappings": "PO1, PO2, PO3",
+        "reward_score": 0.64,
+        "individual_scores": {
+          "conciseness": 0.325,
+          "vtu_compliance": 0.5,
+          "obe_alignment": 1.0,
+          "bloom_accuracy": 1.0,
+          "specificity": 0.0
+        },
+        "approved": false,
+        "justification": {
+          "source_nodes": [],
+          "retrieval_sources": [
+            "vector_search",
+            "vector_search",
+            "vector_search"
+          ],
+          "graph_paths": [],
+          "score_breakdown": {
+            "conciseness": 0.32499999999999996,
+            "vtu_compliance": 0.5,
+            "obe_alignment": 1.0,
+            "bloom_accuracy": 1.0,
+            "specificity": 0.0
+          }
+        },
+        "vtu_checks": {
+          "proper_format": false,
+          "has_action_verb": true,
+          "correct_bloom_verb": true,
+          "specific_content": false
+        }
+      },
+      {
+        "co_text": "CO6 at Create level.",
+        "bloom_level": "Create",
+        "po_mappings": "PO1, PO2, PO3",
+        "reward_score": 0.64,
+        "individual_scores": {
+          "conciseness": 0.325,
+          "vtu_compliance": 0.5,
+          "obe_alignment": 1.0,
+          "bloom_accuracy": 1.0,
+          "specificity": 0.0
+        },
+        "approved": false,
+        "justification": {
+          "source_nodes": [],
+          "retrieval_sources": [
+            "vector_search",
+            "vector_search",
+            "vector_search"
+          ],
+          "graph_paths": [],
+          "score_breakdown": {
+            "conciseness": 0.32499999999999996,
+            "vtu_compliance": 0.5,
+            "obe_alignment": 1.0,
+            "bloom_accuracy": 1.0,
+            "specificity": 0.0
+          }
+        },
+        "vtu_checks": {
+          "proper_format": false,
+          "has_action_verb": true,
+          "correct_bloom_verb": true,
+          "specific_content": false
+        }
+      }
+    ],
+    "co_output": "CO1 at Apply level.\nCO2 at Apply level.\nCO3 at Analyze level.\nCO4 at Analyze level.\nCO5 at Evaluate level.\nCO6 at Create level.",
+    "metrics": {
+      "timestamp": "2025-11-28T13:20:44.812088",
+      "total_cos_generated": 6,
+      "bloom_classification_accuracy": 1.0,
+      "average_quality_score": 0.613,
+      "average_conciseness_score": 0.4,
+      "average_vtu_compliance": 0.167,
+      "average_obe_alignment": 0.833,
+      "po_coverage": 0.25,
+      "latency": {
+        "document_processing_ms": 0.0,
+        "embedding_generation_ms": 0.0,
+        "graph_construction_ms": 0.0,
+        "vector_search_ms": 0.0,
+        "graph_traversal_ms": 0.0,
+        "llm_inference_ms": 5793.07,
+        "refinement_ms": 0.03,
+        "total_pipeline_ms": 5793.1
+      },
+      "co_metrics": [
+        {
+          "co_number": 1,
+          "co_text": "CO1 at Apply level.",
+          "bloom_level_expected": "Apply",
+          "bloom_level_detected": "Apply",
+          "bloom_accuracy": 1.0,
+          "word_count": 4,
+          "conciseness_score": 0.4,
+          "vtu_compliance_score": 0.167,
+          "obe_alignment_score": 0.833,
+          "po_mappings": [
+            "PO1",
+            "PO2",
+            "PO3"
+          ],
+          "semantic_similarity_to_reference": 0.436,
+          "has_action_verb": false,
+          "has_specific_concepts": false,
+          "overall_quality_score": 0.604
+        },
+        {
+          "co_number": 2,
+          "co_text": "CO2 at Apply level.",
+          "bloom_level_expected": "Apply",
+          "bloom_level_detected": "Apply",
+          "bloom_accuracy": 1.0,
+          "word_count": 4,
+          "conciseness_score": 0.4,
+          "vtu_compliance_score": 0.167,
+          "obe_alignment_score": 0.833,
+          "po_mappings": [
+            "PO1",
+            "PO2",
+            "PO3"
+          ],
+          "semantic_similarity_to_reference": 0.574,
+          "has_action_verb": false,
+          "has_specific_concepts": false,
+          "overall_quality_score": 0.617
+        },
+        {
+          "co_number": 3,
+          "co_text": "CO3 at Analyze level.",
+          "bloom_level_expected": "Analyze",
+          "bloom_level_detected": "Analyze",
+          "bloom_accuracy": 1.0,
+          "word_count": 4,
+          "conciseness_score": 0.4,
+          "vtu_compliance_score": 0.167,
+          "obe_alignment_score": 0.833,
+          "po_mappings": [
+            "PO1",
+            "PO2",
+            "PO3"
+          ],
+          "semantic_similarity_to_reference": 0.564,
+          "has_action_verb": false,
+          "has_specific_concepts": false,
+          "overall_quality_score": 0.616
+        },
+        {
+          "co_number": 4,
+          "co_text": "CO4 at Analyze level.",
+          "bloom_level_expected": "Analyze",
+          "bloom_level_detected": "Analyze",
+          "bloom_accuracy": 1.0,
+          "word_count": 4,
+          "conciseness_score": 0.4,
+          "vtu_compliance_score": 0.167,
+          "obe_alignment_score": 0.833,
+          "po_mappings": [
+            "PO1",
+            "PO2",
+            "PO3"
+          ],
+          "semantic_similarity_to_reference": 0.577,
+          "has_action_verb": false,
+          "has_specific_concepts": false,
+          "overall_quality_score": 0.618
+        },
+        {
+          "co_number": 5,
+          "co_text": "CO5 at Evaluate level.",
+          "bloom_level_expected": "Evaluate",
+          "bloom_level_detected": "Evaluate",
+          "bloom_accuracy": 1.0,
+          "word_count": 4,
+          "conciseness_score": 0.4,
+          "vtu_compliance_score": 0.167,
+          "obe_alignment_score": 0.833,
+          "po_mappings": [
+            "PO1",
+            "PO2",
+            "PO3"
+          ],
+          "semantic_similarity_to_reference": 0.512,
+          "has_action_verb": false,
+          "has_specific_concepts": false,
+          "overall_quality_score": 0.611
+        },
+        {
+          "co_number": 6,
+          "co_text": "CO6 at Create level.",
+          "bloom_level_expected": "Create",
+          "bloom_level_detected": "Create",
+          "bloom_accuracy": 1.0,
+          "word_count": 4,
+          "conciseness_score": 0.4,
+          "vtu_compliance_score": 0.167,
+          "obe_alignment_score": 0.833,
+          "po_mappings": [
+            "PO1",
+            "PO2",
+            "PO3"
+          ],
+          "semantic_similarity_to_reference": 0.54,
+          "has_action_verb": false,
+          "has_specific_concepts": false,
+          "overall_quality_score": 0.614
+        }
+      ]
+    },
+    "latency": {
+      "total_ms": 44576.18,
+      "avg_per_co_ms": 7429.36
+    },
+    "profiler_stats": {
+      "vector_search": {
+        "count": 6,
+        "total_ms": 673.91,
+        "mean_ms": 112.32,
+        "min_ms": 83.39,
+        "max_ms": 241.61,
+        "std_ms": 57.92
+      },
+      "graph_traversal": {
+        "count": 6,
+        "total_ms": 0.07,
+        "mean_ms": 0.01,
+        "min_ms": 0.01,
+        "max_ms": 0.04,
+        "std_ms": 0.01
+      },
+      "llm_inference": {
+        "count": 6,
+        "total_ms": 43901.56,
+        "mean_ms": 7316.93,
+        "min_ms": 5364.27,
+        "max_ms": 15153.94,
+        "std_ms": 3509.87
+      },
+      "refinement": {
+        "count": 6,
+        "total_ms": 0.17,
+        "mean_ms": 0.03,
+        "min_ms": 0.02,
+        "max_ms": 0.05,
+        "std_ms": 0.01
+      }
+    },
+    "cache_stats": {
+      "size": 0,
+      "max_size": 5000,
+      "hits": 0,
+      "misses": 0,
+      "hit_rate": "0.0%"
+    }
+  },
+  "explainability": {
+    "graph_based": true,
+    "source_tracking": true,
+    "score_breakdown": true
+  }
+}

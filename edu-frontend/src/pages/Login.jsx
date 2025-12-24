@@ -69,7 +69,7 @@ export default function Login() {
           >
             <School sx={{ fontSize: 60, color: 'primary.main' }} />
             <Typography variant="h4" fontWeight="bold" gutterBottom>
-              OBE Portal
+              Skill-Sync
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Outcome-Based Education Analysis System
@@ -136,14 +136,6 @@ export default function Login() {
                 </Link>
               </Typography>
             </Box>
-
-            <Alert severity="info" sx={{ mt: 3 }}>
-              <Typography variant="caption">
-                <strong>Demo Credentials:</strong><br />
-                <strong>Teacher:</strong> rajesh.kumar@example.edu / password123<br />
-                <strong>Student:</strong> student1@example.edu / password123
-              </Typography>
-            </Alert>
           </form>
         </MotionPaper>
       </Container>

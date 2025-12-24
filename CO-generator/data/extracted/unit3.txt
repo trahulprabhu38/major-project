@@ -1,0 +1,3097 @@
+DBMS[22AI33]  2023 
+
+ Dayananda Sagar College of Engineering 
+           Kumara Swamy Layout,Bangalore-560078 
+
+                     Department of Artificial Intelligence & Machine Learning 
+
+Unit -3 
+
+Relational  Data  Model  and  Relational  Database  Constraints:  Relational  Model  Concepts, 
+
+Relational Model Constraints and Relational Database Schemas, Update  Operations, Transactions 
+
+and Dealing with Constraint Violations.  
+
+Relational  Algebra:  Unary  Relational  Operations,  SELECT,  and  PROJECT,  Relational  Algebra 
+
+Operations  from  Set  Theory  Binary  Relational  Operations:  JOIN  and  DIVISION,  Additional 
+
+Relational Operations, Examples of Queries in Relational Algebra. 
+
+Text Book: 
+1.  Database  systems  Models,  Languages,  Design  and  Application  Programming, 
+RamezElmasri and Shamkant B. Navathe, 7th Edition, 2017, Pearson. 
+
+2.  Database  management  systems,  Ramakrishnan,  and  Gehrke,  3rd  Edition,  2014,  McGraw 
+Hill 
+
+Prepared by, 
+Dr.Aruna M G 
+Associate Professor 
+Department of AI&ML 
+DSCE 
+Bangalore 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 1 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Both Relational Model and Relational Algebra 
+
+Relational Model Concepts 
+
+•  Relational Model: The model was first proposed by Dr. E.F. Codd or Ted Codd of IBM in 
+
+1970 . 
+
+•  The relational model uses the concepts of a mathematical relation-which looks like a table 
+of  values.  Now  in  several  commercial  products  (DB2,  ORACLE,  SQL  Server,  SYBASE, 
+INFORMIX). 
+
+•  The table is called a relation, a row is called a tuple, and column header is called attribute. 
+1.  Relational Model 
+
+It represents database as a collection of relations. 
+
+• 
+•  A relation (table) contains rows and columns. 
+•  Each column represents one type of information. 
+•  Each row represents related data. 
+
+2.  Relation 
+
+•  The main construct for representing data in relational model is called relation. 
+• 
+•  When a relation is thought of as a table of values, each row in the table represents a 
+
+In relational model terminology, the table is called a relation. 
+
+collection of related data values. 
+
+•  The table name and column names are used to help in interpreting the meaning of the 
+
+values in each row. 
+
+•  A relation may be thought of as a set of rows and set of columns. 
+•  Each row represents a fact that corresponds to a real-world entity or relationship. 
+•  Each row has a value of an item or set of items that uniquely identifies that row in the 
+
+table. 
+
+•  Sometimes row-ids or sequential numbers are assigned to identify the rows in the table. 
+•  Each  column  typically  is  called  by  its  column  name  or  column  header  or  attribute 
+
+name. 
+
+USN 
+1DS21AI001 
+1DS20AI045 
+1DS22AI010 
+1DS20AI012 
+
+NAME 
+Ajay 
+Sanujana 
+Gupta 
+Akash  
+
+SEMESTER  MARKS 
+5 
+7 
+3 
+7 
+
+78.8 
+67.4 
+68.3 
+81.3 
+
+3.  Attribute 
+
+• 
+• 
+
+In relational model terminology, column of a table is represented as a attribute. 
+It is also known as field. 
+
+4.  Tuple 
+• 
+• 
+
+In relational model terminology, row of a table is represented as a tuple. 
+It is also known as record. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 2 
+
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+5.  Domain 
+
+•  A domain D is a set of atomic values. 
+•  Atomic means values are distinct & indivisible. 
+•  A domain is given a name, data type & format. 
+
+Example:  
+
+Domain Name        Datatype         Format 
+DoJ 
+Phno                   String        ddd-ddd-dddddd 
+
+     date           mm-dd-yyyy 
+
+6. Relational Schema 
+
+•  A  relational  schema  R,  denoted  by  R(A1,…An)  is  made  up  of  relation  name  R  &  list  of 
+
+attributes A1,A2…An. 
+
+•  Each attribute Ai is the name of a role played by some domain D in the relation schema R. 
+•  D is called the domain of Ai & denoted by dom(Ai). 
+•  A relation schema is used to describe a relation:  R is called name of the relation. 
+
+7. Degree of Relation 
+
+•  The total number of attributes in a relation is called degree (or arity) of relation.  
+
+Example: 
+
+•  STUDENT(Name, SSN, HomePhone, Address, OfficePhone, Age, GRA) 
+
+No. of Attribute = 7 
+The degree of relation STUDENT is 7 
+
+•  The domain for the attributes of the STUDENT are dom(Name)=Names  
+
+dom(SSN)=Social_Security_Number 
+
+8. Cardinality : 
+
+The cardinality of a relation instance is the number of tuples in it. The cardinality of 
+relation STUDENT is 5 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 3 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+9. Relation (Relation State) 
+
+•  A relation (or relation state) r of the relation schema R(A1,..An),also denoted by r(R) is a set 
+
+of n tuples r={t1,t2,…,tn}. 
+
+•  Each n-tuple t is an ordered list of n values t=<v1,..,vn> where each value vi , 1<=i<=n, is 
+
+an element of dom(Ai) or a special null value.  
+Definition of relation can be restated as follows:  
+
+•  A  relation  (or  relation  state)  r(R)  is  a  mathematical  relation  of  degree  n  of  the  domains 
+dom(A1),dom(A2),..dom(An),which  is  the  subset  of  the  cartesian  product  of  the  domains 
+that define R: 
+
+•  R(A1, A2, .........., An) 
+
+r(R)  dom (A1) X dom (A2) X ....X dom(An) 
+
+r of R:  a specific "value" or population of R. 
+
+•  R:  schema of the relation 
+• 
+•  R is also called the intension of a relation 
+• 
+r is also called the extension of a relation 
+
+FORMAL DEFINITIONS 
+•  Let S1 = {0,1} 
+•  Let  S2 =  {a,b,c} 
+•  Let R  S1 X S2 
+•  Then for example: r(R) = {<0,a> , <0,b> , <1,c> } 
+
+ is  one  possible  “state”  or  “population”  or  “extension”  r  of  the  relation  R,  defined  over 
+
+domains S1 and S2. It has three tuples. 
+
+DEFINITION SUMMARY 
+Informal Terms    
+Table    
+Column 
+Row 
+Values in a column 
+Table Definition 
+Populated Table 
+
+        Formal Terms  
+Relation  
+Attribute/Domain 
+Tuple 
+Domain 
+Schema of a Relation 
+Extension 
+
+10. Characteristics Of Relations 
+1.  Ordering of tuples in a relation r(R):  
+•  The tuples are not considered to be ordered, even though they appear to be in the tabular form.  
+
+The relation does not require this ordering 
+
+2.  Ordering of attributes in a relation schema R (and of values within each tuple):  
+•  The ordering of attributes is not important, because the attribute name appears with its value. 
+•  There is no reason to prefer having one attribute value appear before another in a tuple. 
+•  The attributes in R(A1, A2, ..., An) and the values in t=<v1, v2, ..., vn> to be ordered .  
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 4 
+
+ 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+ Ex: STUDENT(“Regno”,”Name”,”Age”,”Sex”) 
+Valid:  t1=<”1SG04CS001”,”Aruna”,23,”F”) 
+Invalid:  t2=<”aruna”,23,”!SG04CS001”,”F”) 
+
+3.Values in a tuple:  
+  All values are considered atomic(indivisible).  
+  A  special  null  value  is  used  to  represent  values  that  are  unknown  or  inapplicable  to  certain 
+
+tuples.  
+
+  In general, NULL values, means value unknown or value exists but is not available 
+
+11. Relational Model Notation: 
+
+•  A relational schema R of degree n is denoted by   R(A1 ,..,An). 
+•  An  n-tuple  t  in  a  relation  r(R)  is  denoted  by  t=<v1,.,vn  >,where  vi  is  the  value 
+
+corresponding to attribute Ai. 
+
+•  The component values of a tuple t by t[Ai] = vi (the value of attribute Ai for tuple t). 
+Similarly, t[Au, Av, ..., Aw] refers to the subtuple of t containing the values    
+
+           <vu,vw,..,vz>attributes Au, Av,., Aw, respectively. 
+
+•  The letters Q,R,S denote relation names. 
+•  The letters q,r,s denote relation states. 
+•  The letters t,u,v denote tuples. 
+•  STUDENT(SSN,Name,..)  refers  to  the  relation  schema.  The  name  of  a  relation  schema 
+
+indicates the current set of tuples in the relation. 
+
+•  An  attribute  A  can  be  qualified  with  the  relation  name  by  R.A-  Eg.STUDENT.Name  or 
+
+STUDENT.Age. 
+
+Note:- the same name may be used for two attributes in different relations. 
+t[Name]=<„Barbara Benson‟> 
+t[Name,SSN,Age]=<„Barbara‟,‟563-789‟,23> 
+t=<„Barbara Benson‟,‟563-789‟,23,null,3.45>   
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 5 
+
+ 
+ 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+ 12. Relational Integrity Constraints 
+
+•  Constraints are conditions  that must hold on all  valid relation instances. 
+•  A constraints  is  a limitation  or restrictions that can be placed on a field  to  ensure that the 
+
+user enters only valid data. 
+
+Categories of constraints 
+1. 
+2. 
+3. 
+
+Inherent model-based or implicit constraints 
+Schema-based or explicit constraints 
+Application-based or semantic constraints or business rules 
+
+1.  Inherent model-based or implicit constraints 
+Constraints that is inherent in a data model. 
+Example: The constraint that a relation cannot have duplicate values 
+
+2.  Schema-based or explicit constraints 
+
+This type of constraint can be expressed directly in schemas of the data model by 
+specifying in DDL 
+
+• 
+
+ There are four main types of constraints: 
+
+1.  Domain constraints 
+2.  Key constraints 
+3.  Entity integrity constraints 
+4.  Referential integrity constraints  
+
+Domain Constraints 
+
+•  Domain constraints specify that the value of each attribute A must be an atomic value from 
+
+the domain dom(A) for that attribute. 
+
+Example : Domain is given a name, datatype and format. 
+ Student_Name Varchar(30) 
+
+Datatype associated with domains typically include 
+• 
+Integer ( short-integer, integer, long-integer ) 
+•  Real Number ( float and double-precision float) 
+•  Character 
+•  Fixed and Variable length string  
+•  Date and Time 
+•  Money 
+
+Domain Constraint = data type + Constraints (NOT NULL / UNIQUE / PRIMARY 
+KEY / FOREIGN KEY / CHECK / DEFAULT) 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 6 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Types of keys: 
+
+1. Super Key 
+2. Primary Key 
+3. Candidate Key 
+4. Alternate Key 
+5. Foreign Key 
+6. Compound Key 
+7. Composite Key 
+8. Surrogate Key/Artificial key 
+
+Key Constraints 
+
+•  A relation is defined as a set of tuples.  
+•  All the tuples in a relation must be distinct/Unique/no duplication.  
+•  This means no two tuples can have the same combination of values for all their attributes. 
+
+o  Keys play an important role in the relational database. 
+
+o 
+
+It  is  used  to  uniquely  identify  any  record  or  row  of  data  from  the  table.  It  is  also 
+
+used to establish and identify relationships between tables. 
+
+A Key satisfies two Constraints: 
+
+1)Superkey of R: 
+ A set of attributes SK of R such that no two tuples in any valid relation instance r(R) will have 
+the same value for SK.   
+That is, for any distinct tuples t1 and t2 in r(R), t1[SK]  t2[SK]. 
+•  A super key is a group of single or multiple keys that identifies rows or a tuple uniquely in a 
+
+table.  
+
+•  A super key is the superset of a key known as a Candidate key 
+•  Adding zero or more attributes to the candidate key generates the super key. 
+•  A candidate key is a super key but vice versa is not true. 
+•  Super Key values may also be NULL. 
+
+Example : Let's consider an EMPLOYEE_DETAIL table example where we have the 
+following attribute: 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 7 
+
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Emp_SSN: The SSN number is stored in this field. 
+
+Emp_Id: An attribute that stores the value of the employee identification number. 
+
+Emp_name: An  attribute  that  stores  the  name  of  the  employee  holding  the  specified 
+employee id. 
+
+Emp_email: An attribute that stores the email id of the specified employees. 
+
+Note : These all are the set of super keys which, together or combining with other 
+prime attributes, can identify a table uniquely. 
+
+Example : Let's consider an STUDENT table example where we have the following 
+attribute 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 8 
+
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+1.  {Roll_no} 
+2.  {Registration_no} 
+3.  {Roll_no, Registration_no}, 
+4.  {Roll_no, Name} 
+5.  {Name, Registration_no} 
+6.  {Roll_no, Name, Registration_no} 
+
+1.  {Roll_no} 
+2.  {Phone} 
+3.  {Roll_no, Phone}, 
+4.  {Roll_no, Name} 
+5.  {Roll no, Name, Age} 
+6.  {Roll_no, Name, Age, Phone} 
+7.  {Phone,Name} 
+8.  {Phone,Age} 
+9.  {Phone, Name, Age} 
+
+Example: 
+The given relation R(A, B, C, D, E, F) and check for super keys by following given dependencies:  
+
+Functional dependencies         Super key 
+AB->CDEF                               YES 
+     YES 
+CD->ABEF                     
+     NO 
+CB->DF                        
+     NO  
+D->BC                        
+
+By Using key AB we can identify the rest of the attributes (CDEF) of the table.  
+Similarly, Key CD. But, by using key CB we can only identify D and F, not A and E.  
+Similarly key D.  
+
+2) Key of R: A "minimal" superkey; that is, a superkey K such that removal of any attribute from K 
+results in a set of attributes that is not a superkey. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 9 
+
+ 
+ 
+ 
+ 
+ 
+  
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Example: The CAR relation schema: 
+CAR(State, Reg#, SerialNo, Make, Model, Year) 
+has two keys Key1 = {State, Reg#}, Key2 = {SerialNo}, which are also superkeys.  
+{SerialNo, Make} is a superkey but not  a key. 
+If  a  relation  has  several  candidate  keys,  one  is  chosen  arbitrarily  to  be  the  primary  key.  The 
+primary key attributes are underlined. 
+CAR relation with two candidate Keys LicenseNumber and EngineSerialNumber 
+
+Primary Key 
+It does not allow null values or blank. 
+
+ 
+  No duplicate value exists for that particular field. 
+  Two rows can‟t have the same primary key value 
+  A table cannot have more than one primary key. 
+ 
+It is selected from a set of candidate keys.  
+  The minimal set of attributes is choose has primary key. 
+  Any candidate key can become a primary key.  
+ 
+  The  value  in  a  primary  key  column  can  never  be  modified  or  updated  if  any  foreign  key 
+
+It depends upon the requirements and is done by the Database Administrator (DBA). 
+
+refers to that primary key. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 10 
+
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Unique Key 
+It is similar to PK,  
+It allows null values or blank. 
+
+• 
+• 
+•  No duplicate value exists for that particular field. 
+
+Secondary Key /Alternate Key  
+
+•  An  alternate  key  i.e.  not  used  as  PK.  Or  the  candidate  key  other  than  the  primary  key  is 
+
+called an alternate key. 
+
+•  All the keys which are not primary keys are called alternate keys / secondary key. 
+•  These values are repeated. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 11 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+•  There  may  be  one  or  more  attributes  or  a  combination  of  attributes  that  uniquely  identify 
+
+each tuple in a relation. 
+
+DBMS[22AI33]  2023 
+
+For example, Employee relation has two attributes, Employee_Id and PAN_No, that act as 
+candidate  keys.  In  this  relation,  Employee_Id  is  chosen  as  the  primary  key,  so  the  other 
+candidate key, PAN_No, acts as the Alternate key. 
+
+Example:- SNAME, and ADDRESS is Alternate keys 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 12 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+•  Consider the table shown above. 
+
+STUD_NO, as well as PHONE both, are candidate keys for relation 
+STUDENT but PHONE will be an alternate key  
+(only one out of many candidate keys). 
+
+Candidate Key 
+
+•  A relation schema may have more than one key; each is called a candidate key. 
+•  A candidate key is an attribute or set of attributes that can uniquely identify a tuple. 
+•  Except  for  the  primary  key,  the  remaining  attributes  are  considered  a  candidate  key.  The 
+
+candidate keys are as strong as the primary key. 
+•  A candidate key which have no redundant attributes 
+
+Example : 
+
+{Roll_no}: This key doesn't have any redundant or repeating attribute. So, it can be considered 
+as a candidate key. 
+{Registration_no}: This key also doesn't have any repeating attribute. So, it can be considered 
+as a candidate key. 
+
+For example: In the EMPLOYEE table, id is best suited for the primary key. The rest of the 
+attributes,  like  SSN,  Passport_Number,  License_Number,  etc.,  are  considered  a  candidate 
+key. 
+
+EX: {SSN} is the only candidate key for EMPLOYEE, so it is also the PK. 
+Ex: CAR { LicenseNo, EngineNo, Make, Year, Color }. LicenseNo and EngineNo are     
+The two Candidate key used to identify tuples in the relation. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 13 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Properties of Candidate key: 
+It must contain unique values 
+
+ 
+
+  Candidate key in SQL may have multiple attributes 
+
+  Must not contain null values 
+
+ 
+
+It should contain minimum fields to ensure uniqueness 
+
+  Uniquely identify each record in a table 
+
+Composite Key or Concatenated Key or Compound Key 
+
+•  A combination of two or more fields that together comprise the primary key.  
+•  Any one of the key attribute is composite attribute. 
+
+Ex: CAR Relation Registration ( Regno, State), VehicleId, Make, Model, Year, Color 
+The two key attributes, Registration and VehicleId. 
+
+For example, in employee relations, we assume that an employee may be assigned 
+multiple  roles,  and  an  employee  may  work  on  multiple  projects  simultaneously.  So  the 
+primary key will be composed of all three attributes, namely Emp_ID, Emp_role, and Proj_ID 
+in combination. So these attributes act as a composite key since the primary key comprises 
+more than one attribute. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 14 
+
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Artificial key/ Surrogate Keys 
+
+  The key created using arbitrarily assigned data are known as artificial keys.  
+  These  keys  are  created  when  a  primary  key  is  large  and  complex  and  has  no  relationship 
+
+with many other relations.  
+
+  The data values of the artificial keys are usually numbered in a serial order. 
+  An artificial key which aims to uniquely identify each record is called a surrogate key. 
+  This  kind  of partial key  in  dbms is  unique because it is  created when  you don‟t have  any 
+
+natural primary key. 
+
+  They do not lend any meaning to the data in the table. 
+  Surrogate key in DBMS is usually an integer.  
+  A surrogate key is a value generated right before the record is inserted into a table 
+  A surrogate key is also known by various other names, which are pseudo key, technical key, 
+synthetic key, arbitrary unique identifier, entity identifier and database sequence number. 
+
+Surrogate keys in sql are allowed when 
+
+  No property has the parameter of the primary key. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 15 
+
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+ 
+
+In the table when the primary key is too big or complicated. 
+
+Fname 
+
+Lastname 
+
+Start Time 
+
+End Time 
+
+Anne 
+Jack 
+Anna 
+Shown 
+
+Smith 
+Francis 
+McLean 
+Willam 
+
+09:00 
+08:00 
+11:00 
+14:00 
+
+18:00 
+17:00 
+20:00 
+23:00 
+
+Above,  given  example,  shown  shift  timings  of  the  different 
+employee.  In  this  example,  a  surrogate  key  is  needed  to  uniquely 
+identify each employee. 
+
+Entity Integrity Constraint 
+ Relational Database Schema:  
+A set S of relation schemas that belong to the same database. S is the name of the database. 
+S = {R1, R2, ..., Rn} 
+
+ Entity Integrity:  
+The primary key attributes PK of each relation schema R in S cannot have null values in any 
+tuple of r(R).  
+This is because primary key values are used to identify  the individual tuples. 
+t[PK]  null for any tuple t in r(R) 
+
+•   Note:  Other  attributes  of  R  may  be  similarly  constrained  to 
+
+disallow  null  values,  even  though  they  are  not  members  of  the 
+
+primary key. 
+
+•  These constraints involve a single relation. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 16 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Referential Integrity Constraint 
+
+•  A constraint is specified between (or involving) two relations. 
+• 
+•  The  referential  integrity  constraint  states  that  a  tuple  in  one  relation  that  refers  to  another 
+
+It used to maintain the consistency among tuples in the two relations. 
+
+relation must refer to an existing tuple in the relation. 
+
+Foreign Key (Referencing Key) 
+
+•  FOREIGN  KEY  is  a  column  that  creates  a  relationship  between  two  tables  or  within  the 
+
+table. 
+
+•  A field in a table that refers to a PK key field in another table. Or it can be defined as a copy 
+
+of a primary key in another table. 
+It can have null value and duplication is allowed. 
+
+• 
+•  Used to specify a relationship among tuples in two relations: the referencing relation and the 
+
+referenced relation. 
+
+•  Tuples in the referencing relation R1 have attributes FK (called foreign key attributes) that 
+reference the primary  key  attributes PK of the  referenced  relation R2. A  tuple t1  in  R1 is 
+said to reference a tuple t2 in R2 if t1[FK] = t2[PK]. 
+
+•  The value in the foreign key column (or columns) FK  of  the referencing relation R1 
+
+can be either: 
+  (1) a value of an existing primary key value of the corresponding primary key PK in the   
+
+        referenced relation R2, or.. 
+
+  (2) a null. 
+  In case (2), the FK in R1 should not be a part of its own primary key. 
+ A referential integrity constraint can be displayed in a relational database schema as a    
+directed arc from R1.FK to R2. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 17 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Other Types of Constraints 
+
+Semantic Integrity Constraints: 
+
+•  based on application semantics and cannot be expressed by the model per se 
+•  E.g., “the max. no. of hours per employee for all projects he or she works on is 56 hrs per 
+
+week” 
+
+•  A constraint specification language may have to be used to express these 
+•  SQL-99 allows triggers and ASSERTIONS to allow for some of these. 
+
+Functional Dependency Constraint: 
+
+•  A functional relationship among two sets of attributes X and Y. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 18 
+
+ 
+ 
+ 
+ 
+ 
+  
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+•  This  constraint  specifies  that  the  value  of  X  determines  the  value  of  Y  in  all  states  of  a 
+
+relation. 
+It is denoted by X Y. 
+
+• 
+
+Relational database schema & Integrity constraints 
+A  relational  DB  schema  S  is  a  set  of  relation  schema  S={R1,R2,….Rm}  &  set  of  integrity 
+constraints(IC). 
+A  relational  DB  instance  DB={r1,r2,…,rm}  such  that  the  ri    is  an  instance  of  Ri  &  ri  relation 
+satisfy the integrity constraints specified in IC. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 19 
+
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Query  is  a  question  or  requesting  information.  Query  language  is  a  language 
+
+which is used to retrieve information from a database. 
+
+Query language is divided into two types − 
+
+  Procedural language 
+
+  Non-procedural language 
+
+Procedural language 
+Information  is  retrieved  from  the  database  by  specifying  the  sequence  of 
+
+operations to be performed. 
+
+For Example: Relational algebra. 
+
+Structure Query language (SQL) is based on relational algebra. 
+
+Relational algebra consists of a set of operations that take one or two relations as 
+
+an input and produces a new relation as output. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 20 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Relational Algebra 
+Relational algebra is a procedural query language, which takes instances of relations as input and 
+yields  instances  of  relations  as  output.  It  uses  operators  to  perform  queries.  An  operator  can  be 
+either  unary  or  binary.  They  accept  relations  as  their  input  and  yield  relations  as  their  output. 
+Relational  algebra  is  performed  recursively  on  a  relation  and  intermediate  results  are  also 
+considered relations. 
+
+The different types of relational algebra operations are as follows − 
+
+  Select operation 
+
+  Project operation 
+
+  Rename operation 
+
+  Union operation 
+
+ 
+
+Intersection operation 
+
+  Difference operation 
+
+  Cartesian product operation 
+
+ 
+
+Join operation 
+
+  Division operation 
+
+Operation(Symbols) 
+
+Purpose 
+
+Select(σ) 
+
+Projection(π) 
+
+Union Operation(∪) 
+
+Set Difference(-) 
+
+Intersection(∩) 
+
+Cartesian Product(X) 
+
+The SELECT operation is used for selecting a subset of the 
+tuples according to a given selection condition 
+The projection eliminates all attributes of the input relation but 
+those mentioned in the projection list. 
+UNION is symbolized by symbol. It includes all tuples that are 
+in tables A or in B. 
+– Symbol denotes it. The result of A – B, is a relation which 
+includes all tuples that are in A but not in B. 
+Intersection defines a relation consisting of a set of all tuple that 
+are in both A and B. 
+Cartesian operation is helpful to merge columns from two 
+relations. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 21 
+
+ 
+ 
+ 
+Operation(Symbols) 
+
+Purpose 
+
+DBMS[22AI33]  2023 
+
+Inner Join 
+
+Theta Join(θ) 
+
+EQUI Join 
+
+Natural Join(⋈) 
+
+Outer Join 
+
+Left Outer Join(
+
+) 
+
+Right Outer join(
+
+) 
+
+Full Outer Join(
+
+) 
+
+Inner join, includes only those tuples that satisfy the matching 
+criteria. 
+The general case of JOIN operation is called a Theta join. It is 
+denoted by symbol θ. 
+When a theta join uses only equivalence condition, it becomes a 
+equi join. 
+Natural join can only be performed if there is a common 
+attribute (column) between the relations. 
+In an outer join, along with tuples that satisfy the matching 
+criteria. 
+In the left outer join, operation allows keeping all tuple in the 
+left relation. 
+In the right outer join, operation allows keeping all tuple in the 
+right relation. 
+In a full outer join, all tuples from both relations are included in 
+the result irrespective of the matching condition. 
+
+sid 
+
+bid 
+
+day 
+
+R1 
+
+22 
+
+58 
+
+101 
+
+10/10/99 
+
+103 
+
+11/12/99 
+
+sid 
+
+sname 
+
+rating 
+
+age 
+
+S1 
+
+22 
+
+31 
+
+58 
+
+Anu 
+
+Laxmi 
+
+7 
+
+8 
+
+Roopa 
+
+10 
+
+45.0 
+
+55.5 
+
+35.0 
+
+sid 
+
+sname 
+
+rating 
+
+S2 
+
+28 
+31 
+44 
+58 
+
+Yamuna 
+Laxmi 
+Geeta 
+Roopa 
+
+9 
+8 
+5 
+10 
+
+age 
+
+35.0 
+55.0 
+35.0 
+
+                35.0 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 22 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+SELECT (σ): 
+
+Unary operator (one relation as operand) 
+It selects tuples that satisfy the given predicate from a relation. 
+
+p is prepositional logic formula which may use connectors like and, or, and not. These terms may 
+
+use relational operators like − =, ≠, ≥, < ,  >,  ≤. 
+σp(r) 
+
+σ is the predicate 
+
+r stands for relation which is the name of the table 
+
+p is prepositional logic 
+
+OR 
+
+𝜍<𝑠𝑒𝑙𝑒𝑐𝑡𝑖𝑜𝑛 𝑐𝑜𝑛𝑑𝑖𝑡𝑖𝑜𝑛> 𝑅 
+
+where <selection condition> 
+
+• may have Boolean conditions AND, OR, and NOT 
+
+• has clauses of the form: 
+
+<attribute name> <comparison op> <constant value> 
+
+or 
+
+<attribute name> <comparison op> <attribute name> 
+
+1. Selects tuples from S1  where sname = „Anu‟. 
+
+σ Sname = "Anu" (S1) 
+2. σsubject = "database"(Books) 
+
+Output − Selects tuples from books where subject is 'database'. 
+
+3. σsubject = "database" and price = "450"(Books) 
+
+Output − Selects tuples from books where subject is 'database' and  
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 23 
+
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+'price' is 450. 
+
+4. σsubject = "database" and price = "450" or year > "2010"(Books) 
+
+Output − Selects tuples from books where subject is 'database' and 'price' is 450 or those books 
+published after 2010. 
+
+Projection(π) : 
+
+It projects column(s) that satisfy a given predicate. 
+
+∏A1, A2, An (r) 
+
+Where A1, A2 , An are attribute names of relation r. 
+
+Uary operator (one relation as operand) 
+
+ Keeps specified attributes and discards the others: 
+
+𝜋<𝑎𝑡𝑡𝑟𝑖𝑏𝑢𝑡𝑒 𝑙𝑖𝑠𝑡> 𝑅 
+
+• Result of PROJECT operation is a set of distinct tuples 
+
+Duplicate rows are automatically eliminated, as relation is a set. 
+
+sname 
+
+rating 
+
+Yamuna 
+
+Laxmi 
+
+Geeta 
+
+9 
+
+8 
+
+5 
+
+Roopa 
+
+10 
+
+sname, rating(S2) 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 24 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+sname 
+
+rating 
+
+Yamuna 
+
+9 
+
+Roopa 
+
+10 
+
+sname, rating(S2) (rating > 8(S2)) 
+
+Rename(ρ):  
+Rename is a unary operation used for renaming attributes of a relation. 
+
+ρ(a/b)R will rename the attribute 'b' of the relation by 'a'.  
+Or 
+
+ρ x (E) 
+
+Where the result of expression E is saved with name of x. 
+
+Renaming can be used by three methods, which are as follows − 
+
+  Changing name of the relation. 
+
+  Changing name of the attribute. 
+
+  Changing both. 
+
+Unary RENAME operator 
+
+• Rename relation 
+
+𝜌𝑆 ( 𝑅) 
+
+• Rename attributes 
+
+𝜌(𝐵1,𝐵2,…𝐵𝑛) (𝑅) 
+
+• Rename relation and its attributes 
+
+𝜌𝑆(𝐵1,𝐵2,…,𝐵𝑛) (𝑅) 
+
+Union, Intersection, Set Difference 
+It performs binary union between two given relations and is defined as 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 25 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Union : Builds a relation from tuples appearing in either or both of the specified relations. 
+
+r ∪ s = { t | t ∈ r or t ∈ s} 
+Notation − r U s 
+Where r and s are either database relations or relation result set (temporary relation). 
+
+NOTE: 
+For a union operation to be valid, the following conditions must hold − 
+
+r, and s must have the same number of attributes. 
+
+ 
+  Attribute domains must be compatible. 
+  Duplicate tuples are automatically eliminated. 
+
+sid 
+
+sname 
+
+rating 
+
+22 
+
+31 
+44 
+58 
+28 
+
+Anu 
+
+Laxmi 
+Geeta 
+Roopa 
+Yamuna 
+
+7 
+
+8 
+5 
+10 
+9 
+
+age 
+
+45.0 
+
+55.0 
+35.0 
+
+                35.0 
+
+35.0 
+
+S1  S2 
+
+Projects the names of the authors who have either written a 
+book or an article or both. 
+∏ author (Books) ∪ ∏ author (Articles) 
+
+Intersection: Builds a relation consisting of tuples that appear in both the relations. 
+
+sid 
+
+31 
+58 
+
+sname 
+
+Laxmi 
+Roopa 
+
+rating 
+
+8 
+10 
+
+age 
+
+55.0 
+
+                35.0 
+
+S1 ∩ S2 
+
+Provides the name of authors who have written books and 
+articles both. 
+
+∏ author (Books) ∩  ∏ author (Articles) 
+
+Set Difference: Builds a relation of tuples appearing in the first but not the second of two specified 
+relations. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 26 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+S1  S2 
+
+sid 
+
+sname 
+
+rating 
+
+age 
+
+22 
+
+Anu 
+
+7 
+
+45.0 
+
+Provides the name of authors who have written books not 
+articles. 
+
+∏ author (Books) − ∏ author (Articles) 
+
+Cross- Product / Cartesian Product (Χ) 
+
+Cross-Product:  
+Builds  a  relation  from  two  specified  relations,  such  that  it  consists  of    all  possible  relations,  one 
+from each of the two relations. 
+
+Combines information of two different relations into one. 
+
+Notation − r Χ s 
+
+Where r and s are relations and their output will be defined as − 
+
+r Χ s = { q t | q ∈ r and t ∈ s} 
+
+Each row of S1 is paired with each row of R1. 
+
+Result schema has one field per field of S1 and R1, with field names `inherited‟ if possible. 
+– Conflict : Both S1 and R1 have a field called sid . 
+
+sid 
+22 
+22 
+31 
+31 
+58 
+58 
+
+sname 
+Anu 
+Anu 
+Laxmi 
+Laxmi 
+Roopa  
+Roopa  
+
+rating 
+7 
+7 
+8 
+8 
+10 
+10 
+
+age 
+45.0 
+45.0 
+55.5 
+55.5 
+35.0 
+35.0 
+
+sid 
+22 
+58 
+22 
+58 
+22 
+58 
+
+bid 
+101 
+103 
+101 
+103 
+101 
+103 
+
+day 
+10/10/99 
+11/12/99 
+10/10/99 
+10/10/99 
+11/12/99 
+10/10/99 
+11/12/99 
+
+A  relation,  which  shows  all  the  books  and  articles  written  by 
+tutorialspoint. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 27 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Division Operator (÷):  
+
+The division operator is used for queries which involve the 'all'. 
+
+R1 ÷ R2 = tuples of R1 associated with all tuples of R2. 
+OR 
+Division operator A÷B or A/B can be applied if and only if: 
+ 
+ 
+
+Attributes of B is proper subset of Attributes of A. 
+The relation returned by division operator will have attributes = (All 
+
+attributes of A – All Attributes of B) 
+
+ 
+
+The relation returned by division operator will return those tuples from 
+
+relation A which are associated to every B’s tuple.                                              
+                                              A 
+
+x  y 
+
+a  1 
+
+b  2 
+
+a  2 
+
+d  4 
+
+                                                                                                    ÷∏ 
+                                                                                                  B 
+
+y 
+
+1 
+
+2 
+
+ The resultant of A/B is   
+
+                                                                                                A ÷ B 
+
+x 
+
+a 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 28 
+
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Division can be expressed in terms of Cross Product , Set 
+Difference and Projection. 
+ In the above example , for A/B , compute all  x values that are not disqualified by 
+some y in B. 
+
+ x value is disqualified if attaching y value from B, we obtain xy tuple that is not in 
+A. 
+
+ Disqualified x values:     ∏x(( ∏x(A) × B ) – A) 
+ So     A/B  = ∏x( A )  − all disqualified tuples 
+          A/B   = ∏x( A )  −  ∏x(( ∏x(A) × B ) – A) 
+ In the above example , disqualified tuples are  
+
+b  2 
+
+d  4 
+
+ So, the resultant is  
+
+x 
+
+a 
+
+Example2: 
+Retrieve the name of the subject that is taught in all courses. 
+Table1  
+
+                                       Table2 
+
+Course 
+Name 
+ System 
+Btech 
+ Database  Mtech 
+Btech 
+Database 
+Btech  
+Algebra 
+
+Course 
+Btech 
+Mtech 
+Btech 
+
+Name 
+
+database 
+
+The resulting operation must have all combinations of tuples of relation S that are present in the 
+first relation or R. 
+Example3 
+Retrieve names of employees who work on all the projects that John Smith works on. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 29 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Consider the Employee table given below − 
+
+DBMS[22AI33]  2023 
+
+Eno 
+
+123 
+
+123 
+
+121 
+
+Pno 
+
+P1 
+
+P2 
+
+P3 
+
+Pno 
+
+P1 
+
+P2 
+
+Pname 
+
+Market 
+
+Sales 
+
+Name 
+
+John 
+
+Smith 
+
+A 
+
+÷ 
+Works on the following − 
+
+Eno 
+
+123 
+
+123 
+
+= 
+The result is as follows 
+
+Eno 
+
+123 
+
+The expression is as follows 
+Smith <- ΠPno(σEname = „john smith‟ (employee * works on Pno=Eno)) 
+
+Join Operations: 
+
+A Join operation combines related tuples from different relations, if and only 
+if a given join condition is satisfied. It is denoted by ⋈. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 30 
+
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+Example: 
+
+EMPLOYEE 
+
+EMP_CODE 
+
+EMP_NAME 
+
+Stephan 
+
+Jack 
+
+Harry 
+
+101 
+
+102 
+
+103 
+
+SALARY 
+
+EMP_CODE 
+
+SALARY 
+
+101 
+
+102 
+
+103 
+
+50000 
+
+30000 
+
+25000 
+
+1. 
+
+Operation: (EMPLOYEE ⋈ SALARY)    
+
+2.   
+
+EMP_CODE 
+
+EMP_NAME 
+
+SALARY 
+
+101 
+
+102 
+
+103 
+
+Stephan 
+
+50000 
+
+Jack 
+
+Harry 
+
+30000 
+
+25000 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 31 
+
+ 
+ 
+Types of Join operations: 
+
+DBMS[22AI33]  2023 
+
+Various forms of join operation are: 
+
+Inner Joins: 
+
+  Theta join 
+  EQUI join 
+  Natural join 
+
+Outer join: 
+
+  Left Outer Join 
+  Right Outer Join 
+  Full Outer Join 
+
+1. Natural Join: 
+
+o  A natural join is the set of tuples of  all combinations in R and S that are equal on 
+
+their common attribute names. 
+
+o  or 
+o  Natural join can only be performed if there is a common attribute 
+
+(column) between the relations.  
+
+o  The name and type of the attribute must be same. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 32 
+
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+o 
+
+It is denoted by ⋈. 
+
+Example: Let's use the above EMPLOYEE table and SALARY table: 
+
+Input: 
+
+1. 
+
+∏EMP_NAME, SALARY (EMPLOYEE ⋈ SALARY)   
+
+Output: 
+
+EMP_NAME 
+
+SALARY 
+
+Stephan 
+
+50000 
+
+Jack 
+
+Harry 
+
+30000 
+
+25000 
+
+ Example2: 
+                  EMP 
+
+Name   
+
+ID     
+
+Dept_Name   
+
+  A 
+
+120 
+
+B 
+
+C 
+
+D 
+
+125 
+
+110 
+
+111 
+
+IT 
+
+HR 
+
+Sales 
+
+IT 
+
+DEPT  
+
+Dept_Name       Manager      
+
+Sales 
+
+Production 
+
+IT 
+
+Y 
+
+Z 
+
+A 
+
+Natural join between EMP and DEPT with condition : 
+
+EMP.Dept_Name = DEPT.Dept_Name 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 33 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+    
+     
+ 
+ 
+ 
+            
+                                                                                                   EMP ⋈ DEPT 
+
+Name       ID           Dept_Name       Manager      
+
+DBMS[22AI33]  2023 
+
+A 
+
+C 
+
+D 
+
+120 
+
+110 
+
+111 
+
+IT 
+
+Sales 
+
+IT 
+
+A 
+
+Y 
+
+A 
+
+2.Theta Join 
+The general case of JOIN operation is called a Theta join. It is denoted 
+by symbol θ 
+Example 
+A ⋈θ B 
+Theta join can use any conditions in the selection criteria. 
+For example: 
+A ⋈ A.column 2 >  B.column 2 (B) 
+
+2.  Conditional  Join: Conditional  join  works  similarly  to  natural  join.  In  natural 
+join, by default condition is equal between common attributes while in conditional 
+join we can specify any condition such as greater than, less than, or not equal.  
+Example: 
+
+R  
+
+ID  Sex  Marks 
+
+1 
+
+2 
+
+3 
+
+F 
+
+F 
+
+F 
+
+45 
+
+55 
+
+60 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 34 
+
+ 
+ 
+ 
+ 
+                                                                                                                               
+ 
+ 
+ 
+ 
+ 
+ 
+       
+ 
+ 
+S                                                                                                                          
+
+DBMS[22AI33]  2023 
+
+ID       Sex       Marks     
+
+10 
+
+11 
+
+12 
+
+M 
+
+M 
+
+M 
+
+20 
+
+22 
+
+59 
+
+Join between R and S with condition  R.marks >= S.marks 
+
+R.ID     R.Sex     R.Marks     S.ID     S.Sex     S.Marks    
+
+1 
+
+1 
+
+2 
+
+2 
+
+3 
+
+3 
+
+3 
+
+F 
+
+F 
+
+F 
+
+F 
+
+F 
+
+F 
+
+F 
+
+3. Outer Join: 
+
+45 
+
+45 
+
+55 
+
+55 
+
+60 
+
+60 
+
+60 
+
+10 
+
+11 
+
+10 
+
+11 
+
+10 
+
+11 
+
+12 
+
+M 
+
+M 
+
+M 
+
+M 
+
+M 
+
+M 
+
+M 
+
+20 
+
+22 
+
+20 
+
+22 
+
+20 
+
+22 
+
+59 
+
+The  outer  join  operation  is  an  extension  of  the  join  operation.  It  is  used  to  deal  with 
+missing information. 
+
+Example: 
+
+EMPLOYEE 
+
+EMP_NAME 
+
+STREET 
+
+CITY 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 35 
+
+ 
+ 
+DBMS[22AI33]  2023 
+
+Ram 
+
+Civil line 
+
+Mumbai 
+
+Shyam 
+
+Park street 
+
+Kolkata 
+
+Ravi 
+
+Hari 
+
+M.G. Street 
+
+Delhi 
+
+Nehru nagar  Hyderabad 
+
+FACT_WORKERS 
+
+EMP_NAME 
+
+BRANCH 
+
+SALARY 
+
+Infosys 
+
+10000 
+
+Wipro 
+
+HCL 
+
+TCS 
+
+20000 
+
+30000 
+
+50000 
+
+Ram 
+
+Shyam 
+
+Kuber 
+
+Hari 
+
+Input: 
+
+1. 
+
+(EMPLOYEE ⋈ FACT_WORKERS)   
+
+Output: 
+
+EMP_NAME 
+
+STREET 
+
+CITY 
+
+BRANCH 
+
+SALARY 
+
+Ram 
+
+Shyam 
+
+Hari 
+
+Civil line 
+
+Mumbai 
+
+Infosys 
+
+Park street 
+
+Kolkata 
+
+Wipro 
+
+Nehru nagar 
+
+Hyderabad 
+
+TCS 
+
+10000 
+
+20000 
+
+50000 
+
+An outer join is basically of three types: 
+
+a.  Left outer join 
+
+b.  Right outer join 
+
+c.  Full outer join 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 36 
+
+ 
+ 
+DBMS[22AI33]  2023 
+
+a. Left outer join: 
+
+o  Left  outer  join  contains  the  set  of  tuples  of  all  combinations  in  R  and  S  that  are 
+
+equal on their common attribute names. 
+
+In the left outer join, tuples in R have no matching tuples in S. 
+
+It is denoted by ⟕. 
+
+o 
+
+o 
+
+Example: Using the above EMPLOYEE table and FACT_WORKERS table 
+
+Input: 
+
+1. 
+
+EMPLOYEE ⟕ FACT_WORKERS    
+
+EMP_NAME 
+
+STREET 
+
+CITY 
+
+BRANCH 
+
+SALARY 
+
+Ram 
+
+Shyam 
+
+Hari 
+
+Ravi 
+
+Civil line 
+
+Mumbai 
+
+Infosys 
+
+Park street 
+
+Kolkata 
+
+Wipro 
+
+Nehru street 
+
+Hyderabad 
+
+TCS 
+
+M.G. Street 
+
+Delhi 
+
+NULL 
+
+10000 
+
+20000 
+
+50000 
+
+NULL 
+
+b. Right outer join: 
+
+o  Right  outer  join  contains  the  set  of  tuples  of  all  combinations  in  R  and  S  that  are 
+
+equal on their common attribute names. 
+
+In right outer join, tuples in S have no matching tuples in R. 
+
+It is denoted by ⟖. 
+
+o 
+
+o 
+
+Example: Using the above EMPLOYEE table and FACT_WORKERS Relation 
+
+Input: 
+
+1. 
+
+EMPLOYEE ⟖ FACT_WORKERS   
+
+Output: 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 37 
+
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+EMP_NAME 
+
+BRANCH 
+
+SALARY 
+
+STREET 
+
+CITY 
+
+Ram 
+
+Shyam 
+
+Hari 
+
+Kuber 
+
+Infosys 
+
+Wipro 
+
+TCS 
+
+HCL 
+
+10000 
+
+20000 
+
+50000 
+
+30000 
+
+Civil line 
+
+Mumbai 
+
+Park street 
+
+Kolkata 
+
+Nehru street 
+
+Hyderabad 
+
+NULL 
+
+NULL 
+
+c. Full outer join: 
+
+o  Full  outer  join  is  like  a  left  or  right  join  except  that  it  contains  all  rows  from  both 
+
+tables. 
+
+o 
+
+In full outer join, tuples in R that have no matching tuples in S and tuples in S that 
+
+have no matching tuples in R in their common attribute name. 
+
+o 
+
+It is denoted by ⟗. 
+
+Example: Using the above EMPLOYEE table and FACT_WORKERS table 
+
+Input: 
+
+1. 
+
+EMPLOYEE ⟗ FACT_WORKERS   
+
+Output: 
+
+EMP_NAME 
+
+STREET 
+
+CITY 
+
+BRANCH 
+
+SALARY 
+
+Ram 
+
+Shyam 
+
+Hari 
+
+Ravi 
+
+Kuber 
+
+Civil line 
+
+Mumbai 
+
+Infosys 
+
+Park street 
+
+Kolkata 
+
+Wipro 
+
+Nehru street 
+
+Hyderabad 
+
+TCS 
+
+M.G. Street 
+
+Delhi 
+
+NULL 
+
+NULL 
+
+NULL 
+
+HCL 
+
+10000 
+
+20000 
+
+50000 
+
+NULL 
+
+30000 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 38 
+
+ 
+ 
+DBMS[22AI33]  2023 
+
+4. Equi join: 
+
+It is also known as an inner join. It is the most common join. It is based on matched data as 
+per the equality condition. The equi join uses the comparison operator(=). 
+
+Example: 
+
+CUSTOMER RELATION 
+
+CLASS_ID  NAME 
+
+1 
+
+2 
+
+3 
+
+John 
+
+Harry 
+
+Jackson 
+
+PRODUCT 
+
+PRODUCT_ID  CITY 
+
+Delhi 
+
+Mumbai 
+
+Noida 
+
+1 
+
+2 
+
+3 
+
+Input: 
+
+1. 
+
+CUSTOMER ⋈ CUSTOMER.CLASS_ID= PRODUCT.PRODUCT_ID PRODUCT 
+
+2.  Output: 
+
+CLASS_ID 
+
+NAME 
+
+PRODUCT_ID 
+
+1 
+
+2 
+
+John 
+
+Harry 
+
+1 
+
+2 
+
+CITY 
+
+Delhi 
+
+Mumbai 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 39 
+
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+3 
+
+Harry 
+
+3 
+
+Noida 
+
+5. Inner Join 
+An INNER JOIN is the default join which retrieves the intersection of two 
+tables. It compares each row of the first table with each row of the second 
+table. If the pairs of these rows satisfy the join-predicate, they are joined 
+together. 
+
+  Other Joins 
+
+In addition to these there are two more joins − 
+
+  SELF JOIN − is used to join a table to itself as if the table were 
+two tables, temporarily renaming at least one table in the SQL 
+statement. 
+
+  CROSS Join − returns the Cartesian product of the sets of 
+
+records from the two or more joined tables. 
+
+Examples of Queries in Relational Algebra 
+Query  1. Retrieve  the  name  and  address  of  all  employees  who  work  for 
+the „Research‟ department. 
+
+RESEARCH_DEPT ← σDname=„Research‟(DEPARTMENT) 
+RESEARCH_EMPS ← (RESEARCH_DEPT  Dnumber=DnoEMPLOYEE) 
+RESULT ← πFname, Lname, Address(RESEARCH_EMPS) 
+
+As a single in-line expression, this query becomes: 
+
+πFname, Lname, Address (σDname=„Research‟(DEPARTMENT 
+Dnumber=Dno(EMPLOYEE)) 
+This  query  could  be  specified  in  other  ways;  for  example,  the  order  of 
+the JOIN and SELECT operations could be reversed, or the JOIN could be replaced 
+by  a NATURAL  JOIN after  renaming  one  of  the  join  attributes  to  match  the  other 
+join attribute name. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 40 
+
+ 
+ 
+ 
+ 
+ 
+ 
+  
+  
+  
+DBMS[22AI33]  2023 
+
+Query  2. For  every  project  located  in  „Stafford‟,  list  the  project  number, 
+the controlling department number, and the department manager‟s last name, address, 
+and birth date. 
+
+ STAFFORD_PROJS ← σPlocation=„Stafford‟(PROJECT) 
+
+CONTR_DEPTS ← (STAFFORD_PROJS 
+
+Dnum=DnumberDEPARTMENT) 
+
+PROJ_DEPT_MGRS ← (CONTR_DEPTS 
+RESULT ← πPnumber, Dnum, Lname, Address, Bdate(PROJ_DEPT_MGRS)
+
+Mgr_ssn=SsnEMPLOYEE) 
+
+ In this example, we first select the projects located in Stafford, then join them with 
+their controlling departments, and then join the result with the department man-agers. 
+Finally, we apply a project operation on the desired attributes. 
+
+Query  3. Find  the  names  of  employees  who  work  on all the  projects  controlled by 
+department number 5. 
+
+ DEPT5_PROJS ← ρ(Pno)(πPnumber(σDnum=5(PROJECT))) 
+
+EMP_PROJ ← ρ(Ssn, Pno)(πEssn, Pno(WORKS_ON)) 
+
+ RESULT_EMP_SSNS ← EMP_PROJ ÷ DEPT5_PROJS 
+
+RESULT ← πLname, Fname(RESULT_EMP_SSNS * EMPLOYEE) 
+
+ In  this  query,  we  first  create  a  table DEPT5_PROJS that  contains  the  project 
+numbers  of  all  projects  controlled  by  department  5.  Then  we  create  a 
+table EMP_PROJ that  holds  (Ssn, Pno)  tuples,  and  apply  the  division  operation. 
+Notice  that  we  renamed  the  attributes  so  that  they  will  be  correctly  used  in  the 
+division  operation.  Finally,  we  join  the  result  of  the  division,  which  holds 
+only Ssn values,  with  the EMPLOYEE table  to  retrieve  the  desired  attributes 
+from EMPLOYEE. 
+
+Query  4. Make  a 
+involve  an 
+employee whose  last  name  is  „Smith‟,  either  as  a  worker  or  as  a  manager  of  the 
+department that controls the project. 
+
+list  of  project  numbers  for  projects 
+
+that 
+
+ SMITHS(Essn) ← πSsn (σLname=„Smith‟(EMPLOYEE)) 
+
+SMITH_WORKER_PROJS ← πPno(WORKS_ON * SMITHS) 
+
+MGRS ← πLname, Dnumber(EMPLOYEE 
+
+Ssn=Mgr_ssnDEPARTMENT) 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 41 
+
+ 
+ 
+ 
+  
+  
+DBMS[22AI33]  2023 
+
+SMITH_MANAGED_DEPTS(Dnum) ← πDnumber (σLname=„Smith‟(MGRS)) 
+
+SMITH_MGR_PROJS(Pno) ← 
+πPnumber(SMITH_MANAGED_DEPTS * PROJECT) 
+
+RESULT ← (SMITH_WORKER_PROJS ∪ SMITH_MGR_PROJS) 
+
+In this query, we retrieved the project numbers for projects that involve an employee 
+named  Smith  as  a  worker  in SMITH_WORKER_PROJS.  Then  we  retrieved  the 
+project numbers  for  projects  that involve an  employee  named  Smith as  manager of 
+the  department  that  controls  the  project  in SMITH_MGR_PROJS.  Finally,  we 
+the UNION operation 
+applied 
+on SMITH_WORKER_PROJS and SMITH_MGR_PROJS.  As  a  single  in-line 
+expression, this query becomes: 
+
+πPno (WORKS_ON  
+
+ Essn=Ssn(πSsn (σLname=„Smith‟(EMPLOYEE))) ∪ πPno 
+
+((πDnumber (σLname=„Smith‟(πLname, Dnumber(EMPLOYEE)))
+
+Ssn=Mgr_ssnDEPARTMENT)) 
+
+ Dnumber=DnumPROJECT) 
+
+Query 5. List the names of all employees with two or more dependents. 
+
+speaking, 
+
+in 
+done 
+ Strictly 
+the AGGREGATE 
+the basic (original) relational algebra.  We  have 
+FUNCTION operation  with  the COUNT aggregate  function.  We  assume  that 
+dependents of the same employee have distinct Dependent_name values. 
+
+to  use 
+
+cannot 
+
+query 
+
+this 
+
+be 
+
+ T1(Ssn, No_of_dependents)← Essn ℑ COUNT Dependent_name(DEPENDENT) 
+
+T2 ← σNo_of_dependents>2(T1) 
+RESULT ← π
+
+Lname, Fname
+
+(T2 * EMPLOYEE)
+
+Query 6. Retrieve the names of employees who have no dependents. 
+
+ This is an example of the type of query that uses the MINUS (SET DIFFERENCE) 
+operation. 
+
+ ALL_EMPS ← πSsn(EMPLOYEE) 
+
+EMPS_WITH_DEPS(Ssn) ← πEssn(DEPENDENT) 
+
+EMPS_WITHOUT_DEPS ← (ALL_EMPS – EMPS_WITH_DEPS) 
+
+RESULT ← πLname, Fname(EMPS_WITHOUT_DEPS * EMPLOYEE) 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 42 
+
+ 
+ 
+ 
+ 
+ 
+DBMS[22AI33]  2023 
+
+the Ssns  of  employees  who  have  at 
+
+ We first retrieve a relation with all employee Ssns in ALL_EMPS. Then we create a 
+table  with 
+least  one  dependent 
+in EMPS_WITH_DEPS.  Then  we  apply  the SET  DIFFERENCE operation  to 
+retrieve employees Ssns  with  no  dependents  in EMPS_WITHOUT_DEPS,  and 
+finally  join  this  with EMPLOYEE to  retrieve  the desired  attributes.  As  a  single  in-
+line expression, this query becomes: 
+ π
+
+(DEPENDENT))) * EMPLOYEE)
+
+(EMPLOYEE) – ρ
+
+Lname, Fname
+
+Essn
+
+Ssn
+
+Ssn
+
+((π
+
+(π
+
+Query 7. List the names of managers who have at least one dependent. 
+
+ MGRS(Ssn) ← πMgr_ssn(DEPARTMENT) 
+
+EMPS_WITH_DEPS(Ssn) ← πEssn(DEPENDENT) 
+
+MGRS_WITH_DEPS ← (MGRS ∩ EMPS_WITH_DEPS) 
+
+RESULT ← πLname, Fname(MGRS_WITH_DEPS * EMPLOYEE) 
+
+ In  this  query,  we  retrieve  the Ssns  of  managers  in MGRS,  and  the Ssns  of 
+employees  with  at  least  one  dependent  in EMPS_WITH_DEPS,  then  we  apply 
+the SET INTERSECTION operation to get the Ssns of managers who have at least 
+one dependent. 
+
+As we mentioned earlier, the same query can be specified in many different ways in 
+relational algebra. In particular, the operations can often be applied in various orders. 
+In  addition,  some  operations  can  be  used  to  replace  others;  for  example, 
+the INTERSECTION operation  in Q7 can  be  replaced  by  a NATURAL  JOIN.  As 
+an exercise, try to do each of these sample queries using different operations. 
+
+Dept of AI&ML,DSCE,Bangalore 
+
+Page 43 
+
+ 
+ 
+ 
+  
+ 
+ 
+

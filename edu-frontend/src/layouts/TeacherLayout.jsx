@@ -35,6 +35,8 @@ import {
   Assessment,
   AutoAwesome,
   TrendingUp,
+  Timeline,
+  GradeOutlined,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -83,12 +85,12 @@ const TeacherLayout = () => {
   const menuItems = [
     { label: 'Dashboard', path: '/teacher/dashboard', icon: <Dashboard /> },
     { label: 'Upload Marks', path: '/teacher/upload', icon: <Upload /> },
+    { label: 'SEE Upload', path: '/teacher/see-upload', icon: <GradeOutlined /> },
     { label: 'CO Generator', path: '/teacher/co-generator', icon: <AutoAwesome /> },
-    { label: 'Analytics', path: '/teacher/analytics', icon: <BarChart /> },
     { label: 'Courses', path: '/teacher/courses', icon: <School /> },
-    { label: 'Analysis', path: '/teacher/analysis', icon: <TrendingUp /> },
-    { label: 'Static Analysis', path: '/teacher/static-analysis', icon: <Analytics /> },
-    { label: 'Attainment', path: '/teacher/attainment', icon: <Assessment /> },
+    { label: 'Analytics', path: '/teacher/analytics', icon: <BarChart /> },
+    { label: 'Student Analysis', path: '/teacher/student-analysis', icon: <Assessment /> },
+    { label: 'Student Progression', path: '/teacher/student-progression', icon: <Timeline /> },
     { label: 'Settings', path: '/teacher/settings', icon: <Settings /> },
   ];
 
@@ -115,7 +117,7 @@ const TeacherLayout = () => {
           <School sx={{ fontSize: 32 }} />
           <Box>
             <Typography variant="h6" fontWeight="bold">
-              OBE Attain
+              SkillSync
             </Typography>
             <Typography variant="caption" sx={{ opacity: 0.9 }}>
               Teacher Portal
@@ -271,7 +273,7 @@ const TeacherLayout = () => {
               display: { xs: 'none', sm: 'block' },
             }}
           >
-            OBE CO/PO Analysis System
+            Skill-Sync : A detailed Analysis System
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

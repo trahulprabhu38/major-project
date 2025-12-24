@@ -35,3 +35,42 @@
 {"level":"info","message":"   - GET    /api/students/courses","service":"backend-api","timestamp":"2025-11-06 09:11:54.997"}
 {"level":"info","message":"   - GET    /api/students/courses/:courseId/analytics","service":"backend-api","timestamp":"2025-11-06 09:11:54.997"}
 {"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-11-06 09:11:54.997"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-01 15:42:01.393"}
+{"level":"info","message":"🚀 Starting OBE Backend Server","service":"backend-api","timestamp":"2025-12-01 15:42:01.396"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-01 15:42:01.396"}
+{"level":"info","message":"📊 Connecting to PostgreSQL...","service":"backend-api","timestamp":"2025-12-01 15:42:01.396"}
+{"level":"warn","message":"⚠️ PostgreSQL connection failed - server will start anyway","service":"backend-api","timestamp":"2025-12-01 15:42:01.418"}
+{"level":"warn","message":"   Some features may not work without database connection","service":"backend-api","timestamp":"2025-12-01 15:42:01.418"}
+{"level":"warn","message":"   To fix: docker-compose up -d postgres mongodb","service":"backend-api","timestamp":"2025-12-01 15:42:01.419"}
+{"level":"info","message":"📊 Connecting to MongoDB...","service":"backend-api","timestamp":"2025-12-01 15:42:01.419"}
+{"level":"info","message":"✅ MongoDB connected","service":"backend-api","timestamp":"2025-12-01 15:42:01.462"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-01 15:42:01.464"}
+{"level":"info","message":"✅ OBE Backend Server Ready!","service":"backend-api","timestamp":"2025-12-01 15:42:01.465"}
+{"level":"info","message":"   - Port: 8080","service":"backend-api","timestamp":"2025-12-01 15:42:01.465"}
+{"level":"info","message":"   - API: http://localhost:8080","service":"backend-api","timestamp":"2025-12-01 15:42:01.465"}
+{"level":"info","message":"   - Health: http://localhost:8080/health","service":"backend-api","timestamp":"2025-12-01 15:42:01.465"}
+{"level":"info","message":"   - Environment: development","service":"backend-api","timestamp":"2025-12-01 15:42:01.465"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-01 15:42:01.465"}
+{"level":"info","message":"📚 Available Routes:","service":"backend-api","timestamp":"2025-12-01 15:42:01.465"}
+{"level":"info","message":"   - POST   /api/auth/register","service":"backend-api","timestamp":"2025-12-01 15:42:01.465"}
+{"level":"info","message":"   - POST   /api/auth/login","service":"backend-api","timestamp":"2025-12-01 15:42:01.465"}
+{"level":"info","message":"   - GET    /api/auth/profile","service":"backend-api","timestamp":"2025-12-01 15:42:01.465"}
+{"level":"info","message":"   - GET    /api/courses","service":"backend-api","timestamp":"2025-12-01 15:42:01.465"}
+{"level":"info","message":"   - POST   /api/courses","service":"backend-api","timestamp":"2025-12-01 15:42:01.466"}
+{"level":"info","message":"   - POST   /api/courses/create-or-get","service":"backend-api","timestamp":"2025-12-01 15:42:01.466"}
+{"level":"info","message":"   - GET    /api/courses/:id","service":"backend-api","timestamp":"2025-12-01 15:42:01.466"}
+{"level":"info","message":"   - POST   /api/assessments","service":"backend-api","timestamp":"2025-12-01 15:42:01.466"}
+{"level":"info","message":"   - POST   /api/upload/assessment","service":"backend-api","timestamp":"2025-12-01 15:42:01.466"}
+{"level":"info","message":"   - GET    /api/upload/template","service":"backend-api","timestamp":"2025-12-01 15:42:01.466"}
+{"level":"info","message":"   - GET    /api/students/courses","service":"backend-api","timestamp":"2025-12-01 15:42:01.466"}
+{"level":"info","message":"   - GET    /api/students/courses/:courseId/analytics","service":"backend-api","timestamp":"2025-12-01 15:42:01.466"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-01 15:42:01.466"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-01 16:53:42.559"}
+{"level":"info","message":"🚀 Starting OBE Backend Server","service":"backend-api","timestamp":"2025-12-01 16:53:42.561"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-01 16:53:42.561"}
+{"level":"info","message":"📊 Connecting to PostgreSQL...","service":"backend-api","timestamp":"2025-12-01 16:53:42.561"}
+{"level":"warn","message":"⚠️ PostgreSQL connection failed - server will start anyway","service":"backend-api","timestamp":"2025-12-01 16:53:42.578"}
+{"level":"warn","message":"   Some features may not work without database connection","service":"backend-api","timestamp":"2025-12-01 16:53:42.579"}
+{"level":"warn","message":"   To fix: docker-compose up -d postgres mongodb","service":"backend-api","timestamp":"2025-12-01 16:53:42.579"}
+{"level":"info","message":"📊 Connecting to MongoDB...","service":"backend-api","timestamp":"2025-12-01 16:53:42.579"}
+{"level":"info","message":"✅ MongoDB connected","service":"backend-api","timestamp":"2025-12-01 16:53:42.604"}

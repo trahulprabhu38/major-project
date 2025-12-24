@@ -105,6 +105,38 @@ export const studentAPI = {
   getCOPerformance: (courseId) => api.get(`/students/courses/${courseId}/co-performance`),
   getPOPerformance: (courseId) => api.get(`/students/courses/${courseId}/po-performance`),
   getAnalytics: (courseId) => api.get(`/students/courses/${courseId}/analytics`),
+  getMarks: (courseId) => api.get(`/students/courses/${courseId}/marks`),
+  getCOAttainment: (courseId) => api.get(`/students/courses/${courseId}/co-attainment`),
+};
+
+// Recommendation System APIs
+const REC_SYS_URL = import.meta.env.VITE_RECOMMENDATION_SERVICE_URL || 'http://localhost:8003';
+const recSysAPI = axios.create({
+  baseURL: REC_SYS_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export const recommendationAPI = {
+  // Get recommendations for a student
+  getRecommendations: (data) => recSysAPI.post('/api/recommendations/student', data),
+  
+  // Feedback endpoints
+  voteResource: (data) => recSysAPI.post('/api/feedback/vote', data),
+  submitFeedback: (data) => recSysAPI.post('/api/feedback/rating', data),
+  markComplete: (data) => recSysAPI.post('/api/feedback/completion', data),
+  
+  // Analytics endpoints
+  getAnalytics: () => recSysAPI.get('/api/analytics/overview'),
+  getStudentProgress: (studentId) => recSysAPI.get(`/api/analytics/student/${studentId}/progress`),
+  
+  // Study plan endpoint
+  getStudyPlan: (data) => recSysAPI.post('/api/recommendations/study-plan', data),
+  
+  // Additional endpoints
+  getCourseSummary: (courseId, internalNo) => 
+    recSysAPI.get(`/api/recommendations/course/${courseId}/recommendations-summary?internal_no=${internalNo}`),
 };
 
 // Marksheet APIs
@@ -115,6 +147,69 @@ export const marksheetAPI = {
   getData: (id, params) => api.get(`/marksheets/${id}/data`, { params }),
   delete: (id) => api.delete(`/marksheets/${id}`),
   update: (id, data) => api.put(`/marksheets/${id}`, data),
+};
+
+// AI-Generated Course Outcomes APIs
+export const aiCOAPI = {
+  save: (data) => api.post('/ai-cos/save', data),
+  getByCourse: (courseId) => api.get(`/ai-cos/course/${courseId}`),
+  getSessions: (courseId) => api.get(`/ai-cos/sessions/${courseId}`),
+  submitFeedback: (data) => api.post('/ai-cos/feedback', data),
+  saveRegeneration: (data) => api.post('/ai-cos/regenerate', data),
+  getStatistics: (courseId) => api.get(`/ai-cos/statistics/${courseId}`),
+  delete: (coId) => api.delete(`/ai-cos/${coId}`),
+};
+
+// Course Outcomes APIs (both manual and AI-generated)
+export const courseOutcomesAPI = {
+  getByCourse: (courseId) => api.get(`/course-outcomes/course/${courseId}`),
+  createManual: (data) => api.post('/course-outcomes/manual', data),
+  update: (coId, data) => api.put(`/course-outcomes/${coId}`, data),
+  delete: (coId) => api.delete(`/course-outcomes/${coId}`),
+  deleteAll: (courseId) => api.delete(`/course-outcomes/course/${courseId}/all`),
+};
+
+// SEE Marks APIs
+export const seeMarksAPI = {
+  uploadMarks: (courseId, marksData) => api.post(`/see-marks/courses/${courseId}/upload`, { marksData }),
+  getByCourse: (courseId) => api.get(`/see-marks/courses/${courseId}`),
+  getByStudent: (studentId, courseId) => api.get(`/see-marks/students/${studentId}/courses/${courseId}`),
+  update: (studentId, courseId, see_marks) => api.put(`/see-marks/students/${studentId}/courses/${courseId}`, { see_marks }),
+  delete: (studentId, courseId) => api.delete(`/see-marks/students/${studentId}/courses/${courseId}`),
+  getStatus: (courseId) => api.get(`/see-marks/courses/${courseId}/status`),
+  validate: (marksData) => api.post('/see-marks/validate', { marksData }),
+};
+
+// Grade Calculation APIs
+export const gradesAPI = {
+  calculateGrade: (studentId, courseId) => api.post(`/grades/students/${studentId}/courses/${courseId}/calculate`),
+  calculateAllGrades: (courseId) => api.post(`/grades/courses/${courseId}/calculate`),
+  getGrade: (studentId, courseId) => api.get(`/grades/students/${studentId}/courses/${courseId}`),
+  getCourseGrades: (courseId) => api.get(`/grades/courses/${courseId}`),
+  getDistribution: (courseId) => api.get(`/grades/courses/${courseId}/distribution`),
+  getStudentGrades: (studentId) => api.get(`/grades/students/${studentId}`),
+};
+
+// CGPA/SGPA APIs
+export const cgpaAPI = {
+  calculateCGPA: (studentId) => api.post(`/cgpa/students/${studentId}/calculate`),
+  calculateSGPA: (studentId, semester, academic_year) => api.post(`/cgpa/students/${studentId}/semester/${semester}/calculate`, { academic_year }),
+  getCGPA: (studentId) => api.get(`/cgpa/students/${studentId}`),
+  getSGPA: (studentId, semester) => api.get(`/cgpa/students/${studentId}/semester/${semester}`),
+  getRank: (studentId, department) => api.get(`/cgpa/students/${studentId}/rank`, { params: { department } }),
+  recalculateAll: () => api.post('/cgpa/recalculate-all'),
+  getTopPerformers: (department, limit) => api.get('/cgpa/top-performers', { params: { department, limit } }),
+};
+
+// Progression Tracking APIs
+export const progressionAPI = {
+  getStudentProgression: (studentId) => api.get(`/progression/students/${studentId}`),
+  getSemesterDetails: (studentId, semester) => api.get(`/progression/students/${studentId}/semester/${semester}`),
+  getCourseStudents: (courseId) => api.get(`/progression/courses/${courseId}/students`),
+  getSemesterStatistics: (semester, department) => api.get(`/progression/semester/${semester}/statistics`, { params: { department } }),
+  exportProgression: (studentId, format) => api.get(`/progression/students/${studentId}/export`, { params: { format } }),
+  getProgressionSummary: (studentId) => api.get(`/progression/students/${studentId}/summary`),
+  getDepartmentOverview: (department) => api.get(`/progression/department/${department}/overview`),
 };
 
 export default api;

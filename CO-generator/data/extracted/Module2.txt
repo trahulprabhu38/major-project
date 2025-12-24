@@ -1,0 +1,2057 @@
+Module2 : Data Modeling using the 
+Entity-Relationship(ER) model 
+
+Dr. Aruna M G 
+Associate Professor  
+Dept. of AI&ML, DSCE 
+
+RDBMS - Dr. AMG        
+
+Contents 
+
+• Data Modelling using the Entity-Relationship(ER) model:  
+• Using High-Level Conceptual Data Models for Database 
+
+Design, A sample Database Application, Entity types, Entity 
+Sets, Attributes, and Keys, Relationship Types, Relationship 
+Sets, Roles and Structural Constraints, Weak Entity types, 
+Refining the ER Design, ER Diagrams, Naming Conventions 
+and Design Issues, Relationship Types of Degree Higher than 
+two, Relational Database Design using ER-to-Relational 
+Mapping. 
+
+RDBMS - Dr. AMG        
+
+Database Design Phases… 
+
+Requirements Collection 
+& Analysis 
+
+Data Requirements 
+
+Functional Requirements 
+
+Conceptual Design 
+
+User Defined Operations  
+Data Flow Diagrams 
+Sequence Diagrams, Scenarios 
+
+Entity Types, Constraints , Relationships 
+No Implementation Details. 
+
+Logical Design 
+
+Ensures Requirements  
+Meets the Design 
+
+Data Model Mapping – Type of Database is identified  
+
+Physical Design 
+
+Internal Storage Structures / Access Path / File Organizations 
+
+RDBMS - Dr. AMG        
+
+Overview of Database Design Process 
+
+• Requirement Analysis 
+• Conceptual Design 
+• Logical Design 
+• Schema Refinement : (Normalization) 
+• Physical Database Design and Tuning  
+
+RDBMS - Dr. AMG        
+
+ Database Design Steps 
+
+Entity-relationship Model 
+       Typically used for conceptual 
+        database design 
+
+Three Levels of 
+Modeling 
+
+Relational Model 
+       Typically used for logical  
+       database design 
+
+RDBMS - Dr. AMG        
+
+Mini-World 
+
+   Conceptual DB design 
+
+Conceptual Data Model 
+
+      Logical DB design 
+
+Logical Data Model 
+
+     Physical DB design 
+
+Physical Data Model 
+
+Relation  
+
+• A relational database is made up of a collection of 
+
+tables or relation. 
+
+Common terms        DBMS  
+1. Database  
+2. Table 
+3. Column   
+ Row 
+4.
+
+   Table 
+   Table 
+   Field 
+  record 
+
+           RDBMS 
+Database 
+Relation 
+Attribute 
+tuple 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+RDBMS - Dr. AMG        
+
+Tuples     Relation      Attributes EMPLOYEE SSN Name Age Address Salary 123467 Aruna 25 #45,Bangalore 20000 123469 Thunga 26 #35,hassan 12000 123468 Nimi 27 #23,Bangalore 15000 123567 Sur 28 Null 20000 Figure2.3Employee Relation E-R Modeling Concepts 
+
+• Entity 
+
+Regular 
+
+Weak 
+
+– is anything that exists and is distinguishable 
+
+• Attribute 
+
+– properties that describe an entity 
+
+• Relationship 
+
+– an association between entities 
+
+• ER Model (Entity Relationship Model) 
+• The ER model describes data as entities, relationships, and 
+
+attributes 
+
+RDBMS - Dr. AMG        
+
+ 
+Entity, Entity Type,  Entity Instance,  Entity Set 
+
+Attributes 
+
+ssn 
+
+name 
+
+lot 
+
+Employee 
+
+Entity Type 
+
+Entity Instance 
+
+SSN  
+
+NAME 
+
+LOT 
+
+123- 22- 3666  Attishoo 
+
+231- 31- 5368  Smiley 
+
+48 
+
+22 
+
+131- 24- 3650  Smethurst  35 
+
+Entity Set 
+
+CREATE TABLE Employees 
+(ssn CHAR (11), 
+name CHAR (20), 
+lot INTEGER, 
+PRIMARY KEY (ssn)) 
+
+RDBMS - Dr. AMG        
+
+Attributes 
+
+• Entity  types  have  Attributes  (or  properties)  which  associate  each 
+
+entity with a value from a domain of values for that attribute 
+
+• Attribute Type: 
+•
+
+It is the property of entity type instance is called attribute type 
+
+• Attribute Instance: 
+•
+• –A specific entity will have a value for each of its attributes. 
+
+It is the property of entity instance is called attribute instance. 
+
+For example a specific employee entity may have  
+• Name='John Smith', SSN='123456789', Address ='731, Fondren, 
+
+Houston, TX', Sex='M', BirthDate='09-JAN-55„ 
+
+•
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+  
+ 
+Types of Attributes 
+
+• Attributes can be 
+
+– Simple v/s Composite 
+– Single Valued v/s Multi-Valued 
+– Stored v/s Derived 
+– Key 
+• Example: 
+
+– simple (atomic) e.g. Surname; date of birth 
+– composite 
+– multi-valued 
+– complex  
+– Stored / derived e.g. D.O.B. ; age 
+– Key  e.g. SSN 
+
+e.g. address (street, town, postcode) 
+e.g. phone number 
+nested , multi-valued and composite 
+
+• Relationship types can also have attributes!  
+
+RDBMS - Dr. AMG        
+
+ 
+Types of Attributes :  
+Simple, Stored, Single Valued 
+
+cust-name 
+
+access-date 
+
+number 
+
+cust-id 
+
+cust-street 
+
+customer 
+
+has 
+
+account 
+
+cust-city 
+
+balance 
+
+RDBMS - Dr. AMG        
+
+Types of Attributes 
+
+cust-name 
+
+access-date 
+
+number 
+
+age 
+
+cust-id 
+
+date-of-birth 
+
+customer 
+
+has 
+
+account 
+
+cust-street 
+
+month 
+
+day 
+
+cust-city 
+year 
+
+phone no. 
+
+balance 
+
+Composite Attribute 
+
+RDBMS - Dr. AMG        
+
+Types of Attributes 
+
+• multi-valued (double oval) 
+access-date 
+• derived (dashed oval) 
+
+number 
+
+cust-name 
+
+age 
+
+cust-id 
+
+date-of-birth 
+
+customer 
+
+has 
+
+account 
+
+cust-street 
+
+cust-city 
+
+phone no. 
+
+balance 
+
+RDBMS - Dr. AMG        
+
+Complex 
+ • The composite and multi-valued attributes may be nested 
+arbitrarily to any number of levels although this is rare. 
+
+• Or  
+• The combination of composite and multivalued attribute is also 
+
+called complex attribute. 
+
+• Composite attribute between denoted by parentheses ( ) and 
+
+multivalued attributes between braces { }.    
+
+• Example1: PreviousDegrees of a STUDENT is a composite multi-
+valued attribute denoted by {PreviousDegrees (College, Year, 
+Degree, Field)}. 
+
+• Example2: 
+
+RDBMS - Dr. AMG        
+
+ 
+Null Attirbute 
+
+• An entity may not have any applicable value for an 
+
+attribute. A special value is used in such situation called 
+NULL. 
+
+• Example: PhoneNo or Degree attribute of EMPLOYEE 
+
+entity. 
+
+The unknown category of Null is classified into two cases: 
+1. The first case arises when it is know that the attribute 
+
+value exists but is missing. 
+
+2. The second case, when it is not known whether the 
+
+attribute value exist or not. 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+Key Attributes 
+
+• Key = set of attributes identifying individual entities or 
+
+relationships 
+
+• An entity type has an attribute whose values can be used to 
+
+identify each entity uniquely is called a key attribute. 
+
+• Keys are one of the basic requirements of a relational database 
+model. It is widely used to identify the tuples(rows) uniquely in 
+the table. We also use keys to set up relations amongst various 
+columns and tables of a relational database. 
+
+SSN 
+
+Age 
+
+EMPLOYEE 
+
+RDBMS - Dr. AMG        
+
+Different Types of Database Keys 
+
+• Candidate Key 
+• Primary Key 
+• Super Key 
+• Alternate Key 
+• Foreign Key 
+• Composite Key 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+Entity Keys 
+
+• Super Key 
+
+– any set of attributes that can distinguish entities 
+
+• Candidate Key 
+
+– a minimal Super Key 
+
+• Can‟t remove any attribute and preserve key-ness 
+
+– {cust-id, age} not a super key  
+– {cust-name, cust-city, cust-street} is  
+» assuming cust-name is not unique 
+
+• Primary Key 
+
+– One of the Candidate Keys chosen as the key by DBA 
+– Underlined in the ER Diagram 
+
+RDBMS - Dr. AMG        
+
+ 
+Super Key 
+
+• The set of attributes that can uniquely identify a tuple is 
+
+known as Super Key. For Example, STUD_NO, 
+(STUD_NO, STUD_NAME),  
+
+• A super key is a group of single or multiple keys that 
+
+identifies rows in a table.  
+• It supports NULL values.  
+• Adding zero or more attributes to the candidate key 
+
+generates the super key. 
+
+• A candidate key is a super key but vice versa is not true. 
+• Super Key values may also be NULL. 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+Candidate key 
+
+An entity type may have more than one key called candidate key.   
+Or 
+
+The minimal set of attributes that can uniquely identify a tuple is known 
+as a candidate key.  
+For example, the CAR entity type may have two keys: 
+–VehicleIdentificationNumber (popularly called VIN) and 
+–VehicleTagNumber (Number, State), also known as license_plate 
+number. 
+
+RegNo 
+
+State  
+
+Model  
+
+Make  
+
+Reg  
+
+VID 
+
+Year  
+
+CAR 
+
+Color  
+
+RDBMS - Dr. AMG        
+
+  
+ 
+  
+Candidate key 
+
+For Example, STUD_NO in STUDENT relation.  
+•
+It is a minimal super key. 
+•
+It is a super key with no repeated data is called a candidate key. 
+• The minimal set of attributes that can uniquely identify a record. 
+•
+•
+• Every table must have at least a single candidate key. 
+• A table can have multiple candidate keys but only one primary 
+
+It must contain unique values. 
+It can contain NULL values. 
+
+key. 
+
+• The value of the Candidate Key is unique and may be null for a 
+
+tuple. 
+
+• There can be more than one candidate key in a relationship.  
+
+RDBMS - Dr. AMG        
+
+ 
+Primary Key 
+
+• There can be more than one candidate key in relation out of which 
+
+one can be chosen as the primary key.  
+It is a unique key. 
+It can identify only one tuple (a record) at a time. 
+It has no duplicate values, it has unique values. 
+It cannot be NULL. 
+
+•
+•
+•
+•
+• Primary keys are not necessarily to be a single column; more than 
+
+one column can also be a primary key for a table. 
+
+RDBMS - Dr. AMG        
+
+ 
+Example: 
+
+• STUD_NO, as well as STUD_PHONE, are candidate keys 
+for relation STUDENT but STUD_NO can be chosen as 
+the primary key (only one out of many candidate 
+keys).  
+
+• STUDENT table -> Student(STUD_NO, SNAME,  
+ADDRESS, PHONE) , STUD_NO is a primary key. 
+
+Table STUDENT 
+
+STUD_NO            
+
+SNAME             
+
+ADDRESS             PHONE                       
+
+1 
+
+2 
+
+3 
+
+Shyam 
+
+Rakesh 
+
+Suraj 
+
+Delhi 
+
+123456789 
+
+Kolkata 
+
+223365796 
+
+Delhi 
+
+175468965 
+
+RDBMS - Dr. AMG        
+
+  
+Example 
+
+RDBMS - Dr. AMG        
+
+Composite Key (CK) 
+A key attribute may be composite. Such attribute is composite key.  
+Or  
+A table might not have a single column/attribute that uniquely 
+identifies all the records of a table. To uniquely identify rows of a 
+table, a combination of two or more columns/attributes can be used. 
+
+For example, VehicleTagNumber is a key of the CAR entity type with 
+components (Number, State). 
+Example2: Flight table Flight_ID is composite key  
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+ 
+Continued. 
+
+•
+
+It still can give duplicate values in rare cases. So, we need to find 
+the optimal set of attributes that can uniquely identify rows in a 
+table. 
+•
+It acts as a primary key if there is no primary key in a table 
+• Two or more attributes are used together to make a composite 
+
+key. 
+
+• Different combinations of attributes may give different accuracy 
+
+in terms of identifying the rows uniquely. 
+
+RDBMS - Dr. AMG        
+
+ 
+Foreign Key (FK) 
+
+•
+
+If an attribute can only take the values which are present as values 
+of some other attribute, it will be a foreign key to the attribute to 
+which it refers.  
+
+• The relation which is being referenced is called referenced 
+relation and the corresponding attribute is called referenced 
+attribute the relation which refers to the referenced relation is 
+called referencing relation and the corresponding attribute is called 
+referencing attribute.  
+
+• The referenced attribute of the referenced relation should be the 
+
+primary key to it. 
+
+RDBMS - Dr. AMG        
+
+FK 
+•
+
+It is a key it acts as a primary key in one table and it acts as  
+secondary key in another table. 
+It combines two or more relations (tables) at a time. 
+
+•
+• They act as a cross-reference between the tables. 
+
+RDBMS - Dr. AMG        
+
+ 
+•
+
+RDBMS - Dr. AMG        
+
+  
+RDBMS - Dr. AMG        
+
+Entity Keys 
+
+date-of-birth 
+
+cust-name 
+
+cust-id 
+
+Possible Keys: 
+{cust-id} 
+
+{cust-name, cust-city, cust-street} 
+
+ {cust-id, age} 
+
+  cust-name ?? Probably not. 
+
+age 
+
+customer 
+
+Domain knowledge dependent !! 
+
+cust-street 
+
+cust-city 
+
+phone no. 
+
+RDBMS - Dr. AMG        
+
+ 
+Entity Keys 
+
+date-of-birth 
+
+cust-name 
+
+cust-id 
+
+age 
+
+customer 
+
+cust-street 
+
+• {cust-id} is a natural primary key 
+
+• Typically, SSN forms a good 
+
+primary key 
+
+• Try to use a candidate key that 
+
+rarely changes 
+
+– e.g. something involving 
+address not a great idea 
+
+cust-city 
+
+phone no. 
+
+RDBMS - Dr. AMG        
+
+Value set (or Domain) of attributes 
+
+• The domain of an attribute is the set of all possible values from 
+
+which the attributes can take its values. 
+
+• Value sets are not displayed in ER diagrams. It is specified during 
+
+creating entity type. 
+
+Example1: Season attribute have the possible values are Spring, 
+Summer, Autumn, Winter. 
+Example2 :Gender attribute can have Female or Male. 
+
+Mathematically Definition of value sets of attribute:  
+• An attribute A of entity type E whose vale set is V can be defined as 
+
+a function from E to the power set P(V) of  V; 
+
+• A : E→ P(V) 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+Relationships 
+
+• A  relationship  is    “..  An  association  among  entities  (the 
+participants)..” . Relationships link entities with each other 
+Express the number of entities to which another entity can be 
+associated via a relationship set. 
+
+• One-to-One 
+
+customer 
+
+has 
+
+account 
+
+• One-to-Many 
+
+customer 
+
+has 
+
+account 
+
+• Many-to-One 
+
+• Many-to-Many 
+
+customer 
+
+has 
+
+account 
+
+customer 
+
+has 
+
+account 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+ 
+ 
+Mapping Cardinalities 
+
+RDBMS - Dr. AMG        
+
+Relationship Type 
+
+• A relationship type between two entity types defines the set of all 
+
+association between these entity types. A relationship relates two or 
+more distinct entities with a specific meaning.   
+
+• or 
+• A relationship type R among n entity types E1,E2, ,……., En defines a 
+
+set of associations. 
+
+Relationship set 
+• An instance of a relationship set is a set of relationship. 
+
+Relationship instance 
+• Each instance of the relationship between members of these entity 
+
+types is called a relationship instance. 
+
+• ri = ( e1,…., en ) 
+
+RDBMS - Dr. AMG        
+
+ 
+  
+ 
+ 
+ 
+Mathematically, the relationship set R is a set of relationship 
+instance ri , where each ri  associates n individual entities ( e1,…., en ) 
+and each entity ei in ri is a member of entity type Ej ,1<=j<=n. 
+
+Where R be the relationship type. E1,E2,….En be the entity type. e1 
+through en, are entity set and ri is the relationship instances. 
+
+RDBMS - Dr. AMG        
+
+  
+Degree of a relationship types 
+
+• The degree of a relationship type number of entity 
+
+participate in relationship. 
+– Binary (connects 2 entity types) 
+– Unary/ recursive (connects 1 entity type with itself) 
+– n-ary / Complex (connects 3 or more entity types) 
+
+• Ternary (connects 3) 
+
+Degree 
+
+• Structural constraints - cardinality  
+
+– one to one (1:1) 
+– one to many (1:m) 
+– many to many (m:n) 
+
+• Structural constraints – participation 
+
+– Full(total) / mandatory 
+– or partial /optional  
+
+RDBMS - Dr. AMG        
+
+Multiplicity 
+
+ 
+ 
+ER Model: Simple Example 
+
+cust-name 
+
+access-date 
+
+number 
+
+cust-id 
+
+cust-street 
+
+customer 
+
+has 
+
+account 
+
+cust-city 
+
+balance 
+
+• Rectangles: entity types 
+• Diamonds: relationship types 
+• Ovals: attributes 
+
+RDBMS - Dr. AMG        
+
+ER Model: Another Example 
+
+ssn 
+
+name 
+
+lot 
+
+since 
+
+did 
+
+dname  budget 
+
+Employee 
+
+Works_in 
+
+Department 
+
+supervisor 
+
+Sub- 
+ordinate 
+
+Reports_To 
+
+RDBMS - Dr. AMG        
+
+Ternary Relationships 
+
+ssn 
+
+name 
+
+lot 
+
+since 
+
+did 
+
+dname 
+
+budget 
+
+Employee 
+
+Works_in 
+
+Department 
+
+Location 
+
+address 
+
+capacity 
+
+RDBMS - Dr. AMG        
+
+ER Model (Contd.) 
+
+Works_ In 
+
+SSN  
+
+DID  SINCE 
+
+123-22-3666  51 
+123-22-3666  56 
+231-31-5368  51 
+
+1/1/91 
+3/3/93 
+2/2/92 
+
+RDBMS - Dr. AMG        
+
+CREATE TABLE Works_ In( 
+ssn CHAR (11), 
+did INTEGER, 
+since DATE, 
+PRIMARY KEY (ssn, did), 
+FOREIGN KEY (ssn) 
+REFERENCES Employees, 
+FOREIGN KEY (did) 
+REFERENCES Departments) 
+
+Role names 
+  • Each entity type that participates in a relationship type plays a particular role in 
+
+the relationship. 
+
+• Role names may be added to make the meaning more explicit. 
+When to use role name? 
+• The participating entity types are distinct, no need to mention role name.  
+•
+
+If the same entity type participates more than once in an r/n type in different 
+roles. 
+ In such cases the role name becomes essential for distinguishing the meaning 
+of each participation. Such r/n types are called recursive relationship. 
+
+•
+
+RDBMS - Dr. AMG        
+
+  Subordinate                                       Manager EMPLOYEE Manages  
+Attributes of relationship types 
+
+• Relationship  types  can  also  have  attribute  similar  to  those  of 
+
+entity type. 
+
+• What attributes are needed to represent a relationship completely 
+
+and uniquely ? 
+– Union  of  primary  keys  of  the  entities  involved,  and 
+
+relationship attributes 
+
+cust-id 
+
+access-date 
+
+number 
+
+customer 
+
+has 
+
+account 
+
+– {cust-id,  access-date,  account-number}  describes  a  relationship 
+
+completely 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Relationship Set Keys 
+
+• Note: Placing the attribute in relationship type i.e 1:1, 1:N 
+
+and M:M . Representing this attribute in one of the entity type. 
+
+• General rule for binary relationships 
+
+– one-to-one: primary key of either entity set 
+– one-to-many: primary key of the entity set on the many side 
+– many-to-many: union of primary keys of the associate entity 
+
+sets 
+
+• n-ary relationships 
+
+– More complicated rules 
+
+RDBMS - Dr. AMG        
+
+ 
+Relationship Set Keys 
+
+•
+
+Is {cust-id, access-date, account-number} a candidate key ? 
+– No.  Attribute  access-date  can  be  removed  from  this  set 
+
+without losing key-ness 
+
+– In  fact,  union  of  primary  keys  of  associated  entities  is 
+
+always a superkey 
+
+cust-id 
+
+access-date 
+
+number 
+
+customer 
+
+has 
+
+account 
+
+RDBMS - Dr. AMG        
+
+Relationship Set Keys 
+
+•
+
+Is {cust-id, account-number} a candidate key ? 
+– Depends 
+
+cust-id 
+
+access-date 
+
+number 
+
+customer 
+
+has 
+
+account 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+Relationship Set Keys 
+
+•
+
+Is {cust-id, account-number} a candidate key ? 
+– Depends 
+
+cust-id 
+
+access-date 
+
+number 
+
+customer 
+
+has 
+
+account 
+
+•
+
+If one-to-one relationship, either {cust-id} or {account-number} 
+sufficient 
+• Since a given customer can only have one account, He / She 
+
+can only participate in one relationship 
+
+• Ditto account 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+Relationship Set Keys 
+
+•
+
+Is {cust-id, account-number} a candidate key ? 
+– Depends 
+
+cust-id 
+
+access-date 
+
+number 
+
+customer 
+
+has 
+
+account 
+
+•
+
+If one-to-many relationship (as shown), {account-number} 
+is a candidate key 
+• A given customer can have many accounts, but at most 
+
+one account holder per account allowed 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+Constraints on Relationships Types (constraints means 
+restriction or limitation) 
+
+• Relationship types have certain constraints that limit the 
+
+possible combination of entities that may participate in the 
+corresponding relationship set. 
+
+• Example: a company has a rule that each employee must work 
+
+•
+
+for exactly one department. 
+ There two main types of relationship constraints  
+– Cardinality ratio (Maximum Cardinality constraint ) 
+– Participation (also called Minimum Cardinality or 
+
+participation constraint or existence dependency constraints) 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+Structural Constraints 
+
+• Participation 
+
+– Do all entity instances participate in at least one 
+
+relationship instance? 
+
+• Cardinality 
+
+– How many relationship instances can an entity 
+
+instance participate in? 
+
+ (min, max)                (min, max) 
+Participation 
+0 -- Partial 
+1 -- Total (Mandatory)  M -- more than one 
+
+Cardinality 
+1 -- one 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+   
+ 
+   
+ 
+ 
+   
+ 
+ 
+   
+Constraints ratio for binary Relationship 
+Types 
+  •
+•
+
+(Also known as ratio constraints) 
+ Cardinality ratio (Maximum Cardinality) for a binary relationship 
+specifies the maximum number of relationship instances that an 
+entity can participate in. 
+•  One-to-one (1:1) 
+•    One-to-many (1:N) 
+•    Many-to-one (N:1) 
+•    Many-to-many (M:N) 
+
+RDBMS - Dr. AMG        
+
+Participation constraint 
+
+•
+
+It specifies whether the existence of an entity depends on its being 
+related to another entity the relationship types. 
+
+• This constraint specifies the minimum number of relationship 
+instances that each entity can participate in. This type is called 
+Minimum Cardinality constraint. 
+
+There are two types of Participation constraint 
+1.Total Participation constraint (or existence dependency): 
+2.Partial Participation constraint 
+
+RDBMS - Dr. AMG        
+
+ 
+Participation Constraint 
+
+• Given an entity set E, and a relationship R it participates in: 
+
+– If every entity in E participates in at least one relationship in 
+
+R, it is total participation 
+
+– partial otherwise 
+
+cust-name 
+
+access-date 
+
+number 
+
+cust-id 
+
+cust-street 
+
+customer 
+
+has 
+
+account 
+
+cust-city 
+
+balance 
+
+Total 
+participation 
+
+RDBMS - Dr. AMG        
+
+Participation Constraints 
+
+• Does every department have a manager? 
+
+– If so, this is a participation constraint:  the participation of  
+Departments in Manages is said to be total (vs. partial). 
+
+• Every did value in Departments table must appear in a row 
+
+of the Manages table (with a non-null ssn value!) 
+
+name 
+name 
+
+ssn 
+
+Employees 
+
+since 
+since 
+
+lot 
+
+0,M 
+
+Manages 
+
+did 
+did 
+1,M 
+
+dname 
+dname 
+
+budget 
+budget 
+
+Departments 
+
+1,1 
+
+Works_In 
+
+1,M 
+
+RDBMS - Dr. AMG        
+
+since 
+
+Cardinality Constraints 
+
+How many relationships can an entity participate in ? 
+
+cust-id 
+
+access-date 
+
+number 
+
+customer 
+
+0..* 
+
+has 
+
+1..1 
+
+account 
+
+Minimum - 0 
+Maximum – no limit 
+
+Minimum - 1  
+Maximum - 1 
+
+RDBMS - Dr. AMG        
+
+Recursive Relationships 
+• Sometimes a relationship associates an entity set to itself 
+
+emp-name 
+
+emp-id 
+
+emp-street 
+
+employee 
+
+manager 
+
+worker 
+
+works-for 
+
+emp-city 
+
+ Must be declared with roles 
+
+RDBMS - Dr. AMG        
+
+ 
+Over to You now! 
+
+• See  if  you  can  draw  an  E-R  diagram  for  this  scenario  –  you 
+
+are already familiar with this! 
+– “A student registers for up to 8 modules and each module 
+has many students on it.  Record the student ID, their full 
+name and address and also each module ID and title.  We 
+also  want  to  hold  the  grade  attained  by  each  student  for 
+each module” 
+
+• Remember to show in your model: 
+
+– All primary keys, 
+– Entities 
+– Relationship 
+– Attributes 
+
+RDBMS - Dr. AMG        
+
+Solution !!!!! 
+
+SID 
+
+Name  Addr 
+
+MID 
+
+Title 
+
+Student 
+
+Register 
+
+Module 
+
+(0,8) 
+
+(1,n) 
+
+Grade 
+
+RDBMS - Dr. AMG        
+
+Weak Entities 
+
+• A  weak  entity can  be identified  uniquely  only  by  considering 
+
+the primary key of another (owner) entity. 
+– Owner entity set and weak entity set must participate in a one-to-many 
+
+relationship set (one owner, many weak entities). 
+
+– Weak  entity  set  must  have  total  participation  in  this  identifying 
+
+relationship set.   
+
+name 
+
+ssn 
+
+lot 
+
+cost 
+
+Partial 
+Key 
+pname 
+
+age 
+
+Employees 
+
+Policy 
+
+Dependents 
+
+RDBMS - Dr. AMG        
+
+Weak Entity Sets 
+
+• A weak entity set must be associated with an identifying or 
+
+owner entity set 
+
+• Account is the owner entity set for Transaction 
+
+number 
+
+trans-date 
+
+account 
+
+has 
+
+Transaction 
+
+Partial 
+Key 
+
+trans-number 
+
+trans-type 
+
+balance 
+
+trans-amt 
+
+RDBMS - Dr. AMG        
+
+  
+  
+l
+e
+d
+o
+M
+R
+E
+n
+i
+
+s
+n
+o
+i
+t
+a
+t
+o
+N
+
+f
+o
+y
+r
+a
+m
+m
+u
+S
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+ 
+ 
+ 
+ER Model – Design Issues 
+
+• Design choices: 
+
+– Should  a  concept  be  modeled  as  an  entity  or  an 
+
+attribute? 
+
+– Should  a  concept  be  modeled  as  an  entity  or  a 
+
+relationship? 
+
+– Identifying 
+
+relationships:  Binary  or 
+
+ternary? 
+
+Aggregation? 
+
+• Constraints in the ER Model: 
+
+– A  lot  of  data  semantics  can  (and  should)  be 
+
+captured. 
+
+– But  some  constraints  cannot  be  captured  in  ER 
+
+diagrams. 
+
+RDBMS - Dr. AMG        
+
+Entity vs. Attribute 
+
+• Should  address  be  an  attribute  of  Employees  or  an  entity 
+
+(connected to Employees by a relationship)? 
+
+• Depends  upon  the  use  we  want  to  make  of  address 
+
+information, and the semantics of the data: 
+– If we have several addresses per employee, address must 
+
+be an entity (since attributes cannot be set-valued).  
+
+– If  the  structure  (city,  street,  etc.)  is  important,  e.g.,  we 
+want to retrieve employees in a given city, address must 
+be  modeled  as  an  entity  (since  attribute  values  are 
+atomic).  
+
+RDBMS - Dr. AMG        
+
+Entity vs. Attribute 
+
+Works_In does not allow an employee to work in a department for 
+two or more periods (why?) 
+
+ssn 
+
+name 
+
+lot 
+
+from 
+
+to 
+
+did 
+
+dname  budget 
+
+Employee 
+
+Works_in 
+
+Department 
+
+RDBMS - Dr. AMG        
+
+Entity vs. Attribute (Contd.) 
+
+ssn 
+
+name 
+
+lot 
+
+did 
+
+dname  budget 
+
+Employee 
+
+Works_in 
+
+Department 
+
+from 
+
+Duration 
+
+to 
+
+RDBMS - Dr. AMG        
+
+Binary vs. Ternary Relationships 
+
+ssn 
+
+name 
+
+lot 
+
+pname 
+
+age 
+
+Employee 
+
+covers 
+
+Policy 
+
+Dependent 
+
+policyid 
+
+cost 
+
+RDBMS - Dr. AMG        
+
+Binary vs. Ternary Relationships 
+
+Better Design 
+
+ssn 
+
+name 
+
+lot 
+
+pname 
+
+age 
+
+Employee 
+
+Dependent 
+
+purchaser 
+
+Beneficiary 
+
+policyid 
+
+Policy 
+
+cost 
+
+RDBMS - Dr. AMG        
+
+Constraints Beyond the ER Model 
+
+• Some constraints cannot be captured in ER diagrams: 
+
+•  Functional dependencies 
+
+• 
+
+Inclusion dependencies 
+
+•  General constraints 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+ 
+E-R Diagram : Example 
+
+DEPARTMENT 
+
+1 
+
+DEPT_ 
+EMP 
+
+M 
+
+M 
+
+EMPLOYEE 
+
+1 
+
+1 
+
+EMP_ 
+DEP 
+
+M 
+
+DEPENDENT 
+
+PROJ_ 
+WORK 
+
+PROJ_ 
+MGR 
+
+M 
+
+M 
+
+M 
+
+PROJECT 
+
+SUPPLIER 
+
+M 
+
+SUPP_ 
+PART_ 
+PROJ 
+
+M 
+
+M 
+
+SUPP_ 
+PART 
+
+PART 
+
+M 
+
+M 
+
+M 
+
+PART_ 
+STRUC
+TURE 
+
+RDBMS - Dr. AMG        
+
+Algorithm for ER-to-Relational mapping 
+
+Step 1: Mapping of Regular Entity Types 
+
+Step 2: Mapping of Weak Entity Types 
+
+Step 3: Mapping of Binary 1:1 Relationship Types 
+
+Step 4: Mapping of Binary 1:N Relationship Types 
+
+Step 5: Mapping of Binary M:N Relationship Types 
+
+Step 6: Mapping of Multivalued/Composite Attributes 
+
+Step 7: Mapping of N-ary Relationship Types 
+
+RDBMS - Dr. AMG        
+
+ 
+ER Diagram – Internet Book Shop 
+
+RDBMS - Dr. AMG        
+
+Exercise – ER Model…. 
+
+• An  Example  Database  Application  called  COMPANY 
+which serves to illustrate the ER Model concepts and their 
+schema design. 
+
+The following are collection from the Client. 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+Analysis… 
+
+• Company 
+
+: 
+Organized into Departments, Each Department has a name, 
+no  and  manager  who  manages  the  department.  The 
+Company keeps track of the date that employee managing 
+the  department.  A  Department  may  have  a  Several 
+locations. 
+
+RDBMS - Dr. AMG        
+
+Analysis… 
+
+• Department 
+
+: 
+A  Department  controls  a  number  of  Projects  each  of  which 
+has a unique name , no and a single Location. 
+
+• Employee: 
+
+Name,  Age,  Gender,  BirthDate,  SSN,  Address,  Salary. 
+An  Employee  is  assigned  to  one  department,  may 
+work  on  several  projects  which  are  not  controlled  by 
+the  department.  Track  of  the  number  of  hours  per 
+week is also controlled. 
+
+• Keep  track  of  the  dependents  of  each  employee  for 
+insurance  policies:  We  keep  each  dependent  first  name, 
+gender, Date of birth and relationship to the employee. 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+ 
+ 
+Now to our Company… 
+
+DEPARTMENT  
+( Name, Number, { Locations }, Manager, Start Date ) 
+
+PROJECT 
+( Name, Number, Location, Controlling Department ) 
+
+EMPLOYEE 
+(Name (Fname, Lname), SSN, Gender, Address, Salary  
+Birthdate, Department, Supervisor, (Workson ( Project , Hrs)) 
+
+DEPENDENT  
+( Employee, Name, Gender,  Birthdate, Relationship ) 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+ 
+ 
+Example …Relationships 
+
+• Manage: 
+
+–  Department and Employee  
+–  Partial Participation 
+–  Relation Attribute: StartDate. 
+
+• Works For: 
+
+–  Department and Employee 
+–  Total Participation 
+
+RDBMS - Dr. AMG        
+
+ 
+Example… 
+
+•
+
+ Control : 
+– Department , Project 
+– Partial Participation from Department  
+–  Total Participation from Project 
+
+• Supervisor : 
+
+– Employee, Employee 
+– Partial and Recursive 
+
+RDBMS - Dr. AMG        
+
+ 
+ 
+Example … 
+
+• Works – On : 
+
+– Project , Employee 
+– Total Participation 
+– Hours Worked is a RKA. 
+
+• Dependants  of: 
+
+– Employee, Dependant 
+– Dependant is a Weaker entity 
+– Dependant is Total , Employee is Partial. 
+
+RDBMS - Dr. AMG        
+
+One Possible mapping of the Problem Statement  
+
+Lname 
+
+Fname 
+
+Sex 
+
+SSN 
+
+Employee 
+
+Name 
+
+Bdate 
+
+Supe
+rvise
+s 
+
+Sal 
+
+Work
+s For 
+
+Department 
+
+Name 
+
+No 
+
+Loc 
+
+Address 
+
+Sdate 
+
+manages 
+
+Hours 
+
+Work
+s On 
+
+Controls 
+
+Project 
+
+Name 
+
+No 
+
+Loc 
+
+Depend On 
+
+Dependent 
+
+Relationship 
+
+Name 
+
+Sex 
+
+Bdate 
+
+RDBMS - Dr. AMG        
+
+Company Schema with Structural 
+Constraints 
+
+RDBMS - Dr. AMG        
+
+

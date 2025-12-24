@@ -14,21 +14,26 @@ import TeacherDashboard from "./pages/teacher/Dashboard";
 import TeacherCourses from "./pages/teacher/Courses";
 import TeacherAnalytics from "./pages/teacher/Analytics";
 import TeacherCourseDetail from "./pages/teacher/CourseDetail";
-import UploadMarks from "./pages/teacher/UploadMarks";
+import StudentAnalysis from "./pages/teacher/StudentAnalysis";
+
 import UploadMarksNew from "./pages/teacher/UploadMarksNew";
+import SEEUpload from "./pages/teacher/SEEUpload";
+import StudentProgression from "./pages/teacher/StudentProgression";
+
+import DynamicDashboard from "./pages/teacher/DynamicDashboard";
 import COGenerator from "./pages/teacher/COGenerator";
-import StaticAnalysis from "./pages/teacher/StaticAnalysis";
-import AttainmentDashboard from "./pages/teacher/AttainmentDashboard";
 
 // Student Pages
 import StudentDashboard from "./pages/student/Dashboard";
 import StudentCourses from "./pages/student/Courses";
+import StudentCourseDetail from "./pages/student/CourseDetail";
 import StudentCourseAnalytics from "./pages/student/CourseAnalytics";
 import StudentEnroll from "./pages/student/Enroll";
+import DBMSRecommender from "./pages/student/DBMSRecommender";
 
 // Shared Pages
 import Settings from "./pages/shared/Settings";
-import Analysis from "./pages/shared/Analysis";
+
 
 // Layouts
 import StudentLayout from "./layouts/StudentLayout";
@@ -132,12 +137,15 @@ const AppContent = () => {
                   <Route path="courses" element={<TeacherCourses />} />
                   <Route path="courses/:id" element={<TeacherCourseDetail />} />
                   <Route path="analytics" element={<TeacherAnalytics />} />
-                  <Route path="analysis" element={<Analysis />} />
-                  <Route path="upload" element={<UploadMarksNew />} />
-                  <Route path="upload-old" element={<UploadMarks />} />
+                  <Route path="student-analysis" element={<StudentAnalysis />} />
+                  {/* <Route path="analysis" element={<Analysis />} /> */}
                   <Route path="co-generator" element={<COGenerator />} />
-                  <Route path="static-analysis" element={<StaticAnalysis />} />
-                  <Route path="attainment" element={<AttainmentDashboard />} />
+                  <Route path="upload" element={<UploadMarksNew />} />
+                  <Route path="see-upload" element={<SEEUpload />} />
+                  <Route path="student-progression" element={<StudentProgression />} />
+                  {/* <Route path="upload-old" element={<UploadMarks />} /> */}
+                  {/* <Route path="static-analysis" element={<StaticAnalysis />} /> */}
+                  <Route path="attainment/:courseId" element={<DynamicDashboard />} />
                   <Route path="settings" element={<Settings />} />
                   <Route index element={<Navigate to="dashboard" replace />} />
                 </Route>
@@ -152,8 +160,10 @@ const AppContent = () => {
                   <Route path="dashboard" element={<StudentDashboard />} />
                   <Route path="enroll" element={<StudentEnroll />} />
                   <Route path="courses" element={<StudentCourses />} />
+                  <Route path="courses/:courseId" element={<StudentCourseDetail />} />
                   <Route path="courses/:courseId/analytics" element={<StudentCourseAnalytics />} />
-                  <Route path="analysis" element={<Analysis />} />
+                  <Route path="dbms-recommender" element={<DBMSRecommender />} />
+                  {/* <Route path="analysis" element={<Analysis />} /> */}
                   <Route path="settings" element={<Settings />} />
                   <Route index element={<Navigate to="dashboard" replace />} />
                 </Route>

@@ -31,6 +31,7 @@ import {
   ChevronLeft,
   AccountCircle,
   TrendingUp,
+  Book,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -78,10 +79,9 @@ const StudentLayout = () => {
   // Sidebar menu items
   const menuItems = [
     { label: 'Dashboard', path: '/student/dashboard', icon: <Dashboard /> },
-    { label: 'Enroll in Course', path: '/student/enroll', icon: <PersonAdd /> },
     { label: 'My Courses', path: '/student/courses', icon: <School /> },
-    { label: 'Analytics', path: '/student/analytics', icon: <BarChart /> },
-    { label: 'Analysis', path: '/student/analysis', icon: <TrendingUp /> },
+    { label: 'Enroll in Course', path: '/student/enroll', icon: <PersonAdd /> },
+    { label: 'Recommendation Engine', path: '/student/dbms-recommender', icon: <Book /> },
     { label: 'Settings', path: '/student/settings', icon: <Settings /> },
   ];
 
@@ -111,7 +111,7 @@ const StudentLayout = () => {
               Student Portal
             </Typography>
             <Typography variant="caption" sx={{ opacity: 0.9 }}>
-              OBE System
+              Skill-Sync
             </Typography>
           </Box>
         </Box>
@@ -264,7 +264,7 @@ const StudentLayout = () => {
               display: { xs: 'none', sm: 'block' },
             }}
           >
-            OBE CO/PO Analysis System
+            Skill-Sync : A detailed Analysis System
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

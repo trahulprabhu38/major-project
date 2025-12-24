@@ -5,7 +5,11 @@ import {
   getStudentCOPerformance,
   getStudentPOPerformance,
   getStudentAnalytics,
-  enrollInCourse
+  enrollInCourse,
+  getStudentMarksFromMarksheets,
+  getStudentCOAttainment,
+  getRecommendations,
+  submitRecommendationFeedback
 } from '../controllers/studentController.js';
 import { authenticateToken, authorizeRoles } from '../middleware/auth.js';
 
@@ -22,5 +26,9 @@ router.get('/courses/:courseId/scores', getStudentScores);
 router.get('/courses/:courseId/co-performance', getStudentCOPerformance);
 router.get('/courses/:courseId/po-performance', getStudentPOPerformance);
 router.get('/courses/:courseId/analytics', getStudentAnalytics);
+router.get('/courses/:courseId/marks', getStudentMarksFromMarksheets);
+router.get('/courses/:courseId/co-attainment', getStudentCOAttainment);
+router.get('/courses/:courseId/recommendations', getRecommendations);
+router.post('/recommendations/feedback', submitRecommendationFeedback);
 
 export default router;
