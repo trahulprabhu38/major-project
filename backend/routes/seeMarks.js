@@ -49,6 +49,24 @@ router.post('/courses/:courseId/upload', authenticateToken, async (req, res) => 
     // Upload marks
     const result = await seeMarksService.uploadSEEMarks(courseId, marksData, uploadedBy);
 
+    // Check if there were any failures
+    if (result.failed > 0 && result.uploaded === 0 && result.updated === 0) {
+      // All uploads failed
+      return res.status(400).json({
+        success: false,
+        message: `All ${result.failed} entries failed to upload. Please check the errors below.`,
+        data: result
+      });
+    } else if (result.failed > 0) {
+      // Partial success
+      return res.status(200).json({
+        success: true,
+        message: `Partial upload: ${result.uploaded + result.updated} succeeded, ${result.failed} failed`,
+        data: result
+      });
+    }
+
+    // Full success
     return res.status(200).json({
       success: true,
       message: 'SEE marks uploaded successfully',

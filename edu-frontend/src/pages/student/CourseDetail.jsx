@@ -1,28 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  LinearProgress,
-  Button,
-  Tabs,
-  Tab,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Divider,
-} from '@mui/material';
+import { motion } from 'framer-motion';
 import {
   BarChart,
   Bar,
@@ -39,23 +17,33 @@ import {
   Cell,
 } from 'recharts';
 import {
-  ArrowBack,
-  Assessment,
+  ArrowLeft,
+  FileText,
   TrendingUp,
-  School,
-  ExpandMore,
+  GraduationCap,
+  ChevronDown,
   CheckCircle,
-  Cancel,
-} from '@mui/icons-material';
-import { motion } from 'framer-motion';
+  XCircle,
+} from 'lucide-react';
 import { studentAPI, courseAPI } from '../../services/api';
 import PageLayout from '../../components/shared/PageLayout';
 import { PageLoader } from '../../components/shared/Loading';
 import { ErrorState } from '../../components/shared/ErrorState';
 import StatsCard from '../../components/shared/StatsCard';
 import Recommendations from '../../components/student/Recommendations';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
+import { CHART_COLORS } from '../../config/chartColors';
 
-const COLORS = ['#2563eb', '#7c3aed', '#059669', '#dc2626', '#ea580c', '#ca8a04'];
+const COLORS = [
+  CHART_COLORS.primary,
+  CHART_COLORS.secondary,
+  CHART_COLORS.success,
+  CHART_COLORS.error,
+  CHART_COLORS.warning,
+  CHART_COLORS.tertiary,
+];
 
 const CourseDetail = () => {
   const { courseId } = useParams();
@@ -63,7 +51,7 @@ const CourseDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tabValue, setTabValue] = useState(0);
-  
+
   const [courseInfo, setCourseInfo] = useState(null);
   const [marks, setMarks] = useState([]);
   const [coAttainment, setCOAttainment] = useState({ combined: [], perAssessment: [] });
@@ -128,258 +116,324 @@ const CourseDetail = () => {
     <PageLayout
       title={courseInfo?.name || 'Course Details'}
       subtitle={`${courseInfo?.code || ''} - Your Performance Overview`}
-      icon={School}
+      icon={GraduationCap}
       breadcrumbs={[
-        { label: 'Dashboard', to: '/student/dashboard', icon: School },
+        { label: 'Dashboard', to: '/student/dashboard', icon: GraduationCap },
         { label: courseInfo?.name || 'Course' },
       ]}
       actions={
-        <Button
-          variant="outlined"
-          startIcon={<ArrowBack />}
-          onClick={() => navigate('/student/dashboard')}
-        >
+        <Button variant="outline" onClick={() => navigate('/student/dashboard')}>
+          <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
       }
     >
       {/* Overall Stats */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Overall Percentage"
-            value={`${overallPercentage.toFixed(1)}%`}
-            icon={TrendingUp}
-            color="primary.main"
-            bgColor="primary.light"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Total Marks"
-            value={`${totalMarks.toFixed(1)} / ${totalMaxMarks.toFixed(1)}`}
-            icon={Assessment}
-            color="info.main"
-            bgColor="info.light"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Assessments"
-            value={marks.length}
-            icon={School}
-            color="success.main"
-            bgColor="success.light"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Your Rank"
-            value={`${analytics?.rank || '--'}/${analytics?.totalStudents || '--'}`}
-            icon={TrendingUp}
-            color="warning.main"
-            bgColor="warning.light"
-          />
-        </Grid>
-      </Grid>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <StatsCard
+          title="Overall Percentage"
+          value={`${overallPercentage.toFixed(1)}%`}
+          icon={TrendingUp}
+          color="primary"
+        />
+        <StatsCard
+          title="Total Marks"
+          value={`${totalMarks.toFixed(1)} / ${totalMaxMarks.toFixed(1)}`}
+          icon={FileText}
+          color="success"
+        />
+        <StatsCard
+          title="Assessments"
+          value={marks.length}
+          icon={GraduationCap}
+          color="secondary"
+        />
+        <StatsCard
+          title="Your Rank"
+          value={`${analytics?.rank || '--'}/${analytics?.totalStudents || '--'}`}
+          icon={TrendingUp}
+          color="warning"
+        />
+      </div>
 
       {/* Tabs */}
-      <Card sx={{ mb: 3 }}>
-        <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
-          <Tab label="Marks Breakdown" />
-          <Tab label="CO Attainment" />
-          <Tab label="Performance Analysis" />
-          <Tab label="Recommendations" />
-        </Tabs>
+      <Card className="mb-6">
+        <div className="border-b border-neutral-200 dark:border-dark-border">
+          <div className="flex gap-1 px-4">
+            <button
+              onClick={() => setTabValue(0)}
+              className={`px-4 py-3 border-b-2 transition-colors ${
+                tabValue === 0
+                  ? 'border-primary-500 dark:border-dark-green-500 text-primary-600 dark:text-dark-green-500 font-semibold'
+                  : 'border-transparent text-neutral-600 dark:text-dark-text-secondary hover:text-neutral-800 dark:hover:text-dark-text-primary'
+              }`}
+            >
+              Marks Breakdown
+            </button>
+            <button
+              onClick={() => setTabValue(1)}
+              className={`px-4 py-3 border-b-2 transition-colors ${
+                tabValue === 1
+                  ? 'border-primary-500 dark:border-dark-green-500 text-primary-600 dark:text-dark-green-500 font-semibold'
+                  : 'border-transparent text-neutral-600 dark:text-dark-text-secondary hover:text-neutral-800 dark:hover:text-dark-text-primary'
+              }`}
+            >
+              CO Attainment
+            </button>
+            <button
+              onClick={() => setTabValue(2)}
+              className={`px-4 py-3 border-b-2 transition-colors ${
+                tabValue === 2
+                  ? 'border-primary-500 dark:border-dark-green-500 text-primary-600 dark:text-dark-green-500 font-semibold'
+                  : 'border-transparent text-neutral-600 dark:text-dark-text-secondary hover:text-neutral-800 dark:hover:text-dark-text-primary'
+              }`}
+            >
+              Performance Analysis
+            </button>
+            <button
+              onClick={() => setTabValue(3)}
+              className={`px-4 py-3 border-b-2 transition-colors ${
+                tabValue === 3
+                  ? 'border-primary-500 dark:border-dark-green-500 text-primary-600 dark:text-dark-green-500 font-semibold'
+                  : 'border-transparent text-neutral-600 dark:text-dark-text-secondary hover:text-neutral-800 dark:hover:text-dark-text-primary'
+              }`}
+            >
+              Recommendations
+            </button>
+          </div>
+        </div>
       </Card>
 
       {/* Tab 0: Marks Breakdown */}
       {tabValue === 0 && (
-        <Grid container spacing={3}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Assessment Performance Chart */}
-          <Grid item xs={12} lg={8}>
+          <div className="lg:col-span-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <Card sx={{ p: 3, borderRadius: 3 }}>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  Assessment Performance
-                </Typography>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={assessmentChartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="marks" fill="#2563eb" name="Marks Obtained" />
-                    <Bar dataKey="max" fill="#e5e7eb" name="Max Marks" />
-                  </BarChart>
-                </ResponsiveContainer>
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-6">
+                    Assessment Performance
+                  </h3>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={assessmentChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#D8CBC0" />
+                      <XAxis dataKey="name" stroke="#666" />
+                      <YAxis stroke="#666" />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#fff',
+                          border: '1px solid #E9762B',
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="marks" fill={CHART_COLORS.primary} name="Marks Obtained" />
+                      <Bar dataKey="max" fill="#E9762B" name="Max Marks" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
               </Card>
             </motion.div>
-          </Grid>
+          </div>
 
           {/* Assessment List */}
-          <Grid item xs={12} lg={4}>
-            <Card sx={{ p: 3, borderRadius: 3 }}>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
-                All Assessments
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-                {marks.map((assessment, index) => (
-                  <Box key={index}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="body2" fontWeight={600}>
-                        {assessment.assessmentName || assessment.assessmentType}
-                      </Typography>
-                      <Chip
-                        label={`${assessment.percentage.toFixed(1)}%`}
-                        size="small"
-                        color={assessment.percentage >= 60 ? 'success' : assessment.percentage >= 40 ? 'warning' : 'error'}
-                      />
-                    </Box>
-                    <LinearProgress
-                      variant="determinate"
-                      value={assessment.percentage}
-                      sx={{
-                        height: 8,
-                        borderRadius: 4,
-                        bgcolor: 'grey.200',
-                        '& .MuiLinearProgress-bar': {
-                          borderRadius: 4,
-                          bgcolor: assessment.percentage >= 60 ? 'success.main' : assessment.percentage >= 40 ? 'warning.main' : 'error.main',
-                        },
-                      }}
-                    />
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
-                      {assessment.totalMarks.toFixed(1)} / {assessment.maxMarks.toFixed(1)} marks
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
+          <div>
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-6">
+                  All Assessments
+                </h3>
+                <div className="flex flex-col gap-4">
+                  {marks.map((assessment, index) => (
+                    <div key={index}>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">
+                          {assessment.assessmentName || assessment.assessmentType}
+                        </span>
+                        <Badge
+                          variant={
+                            assessment.percentage >= 60
+                              ? 'success'
+                              : assessment.percentage >= 40
+                              ? 'default'
+                              : 'destructive'
+                          }
+                        >
+                          {assessment.percentage.toFixed(1)}%
+                        </Badge>
+                      </div>
+                      <div className="h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${
+                            assessment.percentage >= 60
+                              ? 'bg-success-500'
+                              : assessment.percentage >= 40
+                              ? 'bg-warning-500'
+                              : 'bg-error-500'
+                          }`}
+                          style={{ width: `${assessment.percentage}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mt-1">
+                        {assessment.totalMarks.toFixed(1)} / {assessment.maxMarks.toFixed(1)} marks
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
             </Card>
-          </Grid>
+          </div>
 
           {/* Detailed Marks Table */}
-          <Grid item xs={12}>
-            <Card sx={{ borderRadius: 3 }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
+          <div className="lg:col-span-3">
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-6">
                   Detailed Marks Breakdown
-                </Typography>
+                </h3>
                 {marks.map((assessment, idx) => (
-                  <Accordion key={idx} sx={{ mt: 2 }}>
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', pr: 2 }}>
-                        <Box>
-                          <Typography variant="subtitle1" fontWeight={600}>
-                            {assessment.assessmentName || assessment.assessmentType}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {assessment.assessmentType && `${assessment.assessmentType} • `}
-                            {new Date(assessment.date).toLocaleDateString()}
-                          </Typography>
-                        </Box>
-                        <Chip
-                          label={`${assessment.percentage.toFixed(1)}%`}
-                          color={assessment.percentage >= 60 ? 'success' : assessment.percentage >= 40 ? 'warning' : 'error'}
-                        />
-                      </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <TableContainer>
-                        <Table size="small">
-                          <TableHead>
-                            <TableRow>
-                              <TableCell><strong>CO</strong></TableCell>
-                              <TableCell align="right"><strong>Obtained</strong></TableCell>
-                              <TableCell align="right"><strong>Max</strong></TableCell>
-                              <TableCell align="right"><strong>Percentage</strong></TableCell>
-                              <TableCell><strong>Status</strong></TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
+                  <details key={idx} className="group mb-4">
+                    <summary className="flex justify-between items-center p-4 bg-neutral-50 dark:bg-dark-bg-secondary rounded-xl cursor-pointer hover:bg-neutral-100 dark:hover:bg-dark-bg-tertiary transition-colors">
+                      <div className="flex-1">
+                        <h4 className="text-base font-semibold text-neutral-800 dark:text-dark-text-primary">
+                          {assessment.assessmentName || assessment.assessmentType}
+                        </h4>
+                        <p className="text-xs text-neutral-500 dark:text-dark-text-muted mt-1">
+                          {assessment.assessmentType && `${assessment.assessmentType} • `}
+                          {new Date(assessment.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <Badge
+                          variant={
+                            assessment.percentage >= 60
+                              ? 'success'
+                              : assessment.percentage >= 40
+                              ? 'default'
+                              : 'destructive'
+                          }
+                        >
+                          {assessment.percentage.toFixed(1)}%
+                        </Badge>
+                        <ChevronDown className="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" />
+                      </div>
+                    </summary>
+                    <div className="mt-4 p-4 border border-neutral-200 dark:border-dark-border rounded-xl">
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-neutral-200 dark:border-dark-border">
+                              <th className="px-4 py-2 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">
+                                CO
+                              </th>
+                              <th className="px-4 py-2 text-right text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">
+                                Obtained
+                              </th>
+                              <th className="px-4 py-2 text-right text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">
+                                Max
+                              </th>
+                              <th className="px-4 py-2 text-right text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">
+                                Percentage
+                              </th>
+                              <th className="px-4 py-2 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">
+                                Status
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
                             {assessment.coBreakdown && assessment.coBreakdown.length > 0 ? (
                               assessment.coBreakdown.map((co, coIdx) => (
-                                <TableRow key={coIdx}>
-                                  <TableCell>
-                                    <Chip label={`CO${co.coNumber}`} size="small" color="primary" />
-                                  </TableCell>
-                                  <TableCell align="right">{co.obtained.toFixed(1)}</TableCell>
-                                  <TableCell align="right">{co.max.toFixed(1)}</TableCell>
-                                  <TableCell align="right">
-                                    <Typography
-                                      variant="body2"
-                                      sx={{
-                                        color: co.percentage >= 60 ? 'success.main' : co.percentage >= 40 ? 'warning.main' : 'error.main',
-                                        fontWeight: 600,
-                                      }}
+                                <tr key={coIdx} className="border-b border-neutral-200 dark:border-dark-border">
+                                  <td className="px-4 py-3">
+                                    <Badge>CO{co.coNumber}</Badge>
+                                  </td>
+                                  <td className="px-4 py-3 text-right text-sm text-neutral-700 dark:text-dark-text-secondary">
+                                    {co.obtained.toFixed(1)}
+                                  </td>
+                                  <td className="px-4 py-3 text-right text-sm text-neutral-700 dark:text-dark-text-secondary">
+                                    {co.max.toFixed(1)}
+                                  </td>
+                                  <td className="px-4 py-3 text-right">
+                                    <span
+                                      className={`text-sm font-bold ${
+                                        co.percentage >= 60
+                                          ? 'text-success-600 dark:text-success-500'
+                                          : co.percentage >= 40
+                                          ? 'text-warning-600 dark:text-warning-500'
+                                          : 'text-error-600 dark:text-error-500'
+                                      }`}
                                     >
                                       {co.percentage.toFixed(1)}%
-                                    </Typography>
-                                  </TableCell>
-                                  <TableCell>
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-3">
                                     {co.percentage >= 60 ? (
-                                      <CheckCircle color="success" fontSize="small" />
+                                      <CheckCircle className="w-5 h-5 text-success-600 dark:text-success-500" />
                                     ) : (
-                                      <Cancel color="error" fontSize="small" />
+                                      <XCircle className="w-5 h-5 text-error-600 dark:text-error-500" />
                                     )}
-                                  </TableCell>
-                                </TableRow>
+                                  </td>
+                                </tr>
                               ))
                             ) : (
-                              <TableRow>
-                                <TableCell colSpan={5} align="center">
-                                  <Typography variant="body2" color="text.secondary">
-                                    No CO breakdown available
-                                  </Typography>
-                                </TableCell>
-                              </TableRow>
+                              <tr>
+                                <td colSpan={5} className="px-4 py-6 text-center text-sm text-neutral-500 dark:text-dark-text-muted">
+                                  No CO breakdown available
+                                </td>
+                              </tr>
                             )}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                      <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-                        <Typography variant="body2">
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="mt-4 p-3 bg-neutral-50 dark:bg-dark-bg-tertiary rounded-xl">
+                        <p className="text-sm text-neutral-700 dark:text-dark-text-secondary">
                           <strong>Total:</strong> {assessment.totalMarks.toFixed(1)} / {assessment.maxMarks.toFixed(1)} marks
-                        </Typography>
-                      </Box>
-                    </AccordionDetails>
-                  </Accordion>
+                        </p>
+                      </div>
+                    </div>
+                  </details>
                 ))}
               </CardContent>
             </Card>
-          </Grid>
-        </Grid>
+          </div>
+        </div>
       )}
 
       {/* Tab 1: CO Attainment */}
       {tabValue === 1 && (
-        <Grid container spacing={3}>
-          <Grid item xs={12} lg={6}>
-            <Card sx={{ p: 3, borderRadius: 3 }}>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-6">
                 Combined CO Attainment
-              </Typography>
+              </h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={coChartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis domain={[0, 100]} />
-                  <Tooltip />
-                  <Bar dataKey="attainment" fill="#2563eb" radius={[8, 8, 0, 0]} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8CBC0" />
+                  <XAxis dataKey="name" stroke="#666" />
+                  <YAxis domain={[0, 100]} stroke="#666" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
+                      border: '1px solid #E9762B',
+                      borderRadius: '8px',
+                    }}
+                  />
+                  <Bar dataKey="attainment" fill={CHART_COLORS.primary} radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
-            </Card>
-          </Grid>
+            </CardContent>
+          </Card>
 
-          <Grid item xs={12} lg={6}>
-            <Card sx={{ p: 3, borderRadius: 3 }}>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-6">
                 CO Distribution
-              </Typography>
+              </h3>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -399,172 +453,196 @@ const CourseDetail = () => {
                   <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
-            </Card>
-          </Grid>
+            </CardContent>
+          </Card>
 
-          <Grid item xs={12}>
-            <Card sx={{ borderRadius: 3 }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
+          <div className="lg:col-span-2">
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-6">
                   CO Attainment Details
-                </Typography>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell><strong>CO</strong></TableCell>
-                        <TableCell><strong>Description</strong></TableCell>
-                        <TableCell align="right"><strong>Max Marks</strong></TableCell>
-                        <TableCell align="right"><strong>Attainment %</strong></TableCell>
-                        <TableCell><strong>Status</strong></TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-neutral-200 dark:border-dark-border">
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">
+                          CO
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">
+                          Description
+                        </th>
+                        <th className="px-4 py-3 text-right text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">
+                          Max Marks
+                        </th>
+                        <th className="px-4 py-3 text-right text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">
+                          Attainment %
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">
+                          Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {coAttainment.combined.map((co, idx) => {
                         const attainment = parseFloat(co.attainment_percent || 0);
                         return (
-                          <TableRow key={idx}>
-                            <TableCell>
-                              <Chip label={`CO${co.co_number}`} color="primary" />
-                            </TableCell>
-                            <TableCell>{co.description || 'N/A'}</TableCell>
-                            <TableCell align="right">{parseFloat(co.total_max_marks || 0).toFixed(1)}</TableCell>
-                            <TableCell align="right">
-                              <Typography
-                                variant="body2"
-                                sx={{
-                                  color: attainment >= 60 ? 'success.main' : attainment >= 40 ? 'warning.main' : 'error.main',
-                                  fontWeight: 600,
-                                }}
+                          <tr key={idx} className="border-b border-neutral-200 dark:border-dark-border hover:bg-neutral-50 dark:hover:bg-dark-bg-secondary">
+                            <td className="px-4 py-3">
+                              <Badge>CO{co.co_number}</Badge>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-neutral-700 dark:text-dark-text-secondary">
+                              {co.description || 'N/A'}
+                            </td>
+                            <td className="px-4 py-3 text-right text-sm text-neutral-700 dark:text-dark-text-secondary">
+                              {parseFloat(co.total_max_marks || 0).toFixed(1)}
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <span
+                                className={`text-sm font-bold ${
+                                  attainment >= 60
+                                    ? 'text-success-600 dark:text-success-500'
+                                    : attainment >= 40
+                                    ? 'text-warning-600 dark:text-warning-500'
+                                    : 'text-error-600 dark:text-error-500'
+                                }`}
                               >
                                 {attainment.toFixed(1)}%
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
                               {attainment >= 60 ? (
-                                <Chip label="Achieved" color="success" size="small" />
+                                <Badge variant="success">Achieved</Badge>
                               ) : (
-                                <Chip label="Not Achieved" color="error" size="small" />
+                                <Badge variant="destructive">Not Achieved</Badge>
                               )}
-                            </TableCell>
-                          </TableRow>
+                            </td>
+                          </tr>
                         );
                       })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                    </tbody>
+                  </table>
+                </div>
               </CardContent>
             </Card>
-          </Grid>
-        </Grid>
+          </div>
+        </div>
       )}
 
       {/* Tab 2: Performance Analysis */}
       {tabValue === 2 && (
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Card sx={{ p: 3, borderRadius: 3 }}>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
+        <div className="grid grid-cols-1 gap-6">
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-6">
                 Performance Trend
-              </Typography>
+              </h3>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={assessmentChartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis domain={[0, 100]} />
-                  <Tooltip />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8CBC0" />
+                  <XAxis dataKey="name" stroke="#666" />
+                  <YAxis domain={[0, 100]} stroke="#666" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
+                      border: '1px solid #E9762B',
+                      borderRadius: '8px',
+                    }}
+                  />
                   <Legend />
                   <Line
                     type="monotone"
                     dataKey="percentage"
-                    stroke="#2563eb"
+                    stroke={CHART_COLORS.primary}
                     strokeWidth={3}
-                    dot={{ fill: '#2563eb', r: 6 }}
+                    dot={{ fill: CHART_COLORS.primary, r: 6 }}
                     name="Percentage"
                   />
                 </LineChart>
               </ResponsiveContainer>
-            </Card>
-          </Grid>
+            </CardContent>
+          </Card>
 
-          <Grid item xs={12} md={6}>
-            <Card sx={{ p: 3, borderRadius: 3 }}>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
-                Your Performance vs Class Average
-              </Typography>
-              <Box sx={{ mt: 3 }}>
-                <Box sx={{ mb: 2 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                    <Typography variant="body2">Your Average</Typography>
-                    <Typography variant="body2" fontWeight={600}>
-                      {analytics?.studentAverage || 0}%
-                    </Typography>
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={parseFloat(analytics?.studentAverage || 0)}
-                    sx={{ height: 10, borderRadius: 2 }}
-                  />
-                </Box>
-                <Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                    <Typography variant="body2">Class Average</Typography>
-                    <Typography variant="body2" fontWeight={600}>
-                      {analytics?.classAverage || 0}%
-                    </Typography>
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={parseFloat(analytics?.classAverage || 0)}
-                    color="secondary"
-                    sx={{ height: 10, borderRadius: 2 }}
-                  />
-                </Box>
-              </Box>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-6">
+                  Your Performance vs Class Average
+                </h3>
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">Your Average</span>
+                      <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
+                        {analytics?.studentAverage || 0}%
+                      </span>
+                    </div>
+                    <div className="h-3 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary-500 dark:bg-dark-green-500 rounded-full"
+                        style={{ width: `${analytics?.studentAverage || 0}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">Class Average</span>
+                      <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
+                        {analytics?.classAverage || 0}%
+                      </span>
+                    </div>
+                    <div className="h-3 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-secondary-500 rounded-full"
+                        style={{ width: `${analytics?.classAverage || 0}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
             </Card>
-          </Grid>
 
-          <Grid item xs={12} md={6}>
-            <Card sx={{ p: 3, borderRadius: 3 }}>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
-                Performance Summary
-              </Typography>
-              <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Box>
-                  <Typography variant="body2" color="text.secondary">Overall Percentage</Typography>
-                  <Typography variant="h5" fontWeight="bold" color="primary.main">
-                    {overallPercentage.toFixed(1)}%
-                  </Typography>
-                </Box>
-                <Divider />
-                <Box>
-                  <Typography variant="body2" color="text.secondary">Class Rank</Typography>
-                  <Typography variant="h5" fontWeight="bold" color="warning.main">
-                    {analytics?.rank || '--'} / {analytics?.totalStudents || '--'}
-                  </Typography>
-                </Box>
-                <Divider />
-                <Box>
-                  <Typography variant="body2" color="text.secondary">Total Assessments</Typography>
-                  <Typography variant="h5" fontWeight="bold">
-                    {marks.length}
-                  </Typography>
-                </Box>
-              </Box>
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-6">
+                  Performance Summary
+                </h3>
+                <div className="space-y-6">
+                  <div>
+                    <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">Overall Percentage</p>
+                    <p className="text-4xl font-bold text-primary-600 dark:text-dark-green-500 mt-1">
+                      {overallPercentage.toFixed(1)}%
+                    </p>
+                  </div>
+                  <div className="h-px bg-neutral-200 dark:bg-dark-border" />
+                  <div>
+                    <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">Class Rank</p>
+                    <p className="text-4xl font-bold text-warning-600 dark:text-warning-500 mt-1">
+                      {analytics?.rank || '--'} / {analytics?.totalStudents || '--'}
+                    </p>
+                  </div>
+                  <div className="h-px bg-neutral-200 dark:bg-dark-border" />
+                  <div>
+                    <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">Total Assessments</p>
+                    <p className="text-4xl font-bold text-neutral-800 dark:text-dark-text-primary mt-1">
+                      {marks.length}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
             </Card>
-          </Grid>
-        </Grid>
+          </div>
+        </div>
       )}
 
       {/* Tab 3: Recommendations */}
       {tabValue === 3 && (
-        <Box>
+        <div>
           <Recommendations courseId={courseId} courseCode={courseInfo?.code} />
-        </Box>
+        </div>
       )}
     </PageLayout>
   );
 };
 
 export default CourseDetail;
-

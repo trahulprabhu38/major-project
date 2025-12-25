@@ -1,22 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  LinearProgress,
-  Button,
-} from '@mui/material';
+import { motion } from 'framer-motion';
 import {
   BarChart,
   Bar,
@@ -34,13 +18,16 @@ import {
   LineChart,
   Line,
 } from 'recharts';
-import { TrendingUp, School, Star, ArrowBack, Assessment } from '@mui/icons-material';
-import { motion } from 'framer-motion';
+import { TrendingUp, GraduationCap, Star, ArrowLeft, FileText } from 'lucide-react';
 import { studentAPI, courseAPI } from '../../services/api';
 import PageLayout from '../../components/shared/PageLayout';
 import { PageLoader } from '../../components/shared/Loading';
 import { ErrorState } from '../../components/shared/ErrorState';
 import StatsCard from '../../components/shared/StatsCard';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
+import { CHART_COLORS } from '../../config/chartColors';
 
 const CourseAnalytics = () => {
   const { courseId } = useParams();
@@ -109,179 +96,169 @@ const CourseAnalytics = () => {
     <PageLayout
       title={courseInfo?.name || 'Course Analytics'}
       subtitle={`${courseInfo?.code || ''} - Detailed Performance Analysis`}
-      icon={Assessment}
+      icon={FileText}
       breadcrumbs={[
-        { label: 'Dashboard', to: '/student/dashboard', icon: School },
+        { label: 'Dashboard', to: '/student/dashboard', icon: GraduationCap },
         { label: courseInfo?.name || 'Analytics' },
       ]}
       actions={
         <Button
-          variant="outlined"
-          startIcon={<ArrowBack />}
+          variant="outline"
           onClick={() => navigate('/student/dashboard')}
         >
+          <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Dashboard
         </Button>
       }
     >
       {/* Performance Overview */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Your Average"
-            value={`${analytics?.studentAverage || 0}%`}
-            icon={TrendingUp}
-            color="primary.main"
-            bgColor="primary.light"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Class Average"
-            value={`${analytics?.classAverage || 0}%`}
-            icon={School}
-            color="info.main"
-            bgColor="info.light"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Your Rank"
-            value={`${analytics?.rank || '--'}/${analytics?.totalStudents || '--'}`}
-            icon={Star}
-            color="warning.main"
-            bgColor="warning.light"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Assessments"
-            value={scores.length}
-            icon={Assessment}
-            color="success.main"
-            bgColor="success.light"
-          />
-        </Grid>
-      </Grid>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <StatsCard
+          title="Your Average"
+          value={`${analytics?.studentAverage || 0}%`}
+          icon={TrendingUp}
+          color="primary"
+        />
+        <StatsCard
+          title="Class Average"
+          value={`${analytics?.classAverage || 0}%`}
+          icon={GraduationCap}
+          color="success"
+        />
+        <StatsCard
+          title="Your Rank"
+          value={`${analytics?.rank || '--'}/${analytics?.totalStudents || '--'}`}
+          icon={Star}
+          color="warning"
+        />
+        <StatsCard
+          title="Assessments"
+          value={scores.length}
+          icon={FileText}
+          color="secondary"
+        />
+      </div>
 
       {/* Charts Section */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* CO Performance Bar Chart */}
-        <Grid item xs={12} lg={6}>
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card sx={{ borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.08)', p: 3 }}>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
                 Course Outcome (CO) Performance
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              </h3>
+              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-6">
                 Your performance across all course outcomes
-              </Typography>
+              </p>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={coChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8CBC0" />
                   <XAxis dataKey="co" stroke="#666" />
                   <YAxis stroke="#666" domain={[0, 100]} />
                   <Tooltip
                     contentStyle={{
-                      borderRadius: 8,
-                      border: 'none',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                      backgroundColor: '#fff',
+                      border: '1px solid #E9762B',
+                      borderRadius: '8px',
                     }}
                   />
                   <Legend />
-                  <Bar dataKey="performance" fill="#2563eb" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="performance" fill={CHART_COLORS.primary} radius={[8, 8, 0, 0]} name="Performance %" />
                 </BarChart>
               </ResponsiveContainer>
-            </Card>
-          </motion.div>
-        </Grid>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* PO Attainment Radar Chart */}
-        <Grid item xs={12} lg={6}>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card sx={{ borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.08)', p: 3 }}>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
                 Program Outcome (PO) Attainment
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              </h3>
+              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-6">
                 Contribution to program outcomes
-              </Typography>
+              </p>
               <ResponsiveContainer width="100%" height={300}>
                 <RadarChart data={poChartData}>
-                  <PolarGrid stroke="#e0e0e0" />
+                  <PolarGrid stroke="#D8CBC0" />
                   <PolarAngleAxis dataKey="po" stroke="#666" />
                   <PolarRadiusAxis angle={90} domain={[0, 100]} stroke="#666" />
                   <Radar
                     name="PO Attainment"
                     dataKey="attainment"
-                    stroke="#7c3aed"
-                    fill="#7c3aed"
+                    stroke={CHART_COLORS.secondary}
+                    fill={CHART_COLORS.secondary}
                     fillOpacity={0.6}
                   />
                   <Tooltip
                     contentStyle={{
-                      borderRadius: 8,
-                      border: 'none',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                      backgroundColor: '#fff',
+                      border: '1px solid #E9762B',
+                      borderRadius: '8px',
                     }}
                   />
                 </RadarChart>
               </ResponsiveContainer>
-            </Card>
-          </motion.div>
-        </Grid>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Assessment Trend Line Chart */}
         {assessmentTrendData.length > 0 && (
-          <Grid item xs={12}>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <Card sx={{ borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.08)', p: 3 }}>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="lg:col-span-2"
+          >
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
                   Assessment Performance Trend
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                </h3>
+                <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-6">
                   Your performance across different assessments
-                </Typography>
+                </p>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={assessmentTrendData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#D8CBC0" />
                     <XAxis dataKey="name" stroke="#666" />
                     <YAxis stroke="#666" domain={[0, 100]} />
                     <Tooltip
                       contentStyle={{
-                        borderRadius: 8,
-                        border: 'none',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                        backgroundColor: '#fff',
+                        border: '1px solid #E9762B',
+                        borderRadius: '8px',
                       }}
                     />
                     <Legend />
                     <Line
                       type="monotone"
                       dataKey="percentage"
-                      stroke="#10b981"
+                      stroke={CHART_COLORS.success}
                       strokeWidth={3}
-                      dot={{ fill: '#10b981', r: 6 }}
+                      dot={{ fill: CHART_COLORS.success, r: 6 }}
                       activeDot={{ r: 8 }}
+                      name="Percentage"
                     />
                   </LineChart>
                 </ResponsiveContainer>
-              </Card>
-            </motion.div>
-          </Grid>
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
-      </Grid>
+      </div>
 
       {/* CO Performance Table */}
       <motion.div
@@ -289,77 +266,69 @@ const CourseAnalytics = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
       >
-        <Card sx={{ borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.08)', mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-6">
               Detailed CO Performance
-            </Typography>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell><strong>CO Number</strong></TableCell>
-                    <TableCell><strong>Marks Obtained</strong></TableCell>
-                    <TableCell><strong>Max Marks</strong></TableCell>
-                    <TableCell><strong>Performance</strong></TableCell>
-                    <TableCell><strong>Progress</strong></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-neutral-200 dark:border-dark-border">
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">CO Number</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Marks Obtained</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Max Marks</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Performance</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Progress</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {coPerformance.map((co) => {
                     const percentage = parseFloat(co.percentage) || 0;
                     return (
-                      <TableRow key={co.coNumber} hover>
-                        <TableCell>
-                          <Chip label={`CO ${co.coNumber}`} color="primary" size="small" />
-                        </TableCell>
-                        <TableCell>{co.scored || 0}</TableCell>
-                        <TableCell>{co.maxMarks || 0}</TableCell>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            fontWeight="bold"
-                            sx={{
-                              color:
-                                percentage >= 80
-                                  ? 'success.main'
-                                  : percentage >= 60
-                                  ? 'warning.main'
-                                  : 'error.main',
-                            }}
-                          >
+                      <tr key={co.coNumber} className="border-b border-neutral-200 dark:border-dark-border hover:bg-neutral-50 dark:hover:bg-dark-bg-secondary">
+                        <td className="px-4 py-3">
+                          <Badge>CO {co.coNumber}</Badge>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-neutral-700 dark:text-dark-text-secondary">
+                          {co.scored || 0}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-neutral-700 dark:text-dark-text-secondary">
+                          {co.maxMarks || 0}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`text-sm font-bold ${
+                            percentage >= 80
+                              ? 'text-success-600 dark:text-success-500'
+                              : percentage >= 60
+                              ? 'text-warning-600 dark:text-warning-500'
+                              : 'text-error-600 dark:text-error-500'
+                          }`}>
                             {percentage.toFixed(1)}%
-                          </Typography>
-                        </TableCell>
-                        <TableCell sx={{ width: '40%' }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <LinearProgress
-                              variant="determinate"
-                              value={percentage}
-                              sx={{
-                                flex: 1,
-                                height: 8,
-                                borderRadius: 4,
-                                bgcolor: 'grey.200',
-                                '& .MuiLinearProgress-bar': {
-                                  borderRadius: 4,
-                                  bgcolor:
-                                    percentage >= 80
-                                      ? 'success.main'
-                                      : percentage >= 60
-                                      ? 'warning.main'
-                                      : 'error.main',
-                                },
-                              }}
-                            />
-                          </Box>
-                        </TableCell>
-                      </TableRow>
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all ${
+                                  percentage >= 80
+                                    ? 'bg-success-500'
+                                    : percentage >= 60
+                                    ? 'bg-warning-500'
+                                    : 'bg-error-500'
+                                }`}
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
                     );
                   })}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                </tbody>
+              </table>
+            </div>
           </CardContent>
         </Card>
       </motion.div>

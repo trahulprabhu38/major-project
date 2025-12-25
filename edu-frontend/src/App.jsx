@@ -1,9 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { ThemeProvider as MuiThemeProvider, createTheme, CssBaseline, Box } from "@mui/material";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./contexts/AuthContext";
-import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
-import { useMemo } from "react";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 // Pages - Authentication
 import Login from "./pages/Login";
@@ -42,85 +40,49 @@ import TeacherLayout from "./layouts/TeacherLayout";
 // Shared Components
 import ProtectedRoute from "./components/shared/ProtectedRoute";
 
-const getTheme = (mode) => createTheme({
-  palette: {
-    mode,
-    primary: { main: "#2563eb", light: "#60a5fa", dark: "#1e40af" },
-    secondary: { main: "#8b5cf6", light: "#a78bfa", dark: "#7c3aed" },
-    success: { main: "#10b981" },
-    error: { main: "#ef4444" },
-    warning: { main: "#f59e0b" },
-    info: { main: "#06b6d4" },
-    background:
-      mode === "dark"
-        ? { default: "#0f172a", paper: "#1e293b" }
-        : { default: "#f8fafc", paper: "#ffffff" },
-  },
-  typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-    h4: { fontWeight: 700 },
-    h5: { fontWeight: 600 },
-    h6: { fontWeight: 600 },
-  },
-  shape: { borderRadius: 12 },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          fontWeight: 600,
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-        },
-      },
-    },
-  },
-});
-
-// Layout wrapper - Not needed anymore as both roles use their own layouts
-const Layout = ({ children }) => {
-  return <Box>{children}</Box>;
-};
-
-// Wrapper component to access theme context
 const AppContent = () => {
-  const { isDark } = useTheme();
-  const theme = useMemo(() => getTheme(isDark ? 'dark' : 'light'), [isDark]);
-
   return (
-    <MuiThemeProvider theme={theme}>
-      <CssBaseline />
-        <AuthProvider>
-          <BrowserRouter>
-            <Layout>
-              <Toaster
-                position="top-right"
-                toastOptions={{
-                  duration: 3000,
-                  style: {
-                    background: "#363636",
-                    color: "#fff",
-                    borderRadius: "10px",
-                  },
-                  success: {
-                    iconTheme: {
-                      primary: '#10b981',
-                      secondary: '#fff',
-                    },
-                  },
-                  error: {
-                    iconTheme: {
-                      primary: '#ef4444',
-                      secondary: '#fff',
-                    },
-                  },
-                }}
-              />
+    <AuthProvider>
+      <BrowserRouter>
+        <div>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: "#41644A",
+                color: "#EBE1D1",
+                borderRadius: "10px",
+                border: "1px solid #0D4715",
+              },
+              success: {
+                iconTheme: {
+                  primary: '#41644A',
+                  secondary: '#EBE1D1',
+                },
+                style: {
+                  background: "#dae5dc",
+                  color: "#0D4715",
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#DC2626',
+                  secondary: '#fff',
+                },
+                style: {
+                  background: "#fee2e2",
+                  color: "#991b1b",
+                },
+              },
+              loading: {
+                iconTheme: {
+                  primary: '#E9762B',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
 
             <Routes>
               {/* Public Routes */}
@@ -173,10 +135,9 @@ const AppContent = () => {
               <Route path="/" element={<Navigate to="/login" replace />} />
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
-          </Layout>
-        </BrowserRouter>
-      </AuthProvider>
-    </MuiThemeProvider>
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   );
 };
 

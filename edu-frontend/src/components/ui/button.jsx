@@ -3,16 +3,17 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-white dark:ring-offset-dark-bg-primary transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 dark:focus-visible:ring-dark-green-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-gradient-to-r from-blue-600 to-violet-600 text-white hover:from-blue-700 hover:to-violet-700 shadow-md hover:shadow-lg transform hover:scale-105",
-        destructive: "bg-red-500 text-white hover:bg-red-600",
-        outline: "border border-gray-300 bg-white hover:bg-gray-100 hover:text-gray-900",
-        secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
-        ghost: "hover:bg-gray-100 hover:text-gray-900",
-        link: "text-blue-600 underline-offset-4 hover:underline",
+        default: "bg-gradient-to-r from-primary-500 to-secondary-500 text-white hover:from-primary-600 hover:to-secondary-600 shadow-md hover:shadow-lg transform hover:scale-105 dark:from-dark-green-500 dark:to-secondary-600",
+        accent: "bg-gradient-to-r from-accent-500 to-accent-400 text-white hover:from-accent-600 hover:to-accent-500 shadow-md hover:shadow-lg transform hover:scale-105 dark:from-dark-accent-500 dark:to-accent-600",
+        destructive: "bg-error-500 text-white hover:bg-error-600 shadow-sm hover:shadow-md",
+        outline: "border border-neutral-300 dark:border-dark-border bg-white dark:bg-dark-bg-secondary hover:bg-neutral-100 dark:hover:bg-dark-bg-tertiary hover:text-neutral-900 dark:hover:text-dark-text-primary text-neutral-700 dark:text-dark-text-primary",
+        secondary: "bg-neutral-200 dark:bg-dark-bg-tertiary text-neutral-900 dark:text-dark-text-primary hover:bg-neutral-300 dark:hover:bg-neutral-700",
+        ghost: "hover:bg-neutral-100 dark:hover:bg-dark-bg-tertiary hover:text-neutral-900 dark:hover:text-dark-text-primary text-neutral-700 dark:text-dark-text-secondary",
+        link: "text-primary-600 dark:text-dark-green-500 underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",

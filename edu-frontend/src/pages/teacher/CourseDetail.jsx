@@ -1,56 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Chip,
-  Tabs,
-  Tab,
-  Paper,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-  TablePagination,
-  CircularProgress,
-} from '@mui/material';
-import {
-  ArrowBack,
-  People,
-  BarChart,
+  ArrowLeft,
+  Users,
+  BarChart3,
   Upload,
-  School,
-  Dashboard,
-  Email,
-  Person,
-  Assignment,
-  Delete,
-  Visibility,
-  AutoAwesome,
+  GraduationCap,
+  LayoutDashboard,
+  Mail,
+  User,
+  FileText,
+  Trash2,
+  Eye,
+  Sparkles,
   CheckCircle,
   Star,
   TrendingUp,
-  Science,
-  Verified,
-  Add,
-} from '@mui/icons-material';
-import { motion } from 'framer-motion';
-import toast from 'react-hot-toast';
+  FlaskConical,
+  BadgeCheck,
+  Plus,
+  ChevronDown,
+} from 'lucide-react';
 import { courseAPI, marksheetAPI, aiCOAPI, courseOutcomesAPI } from '../../services/api';
 import PageLayout from '../../components/shared/PageLayout';
 import { PageLoader } from '../../components/shared/Loading';
@@ -58,6 +30,9 @@ import { ErrorState, EmptyState } from '../../components/shared/ErrorState';
 import StatsCard from '../../components/shared/StatsCard';
 import COMappingUpload from '../../components/upload/COMappingUpload';
 import ManualCOManager from '../../components/teacher/ManualCOManager';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -76,6 +51,10 @@ const CourseDetail = () => {
   const [dataPage, setDataPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  // Student pagination state
+  const [studentPage, setStudentPage] = useState(0);
+  const studentsPerPage = 10;
+
   // AI-generated COs state
   const [aiCOs, setAICOs] = useState([]);
   const [loadingAICOs, setLoadingAICOs] = useState(false);
@@ -93,7 +72,6 @@ const CourseDetail = () => {
   const loadAICOs = async () => {
     try {
       setLoadingAICOs(true);
-      // Fetch all course outcomes (both manual and AI-generated)
       const [cosRes, statsRes] = await Promise.all([
         courseOutcomesAPI.getByCourse(id),
         aiCOAPI.getStatistics(id).catch(() => ({ data: { statistics: null } })),
@@ -102,7 +80,6 @@ const CourseDetail = () => {
       setCOStatistics(statsRes.data.statistics);
     } catch (err) {
       console.error('Error loading COs:', err);
-      // Don't show error, just log it
     } finally {
       setLoadingAICOs(false);
     }
@@ -147,7 +124,6 @@ const CourseDetail = () => {
       }
 
       toast.success('Attainment calculations completed successfully!');
-      // Reload course details to refresh stats
       await loadCourseDetails();
     } catch (err) {
       console.error('Calculation error:', err);
@@ -220,82 +196,66 @@ const CourseDetail = () => {
     <PageLayout
       title={course?.name || 'Course Details'}
       subtitle={`${course?.code || ''} - ${course?.semester ? `Semester ${course.semester}` : ''}`}
-      icon={School}
+      icon={GraduationCap}
       breadcrumbs={[
-        { label: 'Dashboard', to: '/teacher/dashboard', icon: Dashboard },
+        { label: 'Dashboard', to: '/teacher/dashboard', icon: LayoutDashboard },
         { label: 'Courses', to: '/teacher/courses' },
         { label: course?.code || 'Details' },
       ]}
       actions={
-        <Box sx={{ display: 'flex', gap: 2 }}>
+        <div className="flex gap-2 flex-wrap">
           <Button
-            variant="outlined"
-            startIcon={<ArrowBack />}
+            variant="outline"
             onClick={() => navigate('/teacher/courses')}
           >
+            <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
           <Button
-            variant="outlined"
-            startIcon={<BarChart />}
+            variant="outline"
             onClick={() => navigate(`/teacher/attainment/${id}`)}
-            sx={{ color: 'success.main', borderColor: 'success.main' }}
+            className="border-success-600 text-success-600 hover:bg-success-50 dark:border-success-500 dark:text-success-500 dark:hover:bg-success-900/20"
           >
+            <BarChart3 className="w-4 h-4 mr-2" />
             View Dashboard
           </Button>
           <Button
-            variant="contained"
-            startIcon={<Upload />}
             onClick={() => navigate('/teacher/upload')}
-            sx={{
-              background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-            }}
+            className="bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600"
           >
+            <Upload className="w-4 h-4 mr-2" />
             Upload Marks
           </Button>
-        </Box>
+        </div>
       }
     >
       {/* Course Stats */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Enrolled Students"
-            value={students.length}
-            icon={People}
-            color="primary.main"
-            bgColor="primary.light"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Credits"
-            value={course?.credits || 3}
-            icon={School}
-            color="success.main"
-            bgColor="success.light"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Course Outcomes"
-            value={course?.course_outcomes?.length || 0}
-            icon={BarChart}
-            color="warning.main"
-            bgColor="warning.light"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Academic Year"
-            value={course?.year || '--'}
-            icon={Dashboard}
-            color="secondary.main"
-            bgColor="secondary.light"
-          />
-        </Grid>
-      </Grid>
-
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <StatsCard
+          title="Enrolled Students"
+          value={students.length}
+          icon={Users}
+          color="primary"
+        />
+        <StatsCard
+          title="Credits"
+          value={course?.credits || 3}
+          icon={GraduationCap}
+          color="success"
+        />
+        <StatsCard
+          title="Course Outcomes"
+          value={course?.course_outcomes?.length || 0}
+          icon={BarChart3}
+          color="warning"
+        />
+        <StatsCard
+          title="Academic Year"
+          value={course?.year || '--'}
+          icon={LayoutDashboard}
+          color="secondary"
+        />
+      </div>
 
       {/* Course Information Card */}
       <motion.div
@@ -303,72 +263,72 @@ const CourseDetail = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <Card sx={{ borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.08)', mb: 4 }}>
-          <CardContent sx={{ p: 3 }}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
+        <Card className="mb-8">
+          <CardContent className="p-6">
+            <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-4">
               Course Information
-            </Typography>
-            <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={12} md={6}>
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div className="space-y-3">
+                <div className="flex gap-4">
+                  <span className="text-sm text-neutral-600 dark:text-dark-text-secondary min-w-[120px]">
                     Course Code:
-                  </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  </span>
+                  <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
                     {course?.code}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
+                  </span>
+                </div>
+                <div className="flex gap-4">
+                  <span className="text-sm text-neutral-600 dark:text-dark-text-secondary min-w-[120px]">
                     Course Name:
-                  </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  </span>
+                  <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
                     {course?.name}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
+                  </span>
+                </div>
+                <div className="flex gap-4">
+                  <span className="text-sm text-neutral-600 dark:text-dark-text-secondary min-w-[120px]">
                     Semester:
-                  </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  </span>
+                  <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
                     {course?.semester}
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex gap-4">
+                  <span className="text-sm text-neutral-600 dark:text-dark-text-secondary min-w-[120px]">
                     Academic Year:
-                  </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  </span>
+                  <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
                     {course?.year}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
+                  </span>
+                </div>
+                <div className="flex gap-4">
+                  <span className="text-sm text-neutral-600 dark:text-dark-text-secondary min-w-[120px]">
                     Credits:
-                  </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  </span>
+                  <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
                     {course?.credits || 3}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
+                  </span>
+                </div>
+                <div className="flex gap-4">
+                  <span className="text-sm text-neutral-600 dark:text-dark-text-secondary min-w-[120px]">
                     Instructor:
-                  </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  </span>
+                  <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
                     {course?.teacher_name || 'You'}
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
+                  </span>
+                </div>
+              </div>
+            </div>
             {course?.description && (
-              <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
+              <div className="mt-6 pt-4 border-t border-neutral-200 dark:border-dark-border">
+                <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-2">
                   <strong>Description:</strong>
-                </Typography>
-                <Typography variant="body2">{course.description}</Typography>
-              </Box>
+                </p>
+                <p className="text-sm text-neutral-800 dark:text-dark-text-primary">{course.description}</p>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -381,65 +341,44 @@ const CourseDetail = () => {
         transition={{ duration: 0.4, delay: 0.1 }}
       >
         <Card
-          sx={{
-            borderRadius: 3,
-            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-            mb: 4,
-            border: '2px solid',
-            borderColor: aiCOs.length > 0 ? 'primary.main' : 'divider',
-            background: aiCOs.length > 0
-              ? 'linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, rgba(124, 58, 237, 0.02) 100%)'
-              : 'background.paper',
-          }}
+          className={`mb-8 ${
+            aiCOs.length > 0
+              ? 'border-2 border-primary-500 dark:border-dark-green-500 bg-gradient-to-br from-primary-50/30 to-secondary-50/20 dark:from-primary-900/10 dark:to-secondary-900/10'
+              : ''
+          }`}
         >
-          <CardContent sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Box
-                  sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                  }}
-                >
-                  <AutoAwesome sx={{ color: 'white', fontSize: 28 }} />
-                </Box>
-                <Box>
-                  <Typography variant="h6" fontWeight="bold">
+          <CardContent className="p-6">
+            <div className="flex justify-between items-start mb-6 flex-wrap gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 flex items-center justify-center">
+                  <Sparkles className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary">
                     Course Outcomes
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  </h3>
+                  <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
                     {aiCOs.length > 0
                       ? `${aiCOs.length} COs defined • ${aiCOs.filter(co => co.is_ai_generated).length} AI-generated • ${aiCOs.filter(co => !co.is_ai_generated).length} Manual`
                       : 'Add course outcomes using AI generation or manually'}
-                  </Typography>
-                </Box>
-              </Box>
-              <Box sx={{ display: 'flex', gap: 1 }}>
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2">
                 {aiCOs.length === 0 && (
                   <>
                     <Button
-                      variant="contained"
-                      startIcon={<AutoAwesome />}
                       onClick={() => navigate('/teacher/co-generator')}
-                      sx={{
-                        background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                        '&:hover': {
-                          background: 'linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%)',
-                        },
-                      }}
+                      className="bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600"
                     >
+                      <Sparkles className="w-4 h-4 mr-2" />
                       Generate with AI
                     </Button>
                     <Button
-                      variant="outlined"
-                      startIcon={<Add />}
+                      variant="outline"
                       onClick={() => setManualCOModalOpen(true)}
                     >
+                      <Plus className="w-4 h-4 mr-2" />
                       Add Manually
                     </Button>
                   </>
@@ -447,236 +386,170 @@ const CourseDetail = () => {
                 {aiCOs.length > 0 && (
                   <>
                     <Button
-                      variant="outlined"
-                      startIcon={<AutoAwesome />}
+                      variant="outline"
+                      size="sm"
                       onClick={() => navigate('/teacher/co-generator')}
-                      size="small"
                     >
+                      <Sparkles className="w-4 h-4 mr-2" />
                       Regenerate with AI
                     </Button>
                     <Button
-                      variant="outlined"
-                      startIcon={<Add />}
+                      variant="outline"
+                      size="sm"
                       onClick={() => setManualCOModalOpen(true)}
-                      size="small"
                     >
+                      <Plus className="w-4 h-4 mr-2" />
                       Edit Manually
                     </Button>
                   </>
                 )}
-              </Box>
-            </Box>
+              </div>
+            </div>
 
             {loadingAICOs ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-                <CircularProgress />
-              </Box>
+              <div className="flex justify-center py-8">
+                <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+              </div>
             ) : aiCOs.length === 0 ? (
-              <Box
-                sx={{
-                  textAlign: 'center',
-                  py: 6,
-                  px: 3,
-                  borderRadius: 2,
-                  border: '2px dashed',
-                  borderColor: 'divider',
-                  bgcolor: 'background.default',
-                }}
-              >
-                <Science sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-                <Typography variant="h6" color="text.secondary" gutterBottom>
+              <div className="text-center py-12 px-6 rounded-2xl border-2 border-dashed border-neutral-300 dark:border-dark-border bg-neutral-50 dark:bg-dark-bg-secondary">
+                <FlaskConical className="w-16 h-16 text-neutral-400 dark:text-dark-text-muted mx-auto mb-4" />
+                <h4 className="text-lg font-semibold text-neutral-600 dark:text-dark-text-secondary mb-2">
                   No Course Outcomes Yet
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                </h4>
+                <p className="text-sm text-neutral-500 dark:text-dark-text-muted mb-6">
                   Add course outcomes using our AI-powered generator or create them manually.
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                </p>
+                <div className="flex gap-4 justify-center">
                   <Button
-                    variant="contained"
-                    startIcon={<AutoAwesome />}
                     onClick={() => navigate('/teacher/co-generator')}
-                    sx={{
-                      background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                    }}
+                    className="bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600"
                   >
+                    <Sparkles className="w-4 h-4 mr-2" />
                     Generate with AI
                   </Button>
                   <Button
-                    variant="outlined"
-                    startIcon={<Add />}
+                    variant="outline"
                     onClick={() => setManualCOModalOpen(true)}
                   >
+                    <Plus className="w-4 h-4 mr-2" />
                     Add Manually
                   </Button>
-                </Box>
-              </Box>
+                </div>
+              </div>
             ) : (
               <>
                 {/* Statistics Banner */}
                 {coStatistics && (
-                  <Box
-                    sx={{
-                      mb: 3,
-                      p: 2,
-                      borderRadius: 2,
-                      bgcolor: 'background.default',
-                      display: 'flex',
-                      gap: 3,
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">Total COs</Typography>
-                      <Typography variant="h6" fontWeight="bold">{coStatistics.total_cos}</Typography>
-                    </Box>
-                    <Divider orientation="vertical" flexItem />
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">Approved</Typography>
-                      <Typography variant="h6" fontWeight="bold" color="success.main">
+                  <div className="mb-6 p-4 rounded-2xl bg-neutral-50 dark:bg-dark-bg-tertiary flex flex-wrap gap-6">
+                    <div>
+                      <p className="text-xs text-neutral-600 dark:text-dark-text-secondary">Total COs</p>
+                      <p className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary">{coStatistics.total_cos}</p>
+                    </div>
+                    <div className="h-12 w-px bg-neutral-300 dark:bg-dark-border" />
+                    <div>
+                      <p className="text-xs text-neutral-600 dark:text-dark-text-secondary">Approved</p>
+                      <p className="text-2xl font-bold text-success-600 dark:text-success-500">
                         {coStatistics.approved_cos}
-                      </Typography>
-                    </Box>
-                    <Divider orientation="vertical" flexItem />
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">Avg Quality</Typography>
-                      <Typography variant="h6" fontWeight="bold" color="primary.main">
+                      </p>
+                    </div>
+                    <div className="h-12 w-px bg-neutral-300 dark:bg-dark-border" />
+                    <div>
+                      <p className="text-xs text-neutral-600 dark:text-dark-text-secondary">Avg Quality</p>
+                      <p className="text-2xl font-bold text-primary-600 dark:text-dark-green-500">
                         {((coStatistics.avg_quality || 0) * 100).toFixed(0)}%
-                      </Typography>
-                    </Box>
+                      </p>
+                    </div>
                     {coStatistics.bloom_levels && coStatistics.bloom_levels.length > 0 && (
                       <>
-                        <Divider orientation="vertical" flexItem />
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">Bloom Levels</Typography>
-                          <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5 }}>
+                        <div className="h-12 w-px bg-neutral-300 dark:bg-dark-border" />
+                        <div>
+                          <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mb-2">Bloom Levels</p>
+                          <div className="flex gap-2 flex-wrap">
                             {coStatistics.bloom_levels.map((level) => (
-                              <Chip key={level} label={level} size="small" variant="outlined" />
+                              <Badge key={level} variant="outline">{level}</Badge>
                             ))}
-                          </Box>
-                        </Box>
+                          </div>
+                        </div>
                       </>
                     )}
-                  </Box>
+                  </div>
                 )}
 
                 {/* COs Grid */}
-                <Grid container spacing={2}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {aiCOs.map((co, index) => {
                     const getBloomColor = (level) => {
                       const colors = {
-                        Apply: '#3b82f6',
-                        Analyze: '#8b5cf6',
-                        Evaluate: '#ec4899',
-                        Create: '#10b981',
+                        Apply: 'bg-blue-500',
+                        Analyze: 'bg-purple-500',
+                        Evaluate: 'bg-pink-500',
+                        Create: 'bg-success-500',
                       };
-                      return colors[level] || '#6b7280';
-                    };
-
-                    const getQualityColor = (score) => {
-                      if (score >= 0.8) return 'success';
-                      if (score >= 0.6) return 'warning';
-                      return 'error';
+                      return colors[level] || 'bg-neutral-500';
                     };
 
                     return (
-                      <Grid item xs={12} md={6} key={co.id}>
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.05 }}
+                      <motion.div
+                        key={co.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <Card
+                          className={`h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                            co.approved ? 'border-success-500' : ''
+                          }`}
                         >
-                          <Card
-                            sx={{
-                              height: '100%',
-                              border: '1px solid',
-                              borderColor: co.approved ? 'success.main' : 'divider',
-                              bgcolor: 'background.paper',
-                              transition: 'all 0.3s ease',
-                              '&:hover': {
-                                boxShadow: 3,
-                                transform: 'translateY(-2px)',
-                              },
-                            }}
-                          >
-                            <CardContent>
-                              {/* Header */}
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                  <Chip
-                                    label={`CO${co.co_number}`}
-                                    sx={{
-                                      bgcolor: getBloomColor(co.bloom_level),
-                                      color: 'white',
-                                      fontWeight: 'bold',
-                                      fontSize: '0.85rem',
-                                    }}
-                                  />
-                                  <Chip
-                                    label={co.bloom_level}
-                                    size="small"
-                                    variant="outlined"
-                                    sx={{
-                                      borderColor: getBloomColor(co.bloom_level),
-                                      color: getBloomColor(co.bloom_level),
-                                    }}
-                                  />
-                                  {co.is_ai_generated ? (
-                                    <Chip
-                                      label="AI"
-                                      size="small"
-                                      icon={<AutoAwesome sx={{ fontSize: 14 }} />}
-                                      sx={{
-                                        bgcolor: 'primary.light',
-                                        color: 'primary.dark',
-                                        fontWeight: 'bold',
-                                      }}
-                                    />
-                                  ) : (
-                                    <Chip
-                                      label="Manual"
-                                      size="small"
-                                      variant="outlined"
-                                      sx={{
-                                        borderColor: 'text.secondary',
-                                        color: 'text.secondary',
-                                      }}
-                                    />
-                                  )}
-                                </Box>
-                                {co.approved && (
-                                  <Chip
-                                    label="Approved"
-                                    size="small"
-                                    color="success"
-                                    icon={<Verified />}
-                                  />
+                          <CardContent className="p-4">
+                            {/* Header */}
+                            <div className="flex justify-between mb-4 flex-wrap gap-2">
+                              <div className="flex gap-2 flex-wrap">
+                                <span className={`inline-flex items-center px-3 py-1 rounded-lg ${getBloomColor(co.bloom_level)} text-white font-bold text-sm`}>
+                                  CO{co.co_number}
+                                </span>
+                                <Badge variant="outline" className={`${getBloomColor(co.bloom_level).replace('bg-', 'border-')} ${getBloomColor(co.bloom_level).replace('bg-', 'text-')}`}>
+                                  {co.bloom_level}
+                                </Badge>
+                                {co.is_ai_generated ? (
+                                  <Badge className="bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
+                                    <Sparkles className="w-3 h-3 mr-1" />
+                                    AI
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="outline">Manual</Badge>
                                 )}
-                              </Box>
+                              </div>
+                              {co.approved && (
+                                <Badge variant="success">
+                                  <BadgeCheck className="w-3 h-3 mr-1" />
+                                  Approved
+                                </Badge>
+                              )}
+                            </div>
 
-                              {/* Description */}
-                              <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.6 }}>
-                                {co.description}
-                              </Typography>
+                            {/* Description */}
+                            <p className="text-sm text-neutral-700 dark:text-dark-text-secondary mb-4 leading-relaxed">
+                              {co.description}
+                            </p>
 
-                              {/* Footer */}
-                              <Box sx={{ pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                                <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  <TrendingUp sx={{ fontSize: 14 }} />
-                                  PO Mappings: {co.po_mappings_raw || co.po_numbers?.join(', ') || 'N/A'}
-                                </Typography>
-                                {co.generation_date && (
-                                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                                    Generated: {new Date(co.generation_date).toLocaleDateString()}
-                                  </Typography>
-                                )}
-                              </Box>
-                            </CardContent>
-                          </Card>
-                        </motion.div>
-                      </Grid>
+                            {/* Footer */}
+                            <div className="pt-4 border-t border-neutral-200 dark:border-dark-border">
+                              <p className="text-xs text-neutral-600 dark:text-dark-text-secondary flex items-center gap-1">
+                                <TrendingUp className="w-3 h-3" />
+                                PO Mappings: {co.po_mappings_raw || co.po_numbers?.join(', ') || 'N/A'}
+                              </p>
+                              {co.generation_date && (
+                                <p className="text-xs text-neutral-500 dark:text-dark-text-muted mt-1">
+                                  Generated: {new Date(co.generation_date).toLocaleDateString()}
+                                </p>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
                     );
                   })}
-                </Grid>
+                </div>
               </>
             )}
           </CardContent>
@@ -684,87 +557,128 @@ const CourseDetail = () => {
       </motion.div>
 
       {/* Tabs for different sections */}
-      <Card sx={{ borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
-        <Tabs
-          value={activeTab}
-          onChange={(e, newValue) => setActiveTab(newValue)}
-          sx={{
-            borderBottom: 1,
-            borderColor: 'divider',
-            px: 2,
-          }}
-        >
-          <Tab label="Enrolled Students" icon={<People />} iconPosition="start" />
-          <Tab label="Uploaded Marksheets" icon={<Assignment />} iconPosition="start" />
-        </Tabs>
+      <Card>
+        <div className="border-b border-neutral-200 dark:border-dark-border px-4">
+          <div className="flex gap-1">
+            <button
+              onClick={() => setActiveTab(0)}
+              className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
+                activeTab === 0
+                  ? 'border-primary-500 dark:border-dark-green-500 text-primary-600 dark:text-dark-green-500 font-semibold'
+                  : 'border-transparent text-neutral-600 dark:text-dark-text-secondary hover:text-neutral-800 dark:hover:text-dark-text-primary'
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              Enrolled Students
+            </button>
+            <button
+              onClick={() => setActiveTab(1)}
+              className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
+                activeTab === 1
+                  ? 'border-primary-500 dark:border-dark-green-500 text-primary-600 dark:text-dark-green-500 font-semibold'
+                  : 'border-transparent text-neutral-600 dark:text-dark-text-secondary hover:text-neutral-800 dark:hover:text-dark-text-primary'
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              Uploaded Marksheets
+            </button>
+          </div>
+        </div>
 
         {/* Students Tab */}
         {activeTab === 0 && (
-          <CardContent sx={{ p: 3 }}>
+          <CardContent className="p-6">
             {students.length === 0 ? (
               <EmptyState
                 title="No Students Enrolled"
                 message="No students have been enrolled in this course yet."
               />
             ) : (
-              <TableContainer component={Paper} elevation={0}>
-                <Table>
-                  <TableHead>
-                    <TableRow sx={{ bgcolor: 'grey.50' }}>
-                      <TableCell><strong>USN</strong></TableCell>
-                      <TableCell><strong>Name</strong></TableCell>
-                      <TableCell><strong>Email</strong></TableCell>
-                      <TableCell><strong>Department</strong></TableCell>
-                      <TableCell><strong>Status</strong></TableCell>
-                      <TableCell><strong>Enrolled On</strong></TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {students.map((student) => (
-                      <TableRow key={student.id} hover>
-                        <TableCell>
-                          <Chip label={student.usn} size="small" variant="outlined" />
-                        </TableCell>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Person fontSize="small" color="action" />
-                            <Typography variant="body2" fontWeight={600}>
-                              {student.name}
-                            </Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Email fontSize="small" color="action" />
-                            <Typography variant="body2">{student.email}</Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell>{student.department || 'N/A'}</TableCell>
-                        <TableCell>
-                          <Chip
-                            label={student.status || 'Active'}
-                            color="success"
-                            size="small"
-                            sx={{ fontWeight: 600 }}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          {student.enrollment_date
-                            ? new Date(student.enrollment_date).toLocaleDateString()
-                            : 'N/A'}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-neutral-200 dark:border-dark-border bg-neutral-50 dark:bg-dark-bg-secondary">
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">USN</th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Name</th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Email</th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Department</th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Status</th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Enrolled On</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {students.slice(studentPage * studentsPerPage, (studentPage + 1) * studentsPerPage).map((student) => (
+                        <tr key={student.id} className="border-b border-neutral-200 dark:border-dark-border hover:bg-neutral-50 dark:hover:bg-dark-bg-secondary">
+                          <td className="px-4 py-3">
+                            <Badge variant="outline">{student.usn}</Badge>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <User className="w-4 h-4 text-neutral-400" />
+                              <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
+                                {student.name}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <Mail className="w-4 h-4 text-neutral-400" />
+                              <span className="text-sm text-neutral-700 dark:text-dark-text-secondary">{student.email}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-neutral-700 dark:text-dark-text-secondary">{student.department || 'N/A'}</td>
+                          <td className="px-4 py-3">
+                            <Badge variant="success">{student.status || 'Active'}</Badge>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-neutral-700 dark:text-dark-text-secondary">
+                            {student.enrollment_date
+                              ? new Date(student.enrollment_date).toLocaleDateString()
+                              : 'N/A'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination Controls */}
+                {students.length > studentsPerPage && (
+                  <div className="mt-6 flex items-center justify-between border-t border-neutral-200 dark:border-dark-border pt-4">
+                    <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+                      Showing {studentPage * studentsPerPage + 1} to {Math.min((studentPage + 1) * studentsPerPage, students.length)} of {students.length} students
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setStudentPage(Math.max(0, studentPage - 1))}
+                        disabled={studentPage === 0}
+                      >
+                        Previous
+                      </Button>
+                      <span className="text-sm text-neutral-600 dark:text-dark-text-secondary px-2">
+                        Page {studentPage + 1} of {Math.ceil(students.length / studentsPerPage)}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setStudentPage(Math.min(Math.ceil(students.length / studentsPerPage) - 1, studentPage + 1))}
+                        disabled={studentPage >= Math.ceil(students.length / studentsPerPage) - 1}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         )}
 
         {/* Uploaded Marksheets Tab */}
         {activeTab === 1 && (
-          <CardContent sx={{ p: 3 }}>
+          <CardContent className="p-6">
             {marksheets.length === 0 ? (
               <EmptyState
                 title="No Marksheets Uploaded"
@@ -773,451 +687,231 @@ const CourseDetail = () => {
                 actionLabel="Upload Marks"
               />
             ) : (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="h6" fontWeight="bold">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="text-lg font-bold text-neutral-800 dark:text-dark-text-primary">
                     Assessment Mark Sheets ({marksheets.length})
-                  </Typography>
+                  </h4>
                   <Button
-                    variant="contained"
-                    startIcon={<Upload />}
                     onClick={() => navigate('/teacher/upload')}
-                    sx={{
-                      background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                    }}
+                    className="bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600"
                   >
+                    <Upload className="w-4 h-4 mr-2" />
                     Upload New Marksheet
                   </Button>
-                </Box>
+                </div>
 
-                <Grid container spacing={2}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {marksheets.map((marksheet, index) => (
-                    <Grid item xs={12} md={6} key={marksheet.id}>
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05, duration: 0.3 }}
-                      >
-                        <Paper
-                          elevation={0}
-                          sx={{
-                            p: 3,
-                            border: '2px solid',
-                            borderColor: 'divider',
-                            borderRadius: 2,
-                            transition: 'all 0.3s ease',
-                            '&:hover': {
-                              borderColor: 'primary.main',
-                              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.15)',
-                              transform: 'translateY(-2px)',
-                            },
-                          }}
-                        >
-                          <Box sx={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', mb: 2 }}>
-                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'start' }}>
-                              <Box
-                                sx={{
-                                  width: 48,
-                                  height: 48,
-                                  borderRadius: 2,
-                                  background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  color: 'white',
-                                  flexShrink: 0,
-                                }}
-                              >
-                                <Assignment />
-                              </Box>
-                              <Box sx={{ flex: 1 }}>
-                                <Typography variant="h6" fontWeight="bold" gutterBottom>
-                                  {marksheet.assessment_name || 'Assessment'}
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary" display="block">
-                                  {marksheet.file_name}
-                                </Typography>
-                              </Box>
-                            </Box>
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => handleDeleteMarksheet(marksheet.id)}
-                              sx={{
-                                '&:hover': {
-                                  bgcolor: 'error.light',
-                                  color: 'white',
-                                },
-                              }}
-                            >
-                              <Delete fontSize="small" />
-                            </IconButton>
-                          </Box>
-
-                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Typography variant="body2" color="text.secondary">
-                                Uploaded On:
-                              </Typography>
-                              <Typography variant="body2" fontWeight={600}>
-                                {new Date(marksheet.created_at || marksheet.uploadDate).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric',
-                                })}
-                              </Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Typography variant="body2" color="text.secondary">
-                                Students:
-                              </Typography>
-                              <Chip label={(marksheet.row_count || 1) - 1} size="small" color="primary" />
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Typography variant="body2" color="text.secondary">
-                                Columns:
-                              </Typography>
-                              <Chip
-                                label={marksheet.columns?.length || 0}
-                                size="small"
-                                variant="outlined"
-                                color="secondary"
-                              />
-                            </Box>
-                          </Box>
-
-                          {/* CO Mapping Upload */}
-                          <Box sx={{ mt: 2 }}>
-                            <COMappingUpload courseId={id} marksheet={marksheet} />
-                          </Box>
-
-                          <Box
-                            sx={{
-                              mt: 2,
-                              pt: 2,
-                              borderTop: '1px solid',
-                              borderColor: 'divider',
-                              display: 'flex',
-                              gap: 1,
-                            }}
+                    <motion.div
+                      key={marksheet.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05, duration: 0.3 }}
+                    >
+                      <Card className="p-6 border-2 border-neutral-200 dark:border-dark-border transition-all duration-300 hover:border-primary-500 dark:hover:border-dark-green-500 hover:shadow-lg hover:-translate-y-1">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex gap-4 items-start">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 flex items-center justify-center flex-shrink-0">
+                              <FileText className="w-6 h-6 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <h5 className="text-lg font-bold text-neutral-800 dark:text-dark-text-primary mb-1">
+                                {marksheet.assessment_name || 'Assessment'}
+                              </h5>
+                              <p className="text-xs text-neutral-500 dark:text-dark-text-muted">
+                                {marksheet.file_name}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteMarksheet(marksheet.id)}
+                            className="p-2 rounded-lg text-error-600 hover:bg-error-50 dark:text-error-500 dark:hover:bg-error-900/20 transition-colors"
                           >
-                            <Button
-                              size="small"
-                              variant="outlined"
-                              startIcon={<Visibility />}
-                              fullWidth
-                              onClick={() => handleOpenDetails(marksheet)}
-                            >
-                              View Details
-                            </Button>
-                          </Box>
-                        </Paper>
-                      </motion.div>
-                    </Grid>
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">Uploaded On:</span>
+                            <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
+                              {new Date(marksheet.created_at || marksheet.uploadDate).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                              })}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">Students:</span>
+                            <Badge>{(marksheet.row_count || 1) - 1}</Badge>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">Columns:</span>
+                            <Badge variant="outline">{marksheet.columns?.length || 0}</Badge>
+                          </div>
+                        </div>
+
+                        {/* CO Mapping Upload */}
+                        <div className="mt-4">
+                          <COMappingUpload courseId={id} marksheet={marksheet} />
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-dark-border">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenDetails(marksheet)}
+                            className="w-full"
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </Button>
+                        </div>
+                      </Card>
+                    </motion.div>
                   ))}
-                </Grid>
-              </Box>
+                </div>
+              </div>
             )}
           </CardContent>
         )}
       </Card>
 
       {/* Marksheet Details Modal */}
-      <Dialog
-        open={detailsModalOpen}
-        onClose={handleCloseDetails}
-        maxWidth="lg"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 3,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-          },
-        }}
-      >
-        <DialogTitle
-          sx={{
-            background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-            py: 2.5,
-          }}
-        >
-          <Assignment />
-          <Box component="span" sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
-            Marksheet Details
-          </Box>
-        </DialogTitle>
+      {detailsModalOpen && selectedMarksheet && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white dark:bg-dark-bg-secondary rounded-3xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden"
+          >
+            <div className="bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 text-white p-6 flex items-center gap-4">
+              <FileText className="w-6 h-6" />
+              <h2 className="text-2xl font-bold">Marksheet Details</h2>
+            </div>
 
-        <DialogContent sx={{ mt: 3 }}>
-          {selectedMarksheet && (
-            <Box>
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
               {/* Assessment Information */}
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="overline" color="text.secondary" fontWeight="bold">
+              <div className="mb-6">
+                <p className="text-xs font-bold text-neutral-500 dark:text-dark-text-muted uppercase tracking-wide mb-3">
                   Assessment Information
-                </Typography>
-                <List dense>
-                  <ListItem>
-                    <ListItemText
-                      primary="Assessment Name"
-                      secondary={selectedMarksheet.assessment_name || 'N/A'}
-                      primaryTypographyProps={{ fontWeight: 600, variant: 'body2' }}
-                      secondaryTypographyProps={{ variant: 'body1', color: 'text.primary' }}
-                    />
-                  </ListItem>
-                  <Divider component="li" />
-                  <ListItem>
-                    <ListItemText
-                      primary="File Name"
-                      secondary={selectedMarksheet.file_name || 'N/A'}
-                      primaryTypographyProps={{ fontWeight: 600, variant: 'body2' }}
-                      secondaryTypographyProps={{ variant: 'body1', color: 'text.primary' }}
-                    />
-                  </ListItem>
-                  <Divider component="li" />
-                  <ListItem>
-                    <ListItemText
-                      primary="Table Name"
-                      secondary={selectedMarksheet.table_name || 'N/A'}
-                      primaryTypographyProps={{ fontWeight: 600, variant: 'body2' }}
-                      secondaryTypographyProps={{ variant: 'body1', color: 'text.primary', fontFamily: 'monospace' }}
-                    />
-                  </ListItem>
-                </List>
-              </Box>
+                </p>
+                <div className="space-y-3">
+                  <div className="flex justify-between py-2 border-b border-neutral-200 dark:border-dark-border">
+                    <span className="text-sm font-semibold text-neutral-600 dark:text-dark-text-secondary">Assessment Name</span>
+                    <span className="text-sm text-neutral-800 dark:text-dark-text-primary">{selectedMarksheet.assessment_name || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-neutral-200 dark:border-dark-border">
+                    <span className="text-sm font-semibold text-neutral-600 dark:text-dark-text-secondary">File Name</span>
+                    <span className="text-sm text-neutral-800 dark:text-dark-text-primary">{selectedMarksheet.file_name || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-neutral-200 dark:border-dark-border">
+                    <span className="text-sm font-semibold text-neutral-600 dark:text-dark-text-secondary">Table Name</span>
+                    <span className="text-sm text-neutral-800 dark:text-dark-text-primary font-mono">{selectedMarksheet.table_name || 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
 
               {/* Statistics */}
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="overline" color="text.secondary" fontWeight="bold">
+              <div className="mb-6">
+                <p className="text-xs font-bold text-neutral-500 dark:text-dark-text-muted uppercase tracking-wide mb-3">
                   Statistics
-                </Typography>
-                <Grid container spacing={2} sx={{ mt: 0.5 }}>
-                  <Grid item xs={6}>
-                    <Paper
-                      elevation={0}
-                      sx={{
-                        p: 2,
-                        textAlign: 'center',
-                        border: '2px solid',
-                        borderColor: 'primary.main',
-                        borderRadius: 2,
-                        bgcolor: 'primary.light',
-                      }}
-                    >
-                      <Typography variant="h4" fontWeight="bold" color="primary.main">
-                        {(selectedMarksheet.row_count || 1) - 1}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" fontWeight={600}>
-                        Students
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Paper
-                      elevation={0}
-                      sx={{
-                        p: 2,
-                        textAlign: 'center',
-                        border: '2px solid',
-                        borderColor: 'secondary.main',
-                        borderRadius: 2,
-                        bgcolor: 'secondary.light',
-                      }}
-                    >
-                      <Typography variant="h4" fontWeight="bold" color="secondary.main">
-                        {selectedMarksheet.columns?.length || 0}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" fontWeight={600}>
-                        Columns
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                </Grid>
-              </Box>
-
-              {/* Upload Information */}
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="overline" color="text.secondary" fontWeight="bold">
-                  Upload Information
-                </Typography>
-                <List dense>
-                  <ListItem>
-                    <ListItemText
-                      primary="Uploaded On"
-                      secondary={
-                        selectedMarksheet.created_at || selectedMarksheet.uploadDate
-                          ? new Date(selectedMarksheet.created_at || selectedMarksheet.uploadDate).toLocaleString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })
-                          : 'N/A'
-                      }
-                      primaryTypographyProps={{ fontWeight: 600, variant: 'body2' }}
-                      secondaryTypographyProps={{ variant: 'body1', color: 'text.primary' }}
-                    />
-                  </ListItem>
-                  {selectedMarksheet.uploaded_by_name && (
-                    <>
-                      <Divider component="li" />
-                      <ListItem>
-                        <ListItemText
-                          primary="Uploaded By"
-                          secondary={selectedMarksheet.uploaded_by_name}
-                          primaryTypographyProps={{ fontWeight: 600, variant: 'body2' }}
-                          secondaryTypographyProps={{ variant: 'body1', color: 'text.primary' }}
-                        />
-                      </ListItem>
-                    </>
-                  )}
-                </List>
-              </Box>
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="p-4 text-center border-2 border-primary-500 bg-primary-50 dark:bg-primary-900/20">
+                    <p className="text-3xl font-bold text-primary-600 dark:text-dark-green-500">
+                      {(selectedMarksheet.row_count || 1) - 1}
+                    </p>
+                    <p className="text-sm font-semibold text-neutral-600 dark:text-dark-text-secondary">Students</p>
+                  </Card>
+                  <Card className="p-4 text-center border-2 border-secondary-500 bg-secondary-50 dark:bg-secondary-900/20">
+                    <p className="text-3xl font-bold text-secondary-600 dark:text-secondary-400">
+                      {selectedMarksheet.columns?.length || 0}
+                    </p>
+                    <p className="text-sm font-semibold text-neutral-600 dark:text-dark-text-secondary">Columns</p>
+                  </Card>
+                </div>
+              </div>
 
               {/* Columns */}
               {selectedMarksheet.columns && selectedMarksheet.columns.length > 0 && (
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="overline" color="text.secondary" fontWeight="bold">
+                <div className="mb-6">
+                  <p className="text-xs font-bold text-neutral-500 dark:text-dark-text-muted uppercase tracking-wide mb-3">
                     Columns ({selectedMarksheet.columns.length})
-                  </Typography>
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      mt: 1,
-                      p: 2,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: 2,
-                      maxHeight: 200,
-                      overflowY: 'auto',
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  </p>
+                  <Card className="p-4 max-h-48 overflow-y-auto">
+                    <div className="flex flex-wrap gap-2">
                       {selectedMarksheet.columns.map((col, index) => (
-                        <Chip
-                          key={index}
-                          label={col}
-                          size="small"
-                          variant="outlined"
-                          sx={{
-                            fontFamily: 'monospace',
-                            fontSize: '0.75rem',
-                          }}
-                        />
+                        <Badge key={index} variant="outline" className="font-mono text-xs">
+                          {col}
+                        </Badge>
                       ))}
-                    </Box>
-                  </Paper>
-                </Box>
+                    </div>
+                  </Card>
+                </div>
               )}
 
               {/* Data Table */}
-              <Box>
-                <Typography variant="overline" color="text.secondary" fontWeight="bold">
+              <div>
+                <p className="text-xs font-bold text-neutral-500 dark:text-dark-text-muted uppercase tracking-wide mb-3">
                   Data Preview
-                </Typography>
+                </p>
                 {loadingData ? (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                    <CircularProgress />
-                  </Box>
+                  <div className="flex justify-center py-8">
+                    <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+                  </div>
                 ) : marksheetData && marksheetData.rows && marksheetData.rows.length > 0 ? (
-                  <TableContainer
-                    component={Paper}
-                    elevation={0}
-                    sx={{
-                      mt: 1,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: 2,
-                      maxHeight: 500,
-                    }}
-                  >
-                    <Table stickyHeader size="small">
-                      <TableHead>
-                        <TableRow>
+                  <div className="border border-neutral-200 dark:border-dark-border rounded-2xl overflow-hidden max-h-96 overflow-y-auto">
+                    <table className="w-full">
+                      <thead className="sticky top-0 bg-primary-500 dark:bg-dark-green-600">
+                        <tr>
                           {marksheetData.columns.map((col, index) => (
-                            <TableCell
+                            <th
                               key={index}
-                              sx={{
-                                bgcolor: 'primary.main',
-                                color: 'white',
-                                fontWeight: 'bold',
-                                fontSize: '0.75rem',
-                                whiteSpace: 'nowrap',
-                              }}
+                              className="px-4 py-2 text-left text-xs font-bold text-white whitespace-nowrap"
                             >
                               {col}
-                            </TableCell>
+                            </th>
                           ))}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
+                        </tr>
+                      </thead>
+                      <tbody>
                         {marksheetData.rows.map((row, rowIndex) => (
-                          <TableRow
+                          <tr
                             key={rowIndex}
-                            hover
-                            sx={{
-                              '&:nth-of-type(odd)': {
-                                bgcolor: 'action.hover',
-                              },
-                            }}
+                            className="border-b border-neutral-200 dark:border-dark-border hover:bg-neutral-50 dark:hover:bg-dark-bg-tertiary"
                           >
                             {marksheetData.columns.map((col, colIndex) => (
-                              <TableCell
+                              <td
                                 key={colIndex}
-                                sx={{
-                                  fontSize: '0.75rem',
-                                  whiteSpace: 'nowrap',
-                                }}
+                                className="px-4 py-2 text-xs text-neutral-700 dark:text-dark-text-secondary whitespace-nowrap"
                               >
                                 {row[col] !== null && row[col] !== undefined ? String(row[col]) : '-'}
-                              </TableCell>
+                              </td>
                             ))}
-                          </TableRow>
+                          </tr>
                         ))}
-                      </TableBody>
-                    </Table>
-                    <TablePagination
-                      component="div"
-                      count={marksheetData.total || 0}
-                      page={dataPage}
-                      onPageChange={handleChangePage}
-                      rowsPerPage={rowsPerPage}
-                      onRowsPerPageChange={handleChangeRowsPerPage}
-                      rowsPerPageOptions={[5, 10, 25, 50, 100]}
-                    />
-                  </TableContainer>
+                      </tbody>
+                    </table>
+                  </div>
                 ) : (
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      mt: 1,
-                      p: 3,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: 2,
-                      textAlign: 'center',
-                    }}
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      No data available
-                    </Typography>
-                  </Paper>
+                  <Card className="p-6 text-center">
+                    <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">No data available</p>
+                  </Card>
                 )}
-              </Box>
-            </Box>
-          )}
-        </DialogContent>
+              </div>
+            </div>
 
-        <DialogActions sx={{ p: 2.5, gap: 1 }}>
-          <Button onClick={handleCloseDetails} variant="outlined" sx={{ borderRadius: 2 }}>
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <div className="p-6 border-t border-neutral-200 dark:border-dark-border flex justify-end">
+              <Button onClick={handleCloseDetails} variant="outline">
+                Close
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* Manual CO Manager Modal */}
       <ManualCOManager

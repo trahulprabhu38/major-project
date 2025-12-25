@@ -1,32 +1,20 @@
 import { useState, useEffect } from 'react';
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Button,
-  LinearProgress,
-} from '@mui/material';
-import {
-  School,
-  TrendingUp,
-  AssignmentTurnedIn,
-  EmojiEvents,
-  PersonAdd,
-  ArrowForward,
-} from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import {
+  GraduationCap,
+  TrendingUp,
+  ClipboardList,
+  Trophy,
+  UserPlus,
+  ArrowRight,
+} from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { studentAPI } from '../../services/api';
-import { PageLoader } from '../../components/shared/Loading';
-import { ErrorState, EmptyState } from '../../components/shared/ErrorState';
-import StatsCard from '../../components/shared/StatsCard';
-
-const MotionCard = motion.create(Card);
-const MotionBox = motion.create(Box);
+import { Spinner } from '../../components/ui/progress';
+import { Card, CardContent } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
+import { Button } from '../../components/ui/button';
 
 const StudentDashboard = () => {
   const { user } = useAuth();
@@ -84,8 +72,29 @@ const StudentDashboard = () => {
     }
   };
 
-  if (loading) return <PageLoader message="Loading your dashboard..." />;
-  if (error) return <ErrorState onRetry={loadDashboardData} />;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <Spinner size="lg" />
+          <p className="mt-4 text-neutral-600 dark:text-dark-text-secondary">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <p className="text-error-600 mb-4">Error loading dashboard</p>
+          <button onClick={loadDashboardData} className="btn-primary">
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Calculate dashboard stats
   const totalCourses = courses.length;
@@ -100,340 +109,296 @@ const StudentDashboard = () => {
   const coursesWithMarks = courses.filter(c => coursePerformance[c.id]?.assessmentCount > 0).length;
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 }, pl: { md: 2 } }}>
+    <div className="p-4 md:p-6 space-y-6">
       {/* Hero Welcome Card */}
-      <MotionBox
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        sx={{ mb: 4 }}
       >
-        <Card
-          sx={{
-            background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-            color: 'white',
-            borderRadius: 4,
-            p: { xs: 3, md: 4 },
-            boxShadow: '0 8px 32px rgba(37, 99, 235, 0.2)',
-          }}
-        >
-          <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <School sx={{ fontSize: 48, opacity: 0.9 }} />
-              <Box>
-                <Typography variant="h4" fontWeight="bold" gutterBottom>
-                  Welcome, {user?.name?.split(' ')[0]}! 
-                </Typography>
-                <Typography variant="body1" sx={{ opacity: 0.95 }}>
-                  {totalCourses > 0
-                    ? "Track your learning outcomes and course progress."
-                    : 'Get started by enrolling in your courses below.'}
-                </Typography>
-              </Box>
-            </Box>
+        <div className="bg-gradient-to-br from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 rounded-2xl p-6 md:p-8 text-white shadow-xl">
+          <div className="flex items-start gap-4 mb-4">
+            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center flex-shrink-0">
+              <GraduationCap className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                Welcome, {user?.name}!
+              </h1>
+              <p className="text-white/95 text-base md:text-lg">
+                {totalCourses > 0
+                  ? "Track your learning outcomes and course progress."
+                  : 'Get started by enrolling in your courses below.'}
+              </p>
+            </div>
+          </div>
 
-            {user?.department && (
-              <Box sx={{ mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                <Chip
-                  label={`Department: ${user.department}`}
-                  sx={{
-                    bgcolor: 'rgba(255,255,255,0.2)',
-                    color: 'white',
-                    fontWeight: 600,
-                  }}
-                />
-                {user?.usn && (
-                  <Chip
-                    label={`USN: ${user.usn}`}
-                    sx={{
-                      bgcolor: 'rgba(255,255,255,0.2)',
-                      color: 'white',
-                      fontWeight: 600,
-                    }}
-                  />
-                )}
-              </Box>
-            )}
-          </CardContent>
-        </Card>
-      </MotionBox>
+          {user?.department && (
+            <div className="flex gap-2 flex-wrap mt-4">
+              <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+                Department: {user.department}
+              </Badge>
+              {user?.usn && (
+                <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+                  USN: {user.usn}
+                </Badge>
+              )}
+            </div>
+          )}
+        </div>
+      </motion.div>
 
       {/* Stats Overview */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.4 }}
-          >
-            <StatsCard
-              title="Total Courses"
-              value={totalCourses}
-              icon={School}
-              color="primary.main"
-              bgColor="primary.light"
-            />
-          </motion.div>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
-          >
-            <StatsCard
-              title="Current Semester"
-              value={currentSemesterCourses.length}
-              icon={AssignmentTurnedIn}
-              color="success.main"
-              bgColor="success.light"
-              subtitle="Active courses"
-            />
-          </motion.div>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.4 }}
-          >
-            <StatsCard
-              title="Avg Performance"
-              value={`${avgPerformance.toFixed(1)}%`}
-              icon={TrendingUp}
-              color="secondary.main"
-              bgColor="secondary.light"
-              subtitle="Overall grade"
-            />
-          </motion.div>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.4 }}
-          >
-            <StatsCard
-              title="Class Rank"
-              value="--"
-              icon={EmojiEvents}
-              color="warning.main"
-              bgColor="warning.light"
-              subtitle="Out of total"
-            />
-          </motion.div>
-        </Grid>
-      </Grid>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Courses */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+        >
+          <Card className="hover:-translate-y-1 transition-all duration-200 cursor-pointer">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-semibold text-neutral-600 dark:text-dark-text-secondary">
+                  Total Courses
+                </p>
+                <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center">
+                  <GraduationCap className="w-6 h-6 text-primary-600 dark:text-dark-green-500" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-primary-600 dark:text-dark-green-500">
+                {totalCourses}
+              </p>
+              <p className="text-xs text-neutral-500 dark:text-dark-text-muted mt-1">
+                Enrolled courses
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Current Semester */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
+        >
+          <Card className="hover:-translate-y-1 transition-all duration-200 cursor-pointer">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-semibold text-neutral-600 dark:text-dark-text-secondary">
+                  Current Semester
+                </p>
+                <div className="w-12 h-12 bg-success-100 dark:bg-success-900/30 rounded-xl flex items-center justify-center">
+                  <ClipboardList className="w-6 h-6 text-success-600 dark:text-success-500" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-success-600 dark:text-success-500">
+                {currentSemesterCourses.length}
+              </p>
+              <p className="text-xs text-neutral-500 dark:text-dark-text-muted mt-1">
+                Active courses
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Avg Performance */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+        >
+          <Card className="hover:-translate-y-1 transition-all duration-200 cursor-pointer">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-semibold text-neutral-600 dark:text-dark-text-secondary">
+                  Avg Performance
+                </p>
+                <div className="w-12 h-12 bg-secondary-100 dark:bg-secondary-900/30 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-secondary-600 dark:text-secondary-500" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-secondary-600 dark:text-secondary-500">
+                {avgPerformance.toFixed(1)}%
+              </p>
+              <p className="text-xs text-neutral-500 dark:text-dark-text-muted mt-1">
+                Overall grade
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Class Rank */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.4 }}
+        >
+          <Card className="hover:-translate-y-1 transition-all duration-200 cursor-pointer">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-semibold text-neutral-600 dark:text-dark-text-secondary">
+                  Class Rank
+                </p>
+                <div className="w-12 h-12 bg-warning-100 dark:bg-warning-900/30 rounded-xl flex items-center justify-center">
+                  <Trophy className="w-6 h-6 text-warning-600 dark:text-warning-500" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-warning-600 dark:text-warning-500">
+                --
+              </p>
+              <p className="text-xs text-neutral-500 dark:text-dark-text-muted mt-1">
+                Out of total
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
 
       {/* Enrolled Courses or Empty State */}
       {courses.length === 0 ? (
-        <MotionBox
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
         >
-          <Card
-            sx={{
-              borderRadius: 3,
-              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-              textAlign: 'center',
-              py: 6,
-              background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-            }}
-          >
-            <CardContent>
-              <PersonAdd
-                sx={{
-                  fontSize: 80,
-                  color: 'primary.main',
-                  mb: 2,
-                  opacity: 0.8,
-                }}
-              />
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
+          <Card className="text-center py-12 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-dark-bg-secondary dark:to-dark-bg-tertiary">
+            <CardContent className="space-y-4">
+              <div className="flex justify-center">
+                <UserPlus className="w-20 h-20 text-primary-600 dark:text-dark-green-500 opacity-80" />
+              </div>
+              <h2 className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary">
                 No Courses Enrolled Yet
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 500, mx: 'auto' }}>
+              </h2>
+              <p className="text-neutral-600 dark:text-dark-text-secondary max-w-md mx-auto">
                 Start your learning journey by enrolling in courses. Select a course from the sidebar to get started.
-              </Typography>
-              <Button
-                variant="contained"
-                size="large"
-                startIcon={<PersonAdd />}
-                onClick={() => navigate('/student/enroll')}
-                sx={{
-                  background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                  px: 4,
-                  py: 1.5,
-                  borderRadius: 2,
-                  fontWeight: 600,
-                  textTransform: 'none',
-                }}
-              >
-                Enroll in Course
-              </Button>
+              </p>
+              <div className="pt-2">
+                <Button
+                  size="lg"
+                  onClick={() => navigate('/student/enroll')}
+                  className="px-6"
+                >
+                  <UserPlus className="w-5 h-5 mr-2" />
+                  Enroll in Course
+                </Button>
+              </div>
             </CardContent>
           </Card>
-        </MotionBox>
+        </motion.div>
       ) : (
         <>
           {/* Courses Section Header */}
-          <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
-                Your Courses
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Click on any course to view detailed analytics
-              </Typography>
-            </Box>
-          </Box>
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-1">
+              Your Courses
+            </h2>
+            <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+              Click on any course to view detailed analytics
+            </p>
+          </div>
 
           {/* Courses Grid */}
-          <Grid container spacing={3}>
-            {courses.map((course, index) => (
-              <Grid item xs={12} md={6} lg={4} key={course.id}>
-                <MotionCard
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {courses.map((course, index) => {
+              const gradientColors = [
+                'from-primary-500 to-primary-600 dark:from-dark-green-500 dark:to-dark-green-600',
+                'from-secondary-500 to-secondary-600 dark:from-secondary-600 dark:to-secondary-700',
+                'from-success-500 to-success-600 dark:from-success-600 dark:to-success-700',
+              ];
+              const performance = coursePerformance[course.id];
+              const percentage = performance?.percentage || 0;
+              const performanceColor =
+                percentage >= 60 ? 'success' : percentage >= 40 ? 'warning' : 'error';
+
+              return (
+                <motion.div
+                  key={course.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.4 }}
                   whileHover={{ scale: 1.02, y: -4 }}
-                  onClick={() => navigate(`/student/courses/${course.id}`)}
-                  sx={{
-                    cursor: 'pointer',
-                    borderRadius: 3,
-                    boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-                    overflow: 'hidden',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-                    },
-                  }}
                 >
-                  {/* Header with Gradient */}
-                  <Box
-                    sx={{
-                      background: `linear-gradient(135deg, ${
-                        index % 3 === 0 ? '#2563eb' : index % 3 === 1 ? '#7c3aed' : '#059669'
-                      } 0%, ${
-                        index % 3 === 0 ? '#1e40af' : index % 3 === 1 ? '#6d28d9' : '#047857'
-                      } 100%)`,
-                      p: 3,
-                      color: 'white',
-                      position: 'relative',
-                    }}
+                  <Card
+                    onClick={() => navigate(`/student/courses/${course.id}`)}
+                    className="cursor-pointer hover:shadow-xl transition-all duration-300 overflow-hidden"
                   >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 1 }}>
-                      <Typography variant="h6" fontWeight="bold">
-                        {course.code}
-                      </Typography>
-                      <Chip
-                        label={`Sem ${course.semester}`}
-                        size="small"
-                        sx={{
-                          bgcolor: 'rgba(255,255,255,0.25)',
-                          color: 'white',
-                          fontWeight: 600,
-                        }}
-                      />
-                    </Box>
-                    <Typography variant="body2" sx={{ opacity: 0.95 }}>
-                      {course.name}
-                    </Typography>
-                  </Box>
+                    {/* Header with Gradient */}
+                    <div className={`bg-gradient-to-br ${gradientColors[index % 3]} p-6 text-white`}>
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="text-lg font-bold">{course.code}</h3>
+                        <Badge className="bg-white/25 text-white border-white/30 hover:bg-white/35">
+                          Sem {course.semester}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-white/95">{course.name}</p>
+                    </div>
 
-                  <CardContent>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                      {coursePerformance[course.id] && (
-                        <Box sx={{ mb: 1 }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                            <Typography variant="body2" color="text.secondary">
+                    <CardContent className="p-6 space-y-4">
+                      {performance && (
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">
                               Performance
-                            </Typography>
-                            <Chip
-                              label={`${coursePerformance[course.id].percentage.toFixed(1)}%`}
-                              size="small"
-                              color={
-                                coursePerformance[course.id].percentage >= 60
-                                  ? 'success'
-                                  : coursePerformance[course.id].percentage >= 40
-                                  ? 'warning'
-                                  : 'error'
-                              }
-                              sx={{ fontWeight: 600 }}
+                            </span>
+                            <Badge variant={performanceColor}>
+                              {percentage.toFixed(1)}%
+                            </Badge>
+                          </div>
+                          <div className="h-2 w-full bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all ${
+                                percentage >= 60
+                                  ? 'bg-success-500'
+                                  : percentage >= 40
+                                  ? 'bg-warning-500'
+                                  : 'bg-error-500'
+                              }`}
+                              style={{ width: `${percentage}%` }}
                             />
-                          </Box>
-                          <LinearProgress
-                            variant="determinate"
-                            value={coursePerformance[course.id].percentage}
-                            sx={{
-                              height: 6,
-                              borderRadius: 3,
-                              bgcolor: 'grey.200',
-                              '& .MuiLinearProgress-bar': {
-                                borderRadius: 3,
-                                bgcolor:
-                                  coursePerformance[course.id].percentage >= 60
-                                    ? 'success.main'
-                                    : coursePerformance[course.id].percentage >= 40
-                                    ? 'warning.main'
-                                    : 'error.main',
-                              },
-                            }}
-                          />
-                        </Box>
+                          </div>
+                        </div>
                       )}
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant="body2" color="text.secondary">
-                          Credits
-                        </Typography>
-                        <Chip label={course.credits || 3} size="small" variant="outlined" />
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant="body2" color="text.secondary">
-                          Instructor
-                        </Typography>
-                        <Typography variant="body2" fontWeight={600}>
-                          {course.teacher_name || 'N/A'}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant="body2" color="text.secondary">
-                          Assessments
-                        </Typography>
-                        <Typography variant="body2" fontWeight={600}>
-                          {coursePerformance[course.id]?.assessmentCount || 0}
-                        </Typography>
-                      </Box>
-                    </Box>
 
-                    <Box
-                      sx={{
-                        mt: 2,
-                        pt: 2,
-                        borderTop: '1px solid',
-                        borderColor: 'divider',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 1,
-                        color: 'primary.main',
-                      }}
-                    >
-                      <TrendingUp fontSize="small" />
-                      <Typography variant="body2" fontWeight={600}>
-                        View Performance Analytics
-                      </Typography>
-                      <ArrowForward fontSize="small" />
-                    </Box>
-                  </CardContent>
-                </MotionCard>
-              </Grid>
-            ))}
-          </Grid>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+                            Credits
+                          </span>
+                          <Badge variant="outline">{course.credits || 3}</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+                            Instructor
+                          </span>
+                          <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
+                            {course.teacher_name || 'N/A'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+                            Assessments
+                          </span>
+                          <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
+                            {performance?.assessmentCount || 0}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pt-3 mt-3 border-t border-neutral-200 dark:border-dark-border flex items-center justify-center gap-2 text-primary-600 dark:text-dark-green-500">
+                        <TrendingUp className="w-4 h-4" />
+                        <span className="text-sm font-semibold">View Performance Analytics</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
         </>
       )}
-    </Box>
+    </div>
   );
 };
 

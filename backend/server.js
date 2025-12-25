@@ -23,6 +23,7 @@ import seeMarksRoutes from './routes/seeMarks.js';
 import gradesRoutes from './routes/grades.js';
 import cgpaRoutes from './routes/cgpa.js';
 import progressionRoutes from './routes/progression.js';
+import semesterSubjectsRoutes from './routes/semesterSubjects.js';
 
 // Load environment variables
 dotenv.config();
@@ -63,6 +64,7 @@ app.use('/api/see-marks', seeMarksRoutes);
 app.use('/api/grades', gradesRoutes);
 app.use('/api/cgpa', cgpaRoutes);
 app.use('/api/progression', progressionRoutes);
+app.use('/api/semester-subjects', semesterSubjectsRoutes);
 app.use('/api/teacher', courseRoutes);
 
 

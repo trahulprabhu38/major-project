@@ -1,68 +1,41 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Button,
-  Grid,
-  LinearProgress,
-  Alert,
-  Tabs,
-  Tab,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Rating,
-  CircularProgress,
-  Slider,
-  FormControlLabel,
-  Switch,
-  Paper,
-  Divider,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from '@mui/material';
-import {
-  School,
-  VideoLibrary,
-  Article,
+  GraduationCap,
+  Video,
+  FileText,
   Link as LinkIcon,
-  ThumbUp,
-  ThumbDown,
+  ThumbsUp,
+  ThumbsDown,
   CheckCircle,
   Star,
-  AccessTime,
+  Clock,
   TrendingUp,
-  Timeline,
-  ExpandMore,
-  Refresh,
-  CalendarToday,
+  ChevronDown,
+  RefreshCw,
+  Calendar,
   Book,
-  Speed,
-  EmojiEvents,
-} from '@mui/icons-material';
-import { motion } from 'framer-motion';
+  Gauge,
+  Trophy,
+  X,
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { dbmsRecommenderAPI } from '../../services/dbmsRecommenderAPI';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
+import { Alert } from '../../components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 
 const MotionCard = motion.create(Card);
-const MotionBox = motion.create(Box);
 
 const DBMSRecommender = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [recommendations, setRecommendations] = useState(null);
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState('by-co');
   const [feedbackDialog, setFeedbackDialog] = useState({ open: false, resource: null });
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
@@ -75,6 +48,7 @@ const DBMSRecommender = () => {
   const [cfWeight, setCfWeight] = useState(0.7);
   const [studyDays, setStudyDays] = useState(7);
   const [showSettings, setShowSettings] = useState(false);
+  const [expandedDays, setExpandedDays] = useState({});
 
   useEffect(() => {
     if (user?.usn) {
@@ -121,7 +95,6 @@ const DBMSRecommender = () => {
         resource_id: resourceId,
         vote: vote,
       });
-      // Show success message without reloading
       console.log('Vote submitted successfully');
     } catch (err) {
       console.error('Error voting:', err);
@@ -154,7 +127,6 @@ const DBMSRecommender = () => {
         student_id: user.usn,
         resource_id: resourceId,
       });
-      // Show success message
       console.log('Resource marked as completed');
     } catch (err) {
       console.error('Error marking complete:', err);
@@ -163,11 +135,11 @@ const DBMSRecommender = () => {
 
   const getResourceIcon = (type) => {
     const t = String(type || 'article').toLowerCase();
-    if (t.includes('video')) return <VideoLibrary />;
-    if (t.includes('article') || t.includes('reading')) return <Article />;
-    if (t.includes('tutorial')) return <School />;
-    if (t.includes('practice')) return <Speed />;
-    return <Book />;
+    if (t.includes('video')) return <Video className="w-5 h-5" />;
+    if (t.includes('article') || t.includes('reading')) return <FileText className="w-5 h-5" />;
+    if (t.includes('tutorial')) return <GraduationCap className="w-5 h-5" />;
+    if (t.includes('practice')) return <Gauge className="w-5 h-5" />;
+    return <Book className="w-5 h-5" />;
   };
 
   const getDifficultyColor = (difficulty) => {
@@ -185,44 +157,42 @@ const DBMSRecommender = () => {
 
   if (loading) {
     return (
-      <Box sx={{ p: 3, textAlign: 'center' }}>
-        <CircularProgress size={60} />
-        <Typography variant="h6" sx={{ mt: 3 }}>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+        <h2 className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary">
           Analyzing your performance...
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+        </h2>
+        <p className="text-neutral-600 dark:text-dark-text-secondary">
           Generating personalized recommendations
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Box sx={{ p: 3 }}>
-        <Alert severity="error" sx={{ mb: 2 }}>
+      <div className="p-6">
+        <Alert variant="error" className="mb-4">
           {error}
-          <Button size="small" onClick={loadRecommendations} sx={{ ml: 2 }}>
-            Retry
-          </Button>
         </Alert>
-      </Box>
+        <Button onClick={loadRecommendations}>Retry</Button>
+      </div>
     );
   }
 
   if (!recommendations) {
     return (
-      <Box sx={{ p: 3 }}>
-        <Card sx={{ p: 3, textAlign: 'center' }}>
-          <School sx={{ fontSize: 80, color: 'primary.main', opacity: 0.5 }} />
-          <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+      <div className="p-6">
+        <Card className="p-8 text-center">
+          <GraduationCap className="w-20 h-20 text-primary-500 dark:text-dark-green-500 opacity-50 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
             DBMS Resource Recommender
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
+          </h2>
+          <p className="text-neutral-600 dark:text-dark-text-secondary">
             No recommendations available. Select your internal test to get started.
-          </Typography>
+          </p>
         </Card>
-      </Box>
+      </div>
     );
   }
 
@@ -233,555 +203,549 @@ const DBMSRecommender = () => {
   const weakQuestions = recommendations.weak_questions || [];
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 } }}>
+    <div className="p-4 md:p-6">
       {/* Hero Header */}
-      <MotionBox
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card
-          sx={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white',
-            borderRadius: 4,
-            p: 4,
-            mb: 3,
-            boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)',
-          }}
-        >
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-            <Box>
-              <Typography variant="h4" fontWeight="bold" gutterBottom>
+        <Card className="bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 text-white rounded-3xl p-6 mb-6 shadow-2xl">
+          <div className="flex justify-between items-start flex-wrap gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">
                 📚 DBMS Resource Recommender
-              </Typography>
-              <Typography variant="body1" sx={{ opacity: 0.95, mb: 2 }}>
+              </h1>
+              <p className="text-white/95 mb-4">
                 Personalized Learning Path for Database Management Systems
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                <Chip
-                  label={`Student: ${user?.usn}`}
-                  sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 600 }}
-                />
-                <Chip
-                  label={`Internal ${internalNo}`}
-                  sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 600 }}
-                />
+              </p>
+              <div className="flex gap-2 flex-wrap">
+                <Badge className="bg-white/20 text-white border-white/30">
+                  Student: {user?.usn}
+                </Badge>
+                <Badge className="bg-white/20 text-white border-white/30">
+                  Internal {internalNo}
+                </Badge>
                 {useCF && (
-                  <Chip
-                    label="Collaborative Filtering ON"
-                    icon={<EmojiEvents sx={{ color: 'white !important' }} />}
-                    sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 600 }}
-                  />
+                  <Badge className="bg-white/20 text-white border-white/30">
+                    <Trophy className="w-3 h-3 mr-1" />
+                    Collaborative Filtering ON
+                  </Badge>
                 )}
-              </Box>
-            </Box>
+              </div>
+            </div>
             <Button
-              variant="contained"
+              variant="outline"
+              className="bg-white/20 hover:bg-white/30 border-white/30 text-white"
               onClick={() => setShowSettings(!showSettings)}
-              sx={{
-                bgcolor: 'rgba(255,255,255,0.2)',
-                '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' },
-              }}
             >
               Settings
             </Button>
-          </Box>
+          </div>
         </Card>
-      </MotionBox>
+      </motion.div>
 
       {/* Settings Panel */}
-      {showSettings && (
-        <MotionCard
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          sx={{ mb: 3, p: 3 }}
-        >
-          <Typography variant="h6" gutterBottom>
-            🎓 Recommendation Settings
-          </Typography>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <Typography gutterBottom>Internal Test Number</Typography>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                {[1, 2, 3].map((num) => (
-                  <Button
-                    key={num}
-                    variant={internalNo === num ? 'contained' : 'outlined'}
-                    onClick={() => setInternalNo(num)}
-                  >
-                    Internal {num}
-                  </Button>
-                ))}
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography gutterBottom>
-                Question Pass Threshold: {threshold}/10
-              </Typography>
-              <Slider
-                value={threshold}
-                onChange={(e, val) => setThreshold(val)}
-                min={1}
-                max={10}
-                marks
-                valueLabelDisplay="auto"
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FormControlLabel
-                control={
-                  <Switch checked={useCF} onChange={(e) => setUseCF(e.target.checked)} />
-                }
-                label="Use Collaborative Filtering"
-              />
-              {useCF && (
-                <Box sx={{ mt: 1 }}>
-                  <Typography gutterBottom>CF Weight: {cfWeight.toFixed(1)}</Typography>
-                  <Slider
-                    value={cfWeight}
-                    onChange={(e, val) => setCfWeight(val)}
-                    min={0}
-                    max={1}
-                    step={0.1}
-                    marks
-                    valueLabelDisplay="auto"
+      <AnimatePresence>
+        {showSettings && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="mb-6 p-6">
+              <h2 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-4">
+                🎓 Recommendation Settings
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-700 dark:text-dark-text-primary mb-2">
+                    Internal Test Number
+                  </label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3].map((num) => (
+                      <Button
+                        key={num}
+                        variant={internalNo === num ? 'default' : 'outline'}
+                        onClick={() => setInternalNo(num)}
+                      >
+                        Internal {num}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-700 dark:text-dark-text-primary mb-2">
+                    Question Pass Threshold: {threshold}/10
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={threshold}
+                    onChange={(e) => setThreshold(Number(e.target.value))}
+                    className="w-full h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-lg appearance-none cursor-pointer accent-primary-500"
                   />
-                </Box>
-              )}
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography gutterBottom>Study Plan Days: {studyDays}</Typography>
-              <Slider
-                value={studyDays}
-                onChange={(e, val) => setStudyDays(val)}
-                min={1}
-                max={30}
-                marks
-                valueLabelDisplay="auto"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Button
-                variant="contained"
-                onClick={loadRecommendations}
-                startIcon={<Refresh />}
-                fullWidth
-              >
-                Apply Settings & Reload
-              </Button>
-            </Grid>
-          </Grid>
-        </MotionCard>
-      )}
+                </div>
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-semibold text-neutral-700 dark:text-dark-text-primary mb-2">
+                    <input
+                      type="checkbox"
+                      checked={useCF}
+                      onChange={(e) => setUseCF(e.target.checked)}
+                      className="w-5 h-5 accent-primary-500"
+                    />
+                    Use Collaborative Filtering
+                  </label>
+                  {useCF && (
+                    <div className="mt-2">
+                      <label className="block text-sm text-neutral-600 dark:text-dark-text-secondary mb-1">
+                        CF Weight: {cfWeight.toFixed(1)}
+                      </label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.1"
+                        value={cfWeight}
+                        onChange={(e) => setCfWeight(Number(e.target.value))}
+                        className="w-full h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-lg appearance-none cursor-pointer accent-primary-500"
+                      />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-700 dark:text-dark-text-primary mb-2">
+                    Study Plan Days: {studyDays}
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="30"
+                    value={studyDays}
+                    onChange={(e) => setStudyDays(Number(e.target.value))}
+                    className="w-full h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-lg appearance-none cursor-pointer accent-primary-500"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <Button
+                    onClick={loadRecommendations}
+                    className="w-full bg-gradient-to-r from-primary-500 to-secondary-500"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Apply Settings & Reload
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* KPI Summary Cards */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <MotionCard
-            whileHover={{ scale: 1.05 }}
-            sx={{ 
-              borderRadius: 3, 
-              background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
-              borderTop: '4px solid #F44336'
-            }}
-          >
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">
-                Weak Questions
-              </Typography>
-              <Typography variant="h3" fontWeight="bold" color="#F44336" sx={{ my: 1 }}>
-                {weakQuestions.length}
-              </Typography>
-              <Typography variant="caption" color={weakQuestions.length > 0 ? 'error' : 'success'}>
-                {weakQuestions.length > 0 ? `${weakQuestions.length} areas need work` : '✓ All Good'}
-              </Typography>
-            </CardContent>
-          </MotionCard>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <MotionCard
-            whileHover={{ scale: 1.05 }}
-            sx={{ 
-              borderRadius: 3, 
-              background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
-              borderTop: '4px solid #667eea'
-            }}
-          >
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">
-                Resources
-              </Typography>
-              <Typography variant="h3" fontWeight="bold" color="#667eea" sx={{ my: 1 }}>
-                {totalResources}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                📚 Recommended
-              </Typography>
-            </CardContent>
-          </MotionCard>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <MotionCard
-            whileHover={{ scale: 1.05 }}
-            sx={{ 
-              borderRadius: 3, 
-              background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
-              borderTop: '4px solid #FF9800'
-            }}
-          >
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">
-                Study Time
-              </Typography>
-              <Typography variant="h3" fontWeight="bold" color="#FF9800" sx={{ my: 1 }}>
-                {Math.floor(totalTime / 60)}h {totalTime % 60}m
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                ⏱️ Estimated
-              </Typography>
-            </CardContent>
-          </MotionCard>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <MotionCard
-            whileHover={{ scale: 1.05 }}
-            sx={{ 
-              borderRadius: 3, 
-              background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
-              borderTop: '4px solid #9C27B0'
-            }}
-          >
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">
-                COs to Cover
-              </Typography>
-              <Typography variant="h3" fontWeight="bold" color="#9C27B0" sx={{ my: 1 }}>
-                {cosCount}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                🎯 Focus Areas
-              </Typography>
-            </CardContent>
-          </MotionCard>
-        </Grid>
-      </Grid>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <MotionCard
+          whileHover={{ scale: 1.05 }}
+          className="border-t-4 border-error-500"
+        >
+          <CardContent className="text-center p-6">
+            <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-1">
+              Weak Questions
+            </p>
+            <h3 className="text-4xl font-bold text-error-600 dark:text-error-500 my-2">
+              {weakQuestions.length}
+            </h3>
+            <p className="text-xs text-neutral-500 dark:text-dark-text-muted">
+              {weakQuestions.length > 0 ? `${weakQuestions.length} areas need work` : '✓ All Good'}
+            </p>
+          </CardContent>
+        </MotionCard>
+        <MotionCard
+          whileHover={{ scale: 1.05 }}
+          className="border-t-4 border-primary-500"
+        >
+          <CardContent className="text-center p-6">
+            <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-1">
+              Resources
+            </p>
+            <h3 className="text-4xl font-bold text-primary-600 dark:text-dark-green-500 my-2">
+              {totalResources}
+            </h3>
+            <p className="text-xs text-neutral-500 dark:text-dark-text-muted">
+              📚 Recommended
+            </p>
+          </CardContent>
+        </MotionCard>
+        <MotionCard
+          whileHover={{ scale: 1.05 }}
+          className="border-t-4 border-accent-500"
+        >
+          <CardContent className="text-center p-6">
+            <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-1">
+              Study Time
+            </p>
+            <h3 className="text-4xl font-bold text-accent-600 dark:text-accent-500 my-2">
+              {Math.floor(totalTime / 60)}h {totalTime % 60}m
+            </h3>
+            <p className="text-xs text-neutral-500 dark:text-dark-text-muted">
+              ⏱️ Estimated
+            </p>
+          </CardContent>
+        </MotionCard>
+        <MotionCard
+          whileHover={{ scale: 1.05 }}
+          className="border-t-4 border-secondary-500"
+        >
+          <CardContent className="text-center p-6">
+            <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-1">
+              COs to Cover
+            </p>
+            <h3 className="text-4xl font-bold text-secondary-600 dark:text-secondary-500 my-2">
+              {cosCount}
+            </h3>
+            <p className="text-xs text-neutral-500 dark:text-dark-text-muted">
+              🎯 Focus Areas
+            </p>
+          </CardContent>
+        </MotionCard>
+      </div>
 
       {/* Weak Questions Analysis */}
       {weakQuestions.length > 0 && (
-        <Alert severity="warning" sx={{ mb: 3, borderRadius: 2 }}>
-          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+        <Alert variant="warning" className="mb-6">
+          <h3 className="font-bold text-lg mb-2">
             📋 Performance Analysis for Internal {internalNo}
-          </Typography>
+          </h3>
           {useCF && (
-            <Typography variant="body2" sx={{ mb: 1 }}>
+            <p className="text-sm mb-2">
               🤖 Using <strong>Collaborative Filtering</strong> mode - recommendations based on
               ratings from students with similar skill gaps (CF weight: {(cfWeight * 100).toFixed(0)}%)
-            </Typography>
+            </p>
           )}
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
-            <Typography variant="body2" fontWeight="bold">Weak Questions:</Typography>
+          <div className="flex flex-wrap gap-2 mt-2">
+            <p className="text-sm font-semibold">Weak Questions:</p>
             {weakQuestions.map((q, idx) => (
-              <Chip key={idx} label={`Q${q}`} size="small" color="error" />
+              <Badge key={idx} variant="error">
+                Q{q}
+              </Badge>
             ))}
-          </Box>
+          </div>
           {recommendations.co_map && Object.keys(recommendations.co_map).length > 0 && (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body2" fontWeight="bold" gutterBottom>
-                Course Outcomes Affected:
-              </Typography>
+            <div className="mt-3">
+              <p className="text-sm font-semibold mb-1">Course Outcomes Affected:</p>
               {Object.entries(recommendations.co_map).map(([co, questions]) => (
-                <Typography key={co} variant="body2">
+                <p key={co} className="text-sm">
                   <strong>{co}:</strong> Questions {questions.join(', ')}
-                </Typography>
+                </p>
               ))}
-            </Box>
+            </div>
           )}
         </Alert>
       )}
 
       {/* Study Plan */}
       {studyPlan && studyPlan.daily_schedule && (
-        <Card sx={{ mb: 3, borderRadius: 3 }}>
-          <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <CalendarToday color="primary" />
-              <Typography variant="h6" fontWeight="bold">
+        <Card className="mb-6">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Calendar className="w-6 h-6 text-primary-600 dark:text-dark-green-500" />
+              <h2 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary">
                 📅 Personalized Study Plan ({studyPlan.total_days} days)
-              </Typography>
-            </Box>
-            <Alert severity="info" sx={{ mb: 2 }}>
+              </h2>
+            </div>
+            <Alert variant="info" className="mb-4">
               To complete all resources in <strong>{studyPlan.total_days} days</strong>, you'll
               need approximately <strong>{studyPlan.hours_per_day} hours/day</strong>
             </Alert>
-            {Object.entries(studyPlan.daily_schedule).map(([day, items]) => {
-              const totalDayMin = items.reduce((sum, item) => sum + (item.duration || 0), 0);
-              return (
-                <Accordion key={day}>
-                  <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography fontWeight="bold">
-                      📆 Day {day} ({totalDayMin} minutes)
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <List>
-                      {items.map((item, idx) => (
-                        <ListItem key={idx}>
-                          <ListItemText
-                            primary={item.resource.title}
-                            secondary={`${item.co} - ${item.duration} min`}
-                          />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </AccordionDetails>
-                </Accordion>
-              );
-            })}
+            <div className="space-y-2">
+              {Object.entries(studyPlan.daily_schedule).map(([day, items]) => {
+                const totalDayMin = items.reduce((sum, item) => sum + (item.duration || 0), 0);
+                const isExpanded = expandedDays[day];
+                return (
+                  <div key={day} className="border-2 border-neutral-200 dark:border-dark-border rounded-xl overflow-hidden">
+                    <button
+                      onClick={() => setExpandedDays(prev => ({ ...prev, [day]: !prev[day] }))}
+                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-dark-bg-secondary flex items-center justify-between hover:bg-neutral-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+                    >
+                      <span className="font-bold text-neutral-800 dark:text-dark-text-primary">
+                        📆 Day {day} ({totalDayMin} minutes)
+                      </span>
+                      <ChevronDown className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                    </button>
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: 'auto' }}
+                          exit={{ height: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="p-4 space-y-2">
+                            {items.map((item, idx) => (
+                              <div key={idx} className="flex items-start gap-3 p-3 bg-white dark:bg-dark-bg-primary border border-neutral-200 dark:border-dark-border rounded-lg">
+                                <div className="flex-1">
+                                  <p className="font-medium text-neutral-800 dark:text-dark-text-primary">
+                                    {item.resource.title}
+                                  </p>
+                                  <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+                                    {item.co} - {item.duration} min
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
           </CardContent>
         </Card>
       )}
 
       {/* Tabs */}
-      <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} sx={{ mb: 2 }}>
-        <Tab label="By Course Outcome" />
-        <Tab label="All Resources" />
-      </Tabs>
+      <Tabs value={tabValue} onValueChange={setTabValue} className="mb-6">
+        <TabsList>
+          <TabsTrigger value="by-co">By Course Outcome</TabsTrigger>
+          <TabsTrigger value="all">All Resources</TabsTrigger>
+        </TabsList>
 
-      {/* Recommendations by CO */}
-      {tabValue === 0 && (
-        <Grid container spacing={3}>
+        {/* Recommendations by CO */}
+        <TabsContent value="by-co" className="space-y-6 mt-6">
           {Object.entries(recommendationsByCO).map(([co, resources]) => (
-            <Grid item xs={12} key={co}>
-              <MotionCard
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                sx={{ borderRadius: 3 }}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                    <School color="primary" />
-                    <Typography variant="h6" fontWeight="bold">
+            <motion.div
+              key={co}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <GraduationCap className="w-6 h-6 text-primary-600 dark:text-dark-green-500" />
+                    <h2 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary">
                       {co.toUpperCase()}
-                    </Typography>
-                    <Chip label={`${resources.length} resources`} size="small" />
-                  </Box>
+                    </h2>
+                    <Badge>{resources.length} resources</Badge>
+                  </div>
 
                   {recommendations.co_map && recommendations.co_map[co] && (
-                    <Alert severity="info" sx={{ mb: 2 }}>
+                    <Alert variant="info" className="mb-4">
                       This addresses your weak questions:{' '}
                       {recommendations.co_map[co].map((q) => `Q${q}`).join(', ')}
                     </Alert>
                   )}
 
-                  <List>
+                  <div className="space-y-4">
                     {resources.map((resource, idx) => (
-                      <Paper
+                      <div
                         key={idx}
-                        elevation={2}
-                        sx={{
-                          p: 2,
-                          mb: 2,
-                          borderRadius: 2,
-                          transition: 'all 0.3s',
-                          '&:hover': { boxShadow: 6 },
-                        }}
+                        className="p-4 border-2 border-neutral-200 dark:border-dark-border rounded-xl hover:shadow-lg transition-shadow"
                       >
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                          <Box sx={{ color: 'primary.main', mt: 0.5 }}>
+                        <div className="flex gap-4">
+                          <div className="text-primary-600 dark:text-dark-green-500 mt-1">
                             {getResourceIcon(resource.type)}
-                          </Box>
-                          <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" fontWeight={600} gutterBottom>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-neutral-800 dark:text-dark-text-primary mb-2">
                               {resource.title}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" paragraph>
+                            </h3>
+                            <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-3">
                               {resource.description}
-                            </Typography>
-                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
-                              <Chip
-                                label={resource.difficulty || 'medium'}
-                                size="small"
-                                color={getDifficultyColor(resource.difficulty)}
-                              />
-                              <Chip
-                                icon={<AccessTime />}
-                                label={`${resource.estimated_time_min || 0} min`}
-                                size="small"
-                                variant="outlined"
-                              />
-                              <Chip
-                                label={resource.topic || 'General'}
-                                size="small"
-                                variant="outlined"
-                              />
+                            </p>
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              <Badge variant={getDifficultyColor(resource.difficulty)}>
+                                {resource.difficulty || 'medium'}
+                              </Badge>
+                              <Badge variant="outline">
+                                <Clock className="w-3 h-3 mr-1" />
+                                {resource.estimated_time_min || 0} min
+                              </Badge>
+                              <Badge variant="outline">
+                                {resource.topic || 'General'}
+                              </Badge>
                               {resource.cf_rating && (
-                                <Chip
-                                  label={`${(resource.cf_rating * 100).toFixed(0)}% rated by similar students`}
-                                  size="small"
-                                  color="success"
-                                />
+                                <Badge variant="success">
+                                  {(resource.cf_rating * 100).toFixed(0)}% rated by similar students
+                                </Badge>
                               )}
                               {resource.hybrid_score && (
-                                <Chip
-                                  icon={<TrendingUp />}
-                                  label={`Score: ${resource.hybrid_score.toFixed(2)}`}
-                                  size="small"
-                                  color="primary"
-                                />
+                                <Badge>
+                                  <TrendingUp className="w-3 h-3 mr-1" />
+                                  Score: {resource.hybrid_score.toFixed(2)}
+                                </Badge>
                               )}
-                            </Box>
-                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
                               <Button
-                                size="small"
-                                variant="contained"
-                                href={resource.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                startIcon={<LinkIcon />}
+                                size="sm"
+                                asChild
+                                className="bg-gradient-to-r from-primary-500 to-secondary-500"
                               >
-                                Open Resource
+                                <a
+                                  href={resource.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <LinkIcon className="w-4 h-4 mr-2" />
+                                  Open Resource
+                                </a>
                               </Button>
-                              <IconButton
-                                size="small"
+                              <button
                                 onClick={() => handleVote(resource.resource_id, 1)}
-                                color="success"
+                                className="p-2 rounded-lg text-success-600 hover:bg-success-50 dark:text-success-500 dark:hover:bg-success-900/20 transition-colors"
                                 title="Upvote"
                               >
-                                <ThumbUp fontSize="small" />
-                              </IconButton>
-                              <IconButton
-                                size="small"
+                                <ThumbsUp className="w-4 h-4" />
+                              </button>
+                              <button
                                 onClick={() => handleVote(resource.resource_id, -1)}
-                                color="error"
+                                className="p-2 rounded-lg text-error-600 hover:bg-error-50 dark:text-error-500 dark:hover:bg-error-900/20 transition-colors"
                                 title="Downvote"
                               >
-                                <ThumbDown fontSize="small" />
-                              </IconButton>
-                              <IconButton
-                                size="small"
+                                <ThumbsDown className="w-4 h-4" />
+                              </button>
+                              <button
                                 onClick={() => handleOpenFeedback(resource)}
-                                color="primary"
+                                className="p-2 rounded-lg text-primary-600 hover:bg-primary-50 dark:text-dark-green-500 dark:hover:bg-primary-900/20 transition-colors"
                                 title="Rate"
                               >
-                                <Star fontSize="small" />
-                              </IconButton>
-                              <IconButton
-                                size="small"
+                                <Star className="w-4 h-4" />
+                              </button>
+                              <button
                                 onClick={() => handleMarkComplete(resource.resource_id)}
-                                color="success"
+                                className="p-2 rounded-lg text-success-600 hover:bg-success-50 dark:text-success-500 dark:hover:bg-success-900/20 transition-colors"
                                 title="Mark Complete"
                               >
-                                <CheckCircle fontSize="small" />
-                              </IconButton>
-                            </Box>
-                          </Box>
-                        </Box>
-                      </Paper>
+                                <CheckCircle className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                  </List>
+                  </div>
                 </CardContent>
-              </MotionCard>
-            </Grid>
+              </Card>
+            </motion.div>
           ))}
-        </Grid>
-      )}
+        </TabsContent>
 
-      {/* All Resources Tab */}
-      {tabValue === 1 && (
-        <Card sx={{ borderRadius: 3 }}>
-          <CardContent>
-            <List>
-              {Object.values(recommendationsByCO)
-                .flat()
-                .map((resource, idx) => (
-                  <Paper
-                    key={idx}
-                    elevation={1}
-                    sx={{ p: 2, mb: 2, borderRadius: 2 }}
-                  >
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'start' }}>
-                      <Box sx={{ color: 'primary.main', mt: 0.5 }}>
-                        {getResourceIcon(resource.type)}
-                      </Box>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="subtitle1" fontWeight={600}>
-                          {resource.title}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {resource.description}
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                          <Chip label={resource.CO} size="small" color="primary" />
-                          <Chip
-                            label={resource.difficulty || 'medium'}
-                            size="small"
-                            color={getDifficultyColor(resource.difficulty)}
-                          />
-                        </Box>
-                      </Box>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        href={resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Open
-                      </Button>
-                    </Box>
-                  </Paper>
-                ))}
-            </List>
-          </CardContent>
-        </Card>
-      )}
+        {/* All Resources Tab */}
+        <TabsContent value="all" className="mt-6">
+          <Card>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {Object.values(recommendationsByCO)
+                  .flat()
+                  .map((resource, idx) => (
+                    <div
+                      key={idx}
+                      className="p-4 border border-neutral-200 dark:border-dark-border rounded-xl"
+                    >
+                      <div className="flex gap-4 items-start">
+                        <div className="text-primary-600 dark:text-dark-green-500 mt-1">
+                          {getResourceIcon(resource.type)}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-neutral-800 dark:text-dark-text-primary">
+                            {resource.title}
+                          </h3>
+                          <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+                            {resource.description}
+                          </p>
+                          <div className="flex gap-2 mt-2">
+                            <Badge>{resource.CO}</Badge>
+                            <Badge variant={getDifficultyColor(resource.difficulty)}>
+                              {resource.difficulty || 'medium'}
+                            </Badge>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          asChild
+                        >
+                          <a
+                            href={resource.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Open
+                          </a>
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Feedback Dialog */}
-      <Dialog
-        open={feedbackDialog.open}
-        onClose={() => setFeedbackDialog({ open: false, resource: null })}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Rate Resource</DialogTitle>
-        <DialogContent>
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle1" gutterBottom>
+      <Dialog open={feedbackDialog.open} onOpenChange={(open) => !open && setFeedbackDialog({ open: false, resource: null })}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Rate Resource</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <h3 className="font-semibold text-neutral-800 dark:text-dark-text-primary">
               {feedbackDialog.resource?.title}
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-              <Typography>Rating:</Typography>
-              <Rating
-                value={rating}
-                onChange={(e, newValue) => setRating(newValue)}
-                size="large"
+            </h3>
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 dark:text-dark-text-primary mb-2">
+                Rating:
+              </label>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => setRating(star)}
+                    className={`p-1 transition-colors ${
+                      star <= rating
+                        ? 'text-accent-500'
+                        : 'text-neutral-300 dark:text-dark-text-muted'
+                    }`}
+                  >
+                    <Star className="w-8 h-8 fill-current" />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 dark:text-dark-text-primary mb-2">
+                Comment (optional)
+              </label>
+              <textarea
+                rows={4}
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="What helped? Anything missing?"
+                className="w-full px-4 py-3 border-2 border-neutral-300 dark:border-dark-border rounded-xl bg-white dark:bg-dark-bg-primary text-neutral-800 dark:text-dark-text-primary placeholder:text-neutral-500 focus:outline-none focus:border-primary-500 dark:focus:border-dark-green-500"
               />
-            </Box>
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              label="Comment (optional)"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              sx={{ mt: 2 }}
-              placeholder="What helped? Anything missing?"
-            />
-          </Box>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setFeedbackDialog({ open: false, resource: null })}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmitFeedback}
+              className="bg-gradient-to-r from-primary-500 to-secondary-500"
+            >
+              Submit Feedback
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setFeedbackDialog({ open: false, resource: null })}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmitFeedback} variant="contained">
-            Submit Feedback
-          </Button>
-        </DialogActions>
       </Dialog>
-    </Box>
+    </div>
   );
 };
 
 export default DBMSRecommender;
-

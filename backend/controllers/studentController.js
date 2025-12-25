@@ -4,6 +4,33 @@ import pool from '../config/db.js';
 import axios from 'axios';
 
 /**
+ * Get all students (for teachers/admins)
+ */
+export const getAllStudents = async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT id, email, name, usn, department, created_at
+       FROM users
+       WHERE role = 'student'
+       ORDER BY usn ASC`
+    );
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows
+    });
+  } catch (error) {
+    console.error('Get all students error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get students',
+      error: error.message
+    });
+  }
+};
+
+/**
  * Get student's enrolled courses
  */
 export const getStudentCourses = async (req, res) => {

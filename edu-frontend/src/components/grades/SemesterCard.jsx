@@ -1,7 +1,8 @@
 import React from 'react';
-import { Card, CardContent, Typography, Box, Chip } from '@mui/material';
-import { CheckCircle, Cancel, Schedule, ArrowForward } from '@mui/icons-material';
-import GradeBadge from './GradeBadge';
+import { motion } from 'framer-motion';
+import { CheckCircle, XCircle, Clock, ChevronRight } from 'lucide-react';
+import { Card, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
 
 /**
  * SemesterCard Component
@@ -21,124 +22,102 @@ const SemesterCard = ({
     switch (status) {
       case 'completed':
         return {
-          icon: <CheckCircle sx={{ fontSize: 16 }} />,
-          color: '#43a047',
-          bgColor: '#43a04715',
-          borderColor: '#43a047',
+          icon: <CheckCircle className="w-4 h-4" />,
+          color: 'text-success-600 dark:text-success-500',
+          bgColor: 'bg-success-50 dark:bg-success-900/20',
+          borderColor: 'border-success-500',
+          badgeVariant: 'success',
           label: 'Completed'
         };
       case 'detained':
         return {
-          icon: <Cancel sx={{ fontSize: 16 }} />,
-          color: '#e53935',
-          bgColor: '#e5393515',
-          borderColor: '#e53935',
+          icon: <XCircle className="w-4 h-4" />,
+          color: 'text-error-600 dark:text-error-500',
+          bgColor: 'bg-error-50 dark:bg-error-900/20',
+          borderColor: 'border-error-500',
+          badgeVariant: 'error',
           label: 'Detained'
         };
       case 'in_progress':
         return {
-          icon: <Schedule sx={{ fontSize: 16 }} />,
-          color: '#fb8c00',
-          bgColor: '#fb8c0015',
-          borderColor: '#fb8c00',
+          icon: <Clock className="w-4 h-4" />,
+          color: 'text-warning-600 dark:text-warning-500',
+          bgColor: 'bg-warning-50 dark:bg-warning-900/20',
+          borderColor: 'border-warning-500',
+          badgeVariant: 'warning',
           label: 'In Progress'
         };
       default: // not_started
         return {
           icon: null,
-          color: '#9e9e9e',
-          bgColor: '#f5f5f5',
-          borderColor: '#e0e0e0',
+          color: 'text-neutral-500 dark:text-dark-text-muted',
+          bgColor: 'bg-neutral-50 dark:bg-dark-bg-tertiary',
+          borderColor: 'border-neutral-300 dark:border-dark-border',
+          badgeVariant: 'outline',
           label: 'Not Started'
         };
     }
   };
 
   const config = getStatusConfig(status);
-  const sgpaValue = sgpa !== null ? parseFloat(sgpa).toFixed(2) : '--';
+  const sgpaValue = sgpa !== null && sgpa !== undefined ? parseFloat(sgpa).toFixed(2) : '--';
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+    <motion.div
+      whileHover={onClick ? { scale: 1.05, y: -4 } : {}}
+      whileTap={onClick ? { scale: 0.98 } : {}}
+      transition={{ type: "spring", stiffness: 300 }}
+    >
       <Card
         onClick={onClick}
-        sx={{
-          width: 140,
-          height: 160,
-          cursor: onClick ? 'pointer' : 'default',
-          bgcolor: config.bgColor,
-          border: `2px solid ${isActive ? config.color : config.borderColor}`,
-          borderRadius: 2,
-          transition: 'all 0.3s',
-          '&:hover': onClick ? {
-            transform: 'translateY(-4px)',
-            boxShadow: 6,
-            borderColor: config.color
-          } : {}
+        className={`
+          w-full h-[180px]
+          ${config.bgColor}
+          border-2 ${isActive ? config.borderColor : 'border-neutral-200 dark:border-dark-border'}
+          ${onClick ? 'cursor-pointer hover:shadow-xl' : 'cursor-default'}
+          transition-all duration-300
+          ${isActive ? 'shadow-lg ring-2 ring-offset-2 ring-offset-white dark:ring-offset-dark-bg-primary' : ''}
+        `}
+        style={{
+          ringColor: isActive ? config.borderColor : 'transparent'
         }}
       >
-        <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+        <CardContent className="p-4 h-full flex flex-col">
           {/* Semester Number */}
-          <Typography
-            variant="h6"
-            fontWeight="bold"
-            color={config.color}
-            gutterBottom
-          >
+          <h3 className={`text-lg font-bold ${config.color} mb-1`}>
             Semester {semester}
-          </Typography>
+          </h3>
 
           {/* Year */}
           {year && (
-            <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+            <p className="text-xs text-neutral-500 dark:text-dark-text-muted mb-3">
               {year}
-            </Typography>
+            </p>
           )}
 
           {/* SGPA */}
-          <Box sx={{ my: 2, textAlign: 'center' }}>
-            <Typography variant="h4" fontWeight="bold" color={config.color}>
+          <div className="flex-1 flex flex-col items-center justify-center my-2">
+            <div className={`text-4xl font-bold ${config.color}`}>
               {sgpaValue}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              SGPA
-            </Typography>
-          </Box>
+            </div>
+            <p className="text-xs text-neutral-500 dark:text-dark-text-muted mt-1">
+              SGPA / 10.0
+            </p>
+          </div>
 
           {/* Credits */}
-          <Typography variant="caption" color="text.secondary" display="block">
-            Credits: {creditsEarned || 0}/{credits || 0}
-          </Typography>
+          <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mb-2">
+            Credits: <span className="font-semibold">{creditsEarned || 0}</span>/{credits || 0}
+          </p>
 
-          {/* Status Chip */}
-          <Chip
-            size="small"
-            icon={config.icon}
-            label={config.label}
-            sx={{
-              mt: 1,
-              fontSize: '0.65rem',
-              height: 22,
-              bgcolor: config.color,
-              color: '#fff',
-              '& .MuiChip-icon': {
-                color: '#fff'
-              }
-            }}
-          />
+          {/* Status Badge */}
+          <Badge variant={config.badgeVariant} className="w-full justify-center gap-1">
+            {config.icon}
+            <span className="text-[0.7rem]">{config.label}</span>
+          </Badge>
         </CardContent>
       </Card>
-
-      {/* Arrow connector (shown for all except last semester) */}
-      {semester < 8 && (
-        <ArrowForward
-          sx={{
-            mx: 1,
-            color: config.color,
-            fontSize: 28
-          }}
-        />
-      )}
-    </Box>
+    </motion.div>
   );
 };
 

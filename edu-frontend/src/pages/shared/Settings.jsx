@@ -100,8 +100,8 @@ const Settings = () => {
       transition={{ duration: 0.6 }}
       className={`min-h-screen p-6 transition-colors duration-700 ${
         isDark
-          ? 'bg-dark-radial'
-          : 'bg-gradient-to-br from-blue-50 via-white to-violet-50'
+          ? 'bg-dark-bg-primary'
+          : 'bg-neutral-100'
       }`}
     >
       <motion.div
@@ -114,22 +114,22 @@ const Settings = () => {
         <motion.div variants={itemVariants} className="mb-8">
           <h1 className={`text-4xl font-bold bg-gradient-to-r ${
             isDark
-              ? 'from-blue-400 to-violet-400'
-              : 'from-blue-600 to-violet-600'
+              ? 'from-dark-green-500 to-secondary-600'
+              : 'from-primary-500 to-secondary-500'
           } bg-clip-text text-transparent`}>
             Account Settings
           </h1>
-          <p className={`mt-2 ${isDark ? 'text-dark-text-secondary' : 'text-gray-600'}`}>
+          <p className={`mt-2 ${isDark ? 'text-dark-text-secondary' : 'text-neutral-600'}`}>
             Manage your account settings and preferences
           </p>
         </motion.div>
 
         {/* Profile Card */}
         <motion.div variants={itemVariants}>
-          <Card className="hover:shadow-md">
+          <Card className="hover:shadow-md border-2 border-neutral-200 dark:border-dark-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5 text-blue-600" />
+              <CardTitle className="flex items-center gap-2 text-neutral-800 dark:text-dark-text-primary">
+                <User className="w-5 h-5 text-primary-600 dark:text-dark-green-500" />
                 Profile Information
               </CardTitle>
               <CardDescription>
@@ -140,16 +140,16 @@ const Settings = () => {
               {/* Avatar Section */}
               <div className="flex items-center gap-4">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-violet-600 flex items-center justify-center text-white text-2xl font-bold">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 flex items-center justify-center text-white text-2xl font-bold">
                     {user?.name?.charAt(0).toUpperCase()}
                   </div>
-                  <button className="absolute bottom-0 right-0 p-1.5 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow">
-                    <Camera className="w-4 h-4 text-gray-600" />
+                  <button className="absolute bottom-0 right-0 p-1.5 bg-white dark:bg-dark-bg-secondary rounded-full shadow-md hover:shadow-lg transition-shadow border-2 border-neutral-200 dark:border-dark-border">
+                    <Camera className="w-4 h-4 text-neutral-600 dark:text-dark-text-secondary" />
                   </button>
                 </div>
                 <div>
-                  <p className="font-semibold text-lg">{user?.name}</p>
-                  <p className="text-sm text-gray-500 capitalize">{user?.role}</p>
+                  <p className="font-semibold text-lg text-neutral-800 dark:text-dark-text-primary">{user?.name}</p>
+                  <p className="text-sm text-neutral-600 dark:text-dark-text-secondary capitalize">{user?.role}</p>
                 </div>
               </div>
 
@@ -182,7 +182,7 @@ const Settings = () => {
                     onChange={handleInputChange}
                     placeholder="john@example.com"
                     disabled
-                    className="bg-gray-50"
+                    className="bg-neutral-50 dark:bg-dark-bg-tertiary"
                   />
                 </div>
 
@@ -206,10 +206,10 @@ const Settings = () => {
 
         {/* Password Card */}
         <motion.div variants={itemVariants}>
-          <Card className="hover:shadow-md">
+          <Card className="hover:shadow-md border-2 border-neutral-200 dark:border-dark-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lock className="w-5 h-5 text-blue-600" />
+              <CardTitle className="flex items-center gap-2 text-neutral-800 dark:text-dark-text-primary">
+                <Lock className="w-5 h-5 text-primary-600 dark:text-dark-green-500" />
                 Change Password
               </CardTitle>
               <CardDescription>
@@ -260,10 +260,10 @@ const Settings = () => {
 
         {/* Preferences Card */}
         <motion.div variants={itemVariants}>
-          <Card className="hover:shadow-md">
+          <Card className="hover:shadow-md border-2 border-neutral-200 dark:border-dark-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="w-5 h-5 text-blue-600" />
+              <CardTitle className="flex items-center gap-2 text-neutral-800 dark:text-dark-text-primary">
+                <Bell className="w-5 h-5 text-primary-600 dark:text-dark-green-500" />
                 Preferences
               </CardTitle>
               <CardDescription>
@@ -271,18 +271,18 @@ const Settings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Radiant Dark Mode Toggle */}
+              {/* Dark Mode Toggle */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {isDark ? (
-                    <Moon className={`w-5 h-5 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} />
+                    <Moon className="w-5 h-5 text-primary-600 dark:text-dark-green-500" />
                   ) : (
-                    <Sun className={`w-5 h-5 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} />
+                    <Sun className="w-5 h-5 text-primary-600 dark:text-dark-green-500" />
                   )}
                   <div>
-                    <Label className="text-base font-medium">Radiant Dark Mode</Label>
-                    <p className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-gray-500'}`}>
-                      Enable premium dark theme with blue-violet gradients
+                    <Label className="text-base font-medium text-neutral-800 dark:text-dark-text-primary">Dark Mode</Label>
+                    <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+                      Enable dark theme for comfortable viewing
                     </p>
                   </div>
                 </div>
@@ -293,15 +293,15 @@ const Settings = () => {
                 />
               </div>
 
-              <div className="border-t pt-6" />
+              <div className="border-t border-neutral-200 dark:border-dark-border pt-6" />
 
               {/* Email Notifications Toggle */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Bell className={`w-5 h-5 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} />
+                  <Bell className="w-5 h-5 text-primary-600 dark:text-dark-green-500" />
                   <div>
-                    <Label className="text-base font-medium">Email Notifications</Label>
-                    <p className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-gray-500'}`}>
+                    <Label className="text-base font-medium text-neutral-800 dark:text-dark-text-primary">Email Notifications</Label>
+                    <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
                       Receive email updates about course activities
                     </p>
                   </div>
@@ -325,7 +325,7 @@ const Settings = () => {
             size="lg"
             onClick={handleSaveChanges}
             disabled={loading}
-            className="min-w-[200px]"
+            className="min-w-[200px] bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600"
           >
             <Save className="w-4 h-4 mr-2" />
             {loading ? "Saving..." : "Save Changes"}

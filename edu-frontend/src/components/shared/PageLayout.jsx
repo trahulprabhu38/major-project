@@ -1,7 +1,6 @@
-import { Box, Container, Typography, Breadcrumbs, Link as MuiLink } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { NavigateNext } from '@mui/icons-material';
+import { ChevronRight } from 'lucide-react';
 
 /**
  * Consistent Page Layout Component
@@ -17,52 +16,48 @@ const PageLayout = ({
   maxWidth = 'xl',
   noPadding = false,
 }) => {
+  const maxWidthClasses = {
+    sm: 'max-w-screen-sm',
+    md: 'max-w-screen-md',
+    lg: 'max-w-screen-lg',
+    xl: 'max-w-screen-xl',
+    '2xl': 'max-w-screen-2xl',
+  };
+
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        bgcolor: 'background.default',
-        pt: noPadding ? 0 : 4,
-        pb: noPadding ? 0 : 6,
-      }}
-    >
-      <Container maxWidth={maxWidth}>
+    <div className={`min-h-screen bg-neutral-100 dark:bg-dark-bg-primary ${noPadding ? '' : 'pt-8 pb-12'}`}>
+      <div className={`mx-auto px-4 md:px-6 ${maxWidthClasses[maxWidth] || maxWidthClasses.xl}`}>
         {/* Breadcrumbs */}
         {breadcrumbs.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
+            className="mb-6"
           >
-            <Breadcrumbs
-              separator={<NavigateNext fontSize="small" />}
-              sx={{ mb: 3 }}
-            >
-              {breadcrumbs.map((crumb, index) =>
-                crumb.to ? (
-                  <MuiLink
-                    key={index}
-                    component={Link}
-                    to={crumb.to}
-                    underline="hover"
-                    color="inherit"
-                    sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                  >
-                    {crumb.icon && <crumb.icon fontSize="small" />}
-                    {crumb.label}
-                  </MuiLink>
-                ) : (
-                  <Typography
-                    key={index}
-                    color="text.primary"
-                    sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                  >
-                    {crumb.icon && <crumb.icon fontSize="small" />}
-                    {crumb.label}
-                  </Typography>
-                )
-              )}
-            </Breadcrumbs>
+            <nav className="flex items-center gap-2 text-sm">
+              {breadcrumbs.map((crumb, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  {index > 0 && (
+                    <ChevronRight className="w-4 h-4 text-neutral-400 dark:text-dark-text-muted" />
+                  )}
+                  {crumb.to ? (
+                    <Link
+                      to={crumb.to}
+                      className="flex items-center gap-1.5 text-neutral-600 dark:text-dark-text-secondary hover:text-primary-600 dark:hover:text-dark-green-500 transition-colors"
+                    >
+                      {crumb.icon && <crumb.icon className="w-4 h-4" />}
+                      {crumb.label}
+                    </Link>
+                  ) : (
+                    <span className="flex items-center gap-1.5 text-neutral-800 dark:text-dark-text-primary font-medium">
+                      {crumb.icon && <crumb.icon className="w-4 h-4" />}
+                      {crumb.label}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </nav>
           </motion.div>
         )}
 
@@ -72,61 +67,32 @@ const PageLayout = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              mb: 4,
-              flexWrap: 'wrap',
-              gap: 2,
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <div className="flex justify-between items-start mb-8 flex-wrap gap-4">
+            <div className="flex items-center gap-4">
               {Icon && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 56,
-                    height: 56,
-                    borderRadius: 3,
-                    bgcolor: 'primary.main',
-                    color: 'white',
-                    boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
-                  }}
-                >
-                  <Icon sx={{ fontSize: 32 }} />
-                </Box>
+                <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 text-white shadow-lg">
+                  <Icon className="w-8 h-8" />
+                </div>
               )}
-              <Box>
-                <Typography
-                  variant="h4"
-                  fontWeight="bold"
-                  sx={{
-                    background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }}
-                >
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 bg-clip-text text-transparent">
                   {title}
-                </Typography>
+                </h1>
                 {subtitle && (
-                  <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
+                  <p className="text-sm md:text-base text-neutral-600 dark:text-dark-text-secondary mt-1">
                     {subtitle}
-                  </Typography>
+                  </p>
                 )}
-              </Box>
-            </Box>
+              </div>
+            </div>
 
             {/* Action Buttons */}
             {actions && (
-              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <div className="flex gap-2 items-center">
                 {actions}
-              </Box>
+              </div>
             )}
-          </Box>
+          </div>
         </motion.div>
 
         {/* Page Content */}
@@ -137,8 +103,8 @@ const PageLayout = ({
         >
           {children}
         </motion.div>
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 };
 

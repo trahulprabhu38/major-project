@@ -6,3 +6,4 @@ export { default as CGPACard } from './CGPACard';
 export { default as SemesterCard } from './SemesterCard';
 export { default as CourseGradeTable } from './CourseGradeTable';
 export { default as CGPATrendChart } from './CGPATrendChart';
+export { default as SemesterSubjectManager } from './SemesterSubjectManager';

@@ -1,5 +1,5 @@
-import { Card, CardContent, Box, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
+import { Card, CardContent } from '../ui/card';
 
 /**
  * Reusable Statistics Card Component
@@ -8,102 +8,84 @@ const StatsCard = ({
   title,
   value,
   icon: Icon,
-  color = 'primary.main',
-  bgColor = 'primary.light',
+  color = 'primary',
   subtitle,
   trend,
   onClick,
 }) => {
-  const MotionCard = motion.create(Card);
+  // Map color names to Tailwind classes
+  const colorClasses = {
+    primary: {
+      icon: 'text-primary-600 dark:text-dark-green-500',
+      bg: 'bg-primary-100 dark:bg-primary-900/30',
+      gradient: 'from-primary-100/20 to-primary-100/5',
+    },
+    success: {
+      icon: 'text-success-600 dark:text-success-500',
+      bg: 'bg-success-100 dark:bg-success-900/30',
+      gradient: 'from-success-100/20 to-success-100/5',
+    },
+    secondary: {
+      icon: 'text-secondary-600 dark:text-secondary-500',
+      bg: 'bg-secondary-100 dark:bg-secondary-900/30',
+      gradient: 'from-secondary-100/20 to-secondary-100/5',
+    },
+    warning: {
+      icon: 'text-warning-600 dark:text-warning-500',
+      bg: 'bg-warning-100 dark:bg-warning-900/30',
+      gradient: 'from-warning-100/20 to-warning-100/5',
+    },
+  };
+
+  const colors = colorClasses[color] || colorClasses.primary;
 
   return (
-    <MotionCard
+    <motion.div
       whileHover={{ scale: 1.03, y: -4 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      sx={{
-        cursor: onClick ? 'pointer' : 'default',
-        borderRadius: 3,
-        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-        overflow: 'hidden',
-        position: 'relative',
-        transition: 'box-shadow 0.3s ease',
-        '&:hover': {
-          boxShadow: onClick ? '0 8px 24px rgba(0,0,0,0.15)' : '0 2px 12px rgba(0,0,0,0.08)',
-        },
-      }}
+      className={onClick ? 'cursor-pointer' : ''}
     >
-      {/* Background Gradient */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          width: '40%',
-          height: '100%',
-          background: `linear-gradient(135deg, ${bgColor}20 0%, ${bgColor}05 100%)`,
-          opacity: 0.3,
-        }}
-      />
+      <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden relative">
+        {/* Background Gradient */}
+        <div className={`absolute top-0 right-0 w-2/5 h-full bg-gradient-to-br ${colors.gradient} opacity-30`} />
 
-      <CardContent sx={{ position: 'relative', p: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Box>
-            <Typography variant="body2" color="text.secondary" fontWeight={500}>
-              {title}
-            </Typography>
-            {subtitle && (
-              <Typography variant="caption" color="text.secondary">
-                {subtitle}
-              </Typography>
+        <CardContent className="p-6 relative">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <p className="text-sm font-medium text-neutral-600 dark:text-dark-text-secondary">
+                {title}
+              </p>
+              {subtitle && (
+                <p className="text-xs text-neutral-500 dark:text-dark-text-muted mt-0.5">
+                  {subtitle}
+                </p>
+              )}
+            </div>
+            {Icon && (
+              <div className={`flex items-center justify-center w-12 h-12 rounded-xl ${colors.bg}`}>
+                <Icon className={`w-7 h-7 ${colors.icon}`} />
+              </div>
             )}
-          </Box>
-          {Icon && (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 48,
-                height: 48,
-                borderRadius: 2,
-                bgcolor: `${bgColor}20`,
-              }}
-            >
-              <Icon sx={{ fontSize: 28, color }} />
-            </Box>
+          </div>
+
+          <h3 className={`text-3xl font-bold text-neutral-800 dark:text-dark-text-primary ${trend ? 'mb-2' : ''}`}>
+            {value}
+          </h3>
+
+          {trend && (
+            <div className="flex items-center gap-1">
+              <span className={`text-xs font-semibold ${trend.isPositive ? 'text-success-600 dark:text-success-500' : 'text-error-600 dark:text-error-500'}`}>
+                {trend.isPositive ? '↑' : '↓'} {trend.value}
+              </span>
+              <span className="text-xs text-neutral-500 dark:text-dark-text-muted">
+                {trend.label}
+              </span>
+            </div>
           )}
-        </Box>
-
-        <Typography
-          variant="h3"
-          fontWeight="bold"
-          sx={{
-            color: 'text.primary',
-            mb: trend ? 1 : 0,
-          }}
-        >
-          {value}
-        </Typography>
-
-        {trend && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Typography
-              variant="caption"
-              sx={{
-                color: trend.isPositive ? 'success.main' : 'error.main',
-                fontWeight: 600,
-              }}
-            >
-              {trend.isPositive ? '↑' : '↓'} {trend.value}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {trend.label}
-            </Typography>
-          </Box>
-        )}
-      </CardContent>
-    </MotionCard>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 

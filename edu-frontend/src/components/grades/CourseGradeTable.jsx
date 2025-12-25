@@ -1,17 +1,7 @@
 import React from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Box,
-  Chip
-} from '@mui/material';
-import { CheckCircle, Cancel } from '@mui/icons-material';
+import { CheckCircle, XCircle } from 'lucide-react';
+import { Card, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
 import GradeBadge from './GradeBadge';
 
 /**
@@ -21,11 +11,11 @@ import GradeBadge from './GradeBadge';
 const CourseGradeTable = ({ courses, showSummary = true }) => {
   if (!courses || courses.length === 0) {
     return (
-      <Box sx={{ p: 3, textAlign: 'center' }}>
-        <Typography variant="body2" color="text.secondary">
+      <Card className="p-8 text-center bg-neutral-50 dark:bg-dark-bg-secondary">
+        <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
           No course data available
-        </Typography>
-      </Box>
+        </p>
+      </Card>
     );
   }
 
@@ -35,128 +25,155 @@ const CourseGradeTable = ({ courses, showSummary = true }) => {
   const failedCount = courses.filter(c => !c.passed).length;
 
   return (
-    <Box>
-      <TableContainer component={Paper} variant="outlined">
-        <Table size="small">
-          <TableHead>
-            <TableRow sx={{ bgcolor: 'grey.100' }}>
-              <TableCell><strong>Code</strong></TableCell>
-              <TableCell><strong>Course Name</strong></TableCell>
-              <TableCell align="center"><strong>Credits</strong></TableCell>
-              <TableCell align="center"><strong>CIE</strong></TableCell>
-              <TableCell align="center"><strong>SEE</strong></TableCell>
-              <TableCell align="center"><strong>Final</strong></TableCell>
-              <TableCell align="center"><strong>%</strong></TableCell>
-              <TableCell align="center"><strong>Grade</strong></TableCell>
-              <TableCell align="center"><strong>GP</strong></TableCell>
-              <TableCell align="center"><strong>Status</strong></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {courses.map((course, index) => (
-              <TableRow
-                key={index}
-                sx={{
-                  '&:hover': { bgcolor: 'grey.50' },
-                  bgcolor: course.passed ? 'inherit' : 'error.50'
-                }}
-              >
-                <TableCell>
-                  <Typography variant="body2" fontWeight="medium">
-                    {course.code}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2">
-                    {course.name}
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Chip label={course.credits || 3} size="small" sx={{ fontWeight: 'bold' }} />
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="body2">
-                    {course.cieMarks !== null ? course.cieMarks.toFixed(1) : '--'}
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="body2">
-                    {course.seeMarks !== null ? course.seeMarks.toFixed(1) : '--'}
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="body2" fontWeight="medium">
-                    {course.finalMarks !== null ? course.finalMarks.toFixed(1) : '--'}
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="body2">
-                    {course.percentage !== null ? `${course.percentage.toFixed(1)}%` : '--'}
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <GradeBadge grade={course.grade} size="small" />
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="body2" fontWeight="bold">
-                    {course.gradePoints !== null ? course.gradePoints.toFixed(1) : '--'}
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  {course.passed ? (
-                    <CheckCircle sx={{ color: 'success.main', fontSize: 20 }} />
-                  ) : (
-                    <Cancel sx={{ color: 'error.main', fontSize: 20 }} />
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+    <div className="space-y-4">
+      {/* Table */}
+      <div className="border-2 border-neutral-200 dark:border-dark-border rounded-2xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-neutral-100 dark:bg-dark-bg-secondary">
+                <th className="px-4 py-3 text-left text-xs font-bold text-neutral-700 dark:text-dark-text-primary uppercase tracking-wider">
+                  Code
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-neutral-700 dark:text-dark-text-primary uppercase tracking-wider">
+                  Course Name
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-bold text-neutral-700 dark:text-dark-text-primary uppercase tracking-wider">
+                  Credits
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-bold text-neutral-700 dark:text-dark-text-primary uppercase tracking-wider">
+                  CIE
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-bold text-neutral-700 dark:text-dark-text-primary uppercase tracking-wider">
+                  SEE
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-bold text-neutral-700 dark:text-dark-text-primary uppercase tracking-wider">
+                  Final
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-bold text-neutral-700 dark:text-dark-text-primary uppercase tracking-wider">
+                  %
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-bold text-neutral-700 dark:text-dark-text-primary uppercase tracking-wider">
+                  Grade
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-bold text-neutral-700 dark:text-dark-text-primary uppercase tracking-wider">
+                  GP
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-bold text-neutral-700 dark:text-dark-text-primary uppercase tracking-wider">
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-neutral-200 dark:divide-dark-border">
+              {courses.map((course, index) => (
+                <tr
+                  key={index}
+                  className={`
+                    hover:bg-neutral-50 dark:hover:bg-dark-bg-secondary transition-colors
+                    ${!course.passed ? 'bg-error-50 dark:bg-error-900/10' : 'bg-white dark:bg-dark-bg-primary'}
+                  `}
+                >
+                  <td className="px-4 py-3">
+                    <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
+                      {course.code || 'N/A'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="text-sm text-neutral-700 dark:text-dark-text-secondary">
+                      {course.name || 'Unnamed Course'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <Badge className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-dark-green-500 font-bold">
+                      {course.credits || 3}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="text-sm text-neutral-700 dark:text-dark-text-secondary">
+                      {course.cieMarks !== null && course.cieMarks !== undefined ? course.cieMarks.toFixed(1) : '--'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="text-sm text-neutral-700 dark:text-dark-text-secondary">
+                      {course.seeMarks !== null && course.seeMarks !== undefined ? course.seeMarks.toFixed(1) : '--'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
+                      {course.finalMarks !== null && course.finalMarks !== undefined ? course.finalMarks.toFixed(1) : '--'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="text-sm text-neutral-700 dark:text-dark-text-secondary">
+                      {course.percentage !== null && course.percentage !== undefined ? `${course.percentage.toFixed(1)}%` : '--'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <GradeBadge grade={course.grade} size="small" />
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="text-sm font-bold text-neutral-800 dark:text-dark-text-primary">
+                      {course.gradePoints !== null && course.gradePoints !== undefined ? course.gradePoints.toFixed(1) : '--'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {course.passed ? (
+                      <CheckCircle className="w-5 h-5 text-success-600 dark:text-success-500 inline-block" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-error-600 dark:text-error-500 inline-block" />
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* Summary */}
       {showSummary && (
-        <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-          <Box sx={{ display: 'flex', gap: 3, justifyContent: 'space-around' }}>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Total Courses
-              </Typography>
-              <Typography variant="h6" fontWeight="bold">
-                {courses.length}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Credits
-              </Typography>
-              <Typography variant="h6" fontWeight="bold" color="primary">
-                {earnedCredits}/{totalCredits}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Passed
-              </Typography>
-              <Typography variant="h6" fontWeight="bold" color="success.main">
-                {passedCount}
-              </Typography>
-            </Box>
-            {failedCount > 0 && (
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  Failed
-                </Typography>
-                <Typography variant="h6" fontWeight="bold" color="error.main">
-                  {failedCount}
-                </Typography>
-              </Box>
-            )}
-          </Box>
-        </Box>
+        <Card className="bg-neutral-50 dark:bg-dark-bg-secondary">
+          <CardContent className="p-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="text-center">
+                <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mb-1">
+                  Total Courses
+                </p>
+                <p className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary">
+                  {courses.length}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mb-1">
+                  Credits
+                </p>
+                <p className="text-2xl font-bold text-primary-600 dark:text-dark-green-500">
+                  {earnedCredits}/{totalCredits}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mb-1">
+                  Passed
+                </p>
+                <p className="text-2xl font-bold text-success-600 dark:text-success-500">
+                  {passedCount}
+                </p>
+              </div>
+              {failedCount > 0 && (
+                <div className="text-center">
+                  <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mb-1">
+                    Failed
+                  </p>
+                  <p className="text-2xl font-bold text-error-600 dark:text-error-500">
+                    {failedCount}
+                  </p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       )}
-    </Box>
+    </div>
   );
 };
 

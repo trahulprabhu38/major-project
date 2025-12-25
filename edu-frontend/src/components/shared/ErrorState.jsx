@@ -1,11 +1,11 @@
-import { Box, Typography, Button, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
 import {
-  ErrorOutline,
-  SentimentDissatisfied,
+  AlertCircle,
+  Frown,
   CloudOff,
   FolderOpen,
-} from '@mui/icons-material';
+} from 'lucide-react';
+import { Button } from '../ui/button';
 
 /**
  * Generic Error Display Component
@@ -14,49 +14,27 @@ export const ErrorState = ({
   title = 'Something went wrong',
   message = 'An unexpected error occurred. Please try again.',
   onRetry,
-  icon: Icon = ErrorOutline,
+  icon: Icon = AlertCircle,
 }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.4 }}
   >
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '50vh',
-        textAlign: 'center',
-        px: 3,
-      }}
-    >
-      <Icon
-        sx={{
-          fontSize: 80,
-          color: 'error.main',
-          mb: 2,
-          opacity: 0.8,
-        }}
-      />
-      <Typography variant="h5" fontWeight="bold" gutterBottom>
+    <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-6">
+      <Icon className="w-20 h-20 text-error-600 dark:text-error-500 mb-4 opacity-80" />
+      <h2 className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
         {title}
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 500 }}>
+      </h2>
+      <p className="text-neutral-600 dark:text-dark-text-secondary mb-6 max-w-lg">
         {message}
-      </Typography>
+      </p>
       {onRetry && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={onRetry}
-          sx={{ borderRadius: 2, px: 4, py: 1.5 }}
-        >
+        <Button onClick={onRetry} size="lg">
           Try Again
         </Button>
       )}
-    </Box>
+    </div>
   </motion.div>
 );
 
@@ -75,48 +53,20 @@ export const EmptyState = ({
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.3 }}
   >
-    <Paper
-      elevation={0}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '40vh',
-        textAlign: 'center',
-        px: 3,
-        py: 6,
-        bgcolor: 'background.default',
-        border: '2px dashed',
-        borderColor: 'divider',
-        borderRadius: 3,
-      }}
-    >
-      <Icon
-        sx={{
-          fontSize: 80,
-          color: 'text.secondary',
-          mb: 2,
-          opacity: 0.5,
-        }}
-      />
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
+    <div className="flex flex-col items-center justify-center min-h-[40vh] text-center px-6 py-12 bg-neutral-50 dark:bg-dark-bg-secondary border-2 border-dashed border-neutral-300 dark:border-dark-border rounded-2xl">
+      <Icon className="w-20 h-20 text-neutral-400 dark:text-dark-text-muted mb-4 opacity-50" />
+      <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
         {title}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 400 }}>
+      </h3>
+      <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-6 max-w-md">
         {message}
-      </Typography>
+      </p>
       {action && actionLabel && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={action}
-          sx={{ borderRadius: 2, px: 4 }}
-        >
+        <Button onClick={action}>
           {actionLabel}
         </Button>
       )}
-    </Paper>
+    </div>
   </motion.div>
 );
 
@@ -139,7 +89,7 @@ export const NotFound = ({ message = 'The page you are looking for does not exis
   <ErrorState
     title="404 - Not Found"
     message={message}
-    icon={SentimentDissatisfied}
+    icon={Frown}
   />
 );
 

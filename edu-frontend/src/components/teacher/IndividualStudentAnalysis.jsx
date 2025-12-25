@@ -60,6 +60,7 @@ import {
   Info as InfoIcon,
   CheckCircleOutline,
   RadioButtonUnchecked,
+  Calculate,
 } from '@mui/icons-material';
 import axios from 'axios';
 
@@ -72,6 +73,8 @@ const IndividualStudentAnalysis = ({ courseId }) => {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState('');
   const [studentData, setStudentData] = useState(null);
+  const [seeMarks, setSeeMarks] = useState(null);
+  const [finalGrade, setFinalGrade] = useState(null);
 
   useEffect(() => {
     if (courseId) {
@@ -102,9 +105,12 @@ const IndividualStudentAnalysis = ({ courseId }) => {
     try {
       setLoading(true);
       setStudentData(null); // Clear old data first
+      setSeeMarks(null);
+      setFinalGrade(null);
 
       const token = localStorage.getItem('token');
 
+      // Fetch CIE performance data
       const response = await axios.get(
         `${API_URL}/detailed-calculations/course/${courseId}/student/${selectedStudent}/performance`,
         {
@@ -122,6 +128,53 @@ const IndividualStudentAnalysis = ({ courseId }) => {
         console.error('Invalid response structure:', response.data);
         alert('Invalid data received from server');
       }
+
+      // Fetch SEE marks
+      try {
+        const seeResponse = await axios.get(
+          `${API_URL}/see-marks/students/${selectedStudent}/courses/${courseId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (seeResponse.data.success && seeResponse.data.data) {
+          // Convert numeric fields to numbers
+          const see = seeResponse.data.data;
+          setSeeMarks({
+            ...see,
+            see_marks_obtained: parseFloat(see.see_marks_obtained) || 0,
+            see_max_marks: parseFloat(see.see_max_marks) || 100
+          });
+        }
+      } catch (seeErr) {
+        // SEE marks might not be uploaded yet, that's okay
+        console.log('SEE marks not found (may not be uploaded yet)');
+      }
+
+      // Fetch final grade
+      try {
+        const gradeResponse = await axios.get(
+          `${API_URL}/grades/students/${selectedStudent}/courses/${courseId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (gradeResponse.data.success && gradeResponse.data.data) {
+          // Convert numeric fields to numbers
+          const grade = gradeResponse.data.data;
+          setFinalGrade({
+            ...grade,
+            cie_total: parseFloat(grade.cie_total) || 0,
+            cie_max: parseFloat(grade.cie_max) || 50,
+            see_total: parseFloat(grade.see_total) || 0,
+            see_max: parseFloat(grade.see_max) || 50,
+            final_total: parseFloat(grade.final_total) || 0,
+            final_max: parseFloat(grade.final_max) || 100,
+            final_percentage: parseFloat(grade.final_percentage) || 0,
+            grade_points: parseFloat(grade.grade_points) || 0
+          });
+        }
+      } catch (gradeErr) {
+        // Final grade might not be calculated yet
+        console.log('Final grade not found (may not be calculated yet)');
+      }
+
     } catch (err) {
       console.error('Error loading student performance:', err);
       alert(`Error: ${err.response?.data?.error || err.message}`);
@@ -414,16 +467,167 @@ const IndividualStudentAnalysis = ({ courseId }) => {
             )}
           </Grid>
 
+          {/* SEE Marks and Final Grade Section */}
+          {(seeMarks || finalGrade) && (
+            <Accordion defaultExpanded sx={{ mb: 2, boxShadow: 1 }}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                sx={{
+                  backgroundColor: '#f8f9fa',
+                  borderLeft: '4px solid #2196f3',
+                  '&:hover': { backgroundColor: '#f0f1f2' },
+                  '& .MuiAccordionSummary-content': { my: 1.5 }
+                }}
+              >
+                <Box display="flex" alignItems="center" gap={1.5}>
+                  <AssessmentIcon sx={{ color: '#2196f3', fontSize: 24 }} />
+                  <Typography variant="h6" fontWeight="600" color="text.primary">
+                    SEE Marks & Final Grade
+                  </Typography>
+                </Box>
+              </AccordionSummary>
+              <AccordionDetails>
+
+                <Grid container spacing={3}>
+                  {/* SEE Marks Card */}
+                  {seeMarks && (
+                    <Grid item xs={12} md={6}>
+                      <Card sx={{
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white'
+                      }}>
+                        <CardContent>
+                          <Typography variant="body2" gutterBottom sx={{ opacity: 0.9 }}>
+                            SEE Marks (out of {seeMarks.see_max_marks || 100})
+                          </Typography>
+                          <Typography variant="h3" fontWeight="bold">
+                            {seeMarks.see_marks_obtained || 0}
+                          </Typography>
+                          <LinearProgress
+                            variant="determinate"
+                            value={((seeMarks.see_marks_obtained || 0) / (seeMarks.see_max_marks || 100)) * 100}
+                            sx={{
+                              mt: 2,
+                              height: 8,
+                              borderRadius: 4,
+                              backgroundColor: 'rgba(255,255,255,0.3)',
+                              '& .MuiLinearProgress-bar': {
+                                backgroundColor: 'white'
+                              }
+                            }}
+                          />
+                          <Typography variant="body2" sx={{ mt: 1, opacity: 0.9 }}>
+                            {(((seeMarks.see_marks_obtained || 0) / (seeMarks.see_max_marks || 100)) * 100).toFixed(2)}%
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  )}
+
+                  {/* Final Grade Card */}
+                  {finalGrade && (
+                    <Grid item xs={12} md={6}>
+                      <Card sx={{
+                        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                        color: 'white'
+                      }}>
+                        <CardContent>
+                          <Typography variant="body2" gutterBottom sx={{ opacity: 0.9 }}>
+                            Final Grade
+                          </Typography>
+                          <Box display="flex" alignItems="baseline" gap={2}>
+                            <Typography variant="h2" fontWeight="bold">
+                              {finalGrade.letter_grade || 'N/A'}
+                            </Typography>
+                            <Typography variant="h4">
+                              ({(finalGrade.grade_points || 0)}/10)
+                            </Typography>
+                          </Box>
+                          <Typography variant="h5" sx={{ mt: 1 }}>
+                            {(finalGrade.final_total || 0).toFixed(2)}/100
+                          </Typography>
+                          <Typography variant="body2" sx={{ mt: 1, opacity: 0.9 }}>
+                            {(finalGrade.final_percentage || 0).toFixed(2)}%
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  )}
+
+                  {/* Breakdown Table */}
+                  {finalGrade && (
+                    <Grid item xs={12}>
+                      <TableContainer component={Paper} sx={{ mt: 2 }}>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                              <TableCell><strong>Component</strong></TableCell>
+                              <TableCell align="right"><strong>Marks Obtained</strong></TableCell>
+                              <TableCell align="right"><strong>Max Marks</strong></TableCell>
+                              <TableCell align="right"><strong>Percentage</strong></TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell>CIE (Continuous Internal Evaluation)</TableCell>
+                              <TableCell align="right">{(finalGrade.cie_total || 0).toFixed(2)}</TableCell>
+                              <TableCell align="right">{(finalGrade.cie_max || 50).toFixed(2)}</TableCell>
+                              <TableCell align="right">
+                                {(((finalGrade.cie_total || 0) / (finalGrade.cie_max || 50)) * 100).toFixed(2)}%
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>SEE (Semester End Examination)</TableCell>
+                              <TableCell align="right">{(finalGrade.see_total || 0).toFixed(2)}</TableCell>
+                              <TableCell align="right">{(finalGrade.see_max || 50).toFixed(2)}</TableCell>
+                              <TableCell align="right">
+                                {(((finalGrade.see_total || 0) / (finalGrade.see_max || 50)) * 100).toFixed(2)}%
+                              </TableCell>
+                            </TableRow>
+                            <TableRow sx={{ backgroundColor: '#e3f2fd' }}>
+                              <TableCell><strong>Final Total</strong></TableCell>
+                              <TableCell align="right"><strong>{(finalGrade.final_total || 0).toFixed(2)}</strong></TableCell>
+                              <TableCell align="right"><strong>{(finalGrade.final_max || 100).toFixed(2)}</strong></TableCell>
+                              <TableCell align="right"><strong>{(finalGrade.final_percentage || 0).toFixed(2)}%</strong></TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                      <Box sx={{ mt: 2 }}>
+                        <Alert severity={finalGrade.is_passed ? 'success' : 'error'}>
+                          <AlertTitle>
+                            {finalGrade.is_passed ? 'Passed' : 'Failed'}
+                          </AlertTitle>
+                          Status: {finalGrade.is_passed ? 'Student has passed the course' : 'Student needs to retake the course'}
+                        </Alert>
+                      </Box>
+                    </Grid>
+                  )}
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+          )}
+
           {/* Performance Insights Card */}
           {studentData && studentData.coPerformance && studentData.coPerformance.length > 0 && (
-            <Card sx={{ mb: 3, borderLeft: '4px solid #4caf50' }}>
-              <CardContent>
-                <Box display="flex" alignItems="center" gap={1} mb={2}>
-                  <CheckCircle color="success" />
-                  <Typography variant="h6" fontWeight="bold">
+            <Accordion sx={{ mb: 2, boxShadow: 1 }}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                sx={{
+                  backgroundColor: '#f8f9fa',
+                  borderLeft: '4px solid #4caf50',
+                  '&:hover': { backgroundColor: '#f0f1f2' },
+                  '& .MuiAccordionSummary-content': { my: 1.5 }
+                }}
+              >
+                <Box display="flex" alignItems="center" gap={1.5}>
+                  <CheckCircle sx={{ color: '#4caf50', fontSize: 24 }} />
+                  <Typography variant="h6" fontWeight="600" color="text.primary">
                     Performance Insights
                   </Typography>
                 </Box>
+              </AccordionSummary>
+              <AccordionDetails>
                 <Grid container spacing={2}>
                   {studentData.overallStats.avg_performance >= 80 && (
                     <Grid item xs={12}>
@@ -489,25 +693,35 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                     </Grid>
                   )}
                 </Grid>
-              </CardContent>
-            </Card>
+              </AccordionDetails>
+            </Accordion>
           )}
 
           {/* Only show CO-dependent sections if COs are defined */}
           {studentData.coPerformance && studentData.coPerformance.length > 0 && (
             <>
               {/* CIE Performance Summary */}
-              <Card sx={{ mb: 3, borderLeft: '4px solid #ff9800' }}>
-            <CardContent>
-              <Box display="flex" alignItems="center" gap={1} mb={2}>
-                <AssessmentIcon sx={{ color: '#ff9800' }} />
-                <Typography variant="h6" fontWeight="bold">
-                  Assessment (CIE) Performance Summary
-                </Typography>
-              </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Overall performance in each Continuous Internal Evaluation (CIE) across all Course Outcomes
-              </Typography>
+              <Accordion sx={{ mb: 2, boxShadow: 1 }}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  sx={{
+                    backgroundColor: '#f8f9fa',
+                    borderLeft: '4px solid #ff9800',
+                    '&:hover': { backgroundColor: '#f0f1f2' },
+                    '& .MuiAccordionSummary-content': { my: 1.5 }
+                  }}
+                >
+                  <Box display="flex" alignItems="center" gap={1.5}>
+                    <AssessmentIcon sx={{ color: '#ff9800', fontSize: 24 }} />
+                    <Typography variant="h6" fontWeight="600" color="text.primary">
+                      Assessment (CIE) Performance Summary
+                    </Typography>
+                  </Box>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                    Overall performance in each Continuous Internal Evaluation (CIE) across all Course Outcomes
+                  </Typography>
 
               <Grid container spacing={2}>
                 {(() => {
@@ -663,12 +877,30 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                   </BarChart>
                 </ResponsiveContainer>
               </Box>
-            </CardContent>
-          </Card>
+                </AccordionDetails>
+              </Accordion>
 
           {/* Charts Section */}
-          <Grid container spacing={3} sx={{ mb: 3 }}>
-            {/* Radar Chart */}
+          <Accordion sx={{ mb: 2, boxShadow: 1 }}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              sx={{
+                backgroundColor: '#f8f9fa',
+                borderLeft: '4px solid #9c27b0',
+                '&:hover': { backgroundColor: '#f0f1f2' },
+                '& .MuiAccordionSummary-content': { my: 1.5 }
+              }}
+            >
+              <Box display="flex" alignItems="center" gap={1.5}>
+                <School sx={{ color: '#9c27b0', fontSize: 24 }} />
+                <Typography variant="h6" fontWeight="600" color="text.primary">
+                  CO Performance Charts
+                </Typography>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={3}>
+                {/* Radar Chart */}
             {hasRadarData && (
               <Grid item xs={12} md={6}>
                 <Card sx={{
@@ -806,14 +1038,29 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                 </Alert>
               </Grid>
             )}
-          </Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
 
           {/* CO Performance Details */}
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
-                Detailed CO Performance
-              </Typography>
+          <Accordion sx={{ mb: 2, boxShadow: 1 }}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              sx={{
+                backgroundColor: '#f8f9fa',
+                borderLeft: '4px solid #00bcd4',
+                '&:hover': { backgroundColor: '#f0f1f2' },
+                '& .MuiAccordionSummary-content': { my: 1.5 }
+              }}
+            >
+              <Box display="flex" alignItems="center" gap={1.5}>
+                <School sx={{ color: '#00bcd4', fontSize: 24 }} />
+                <Typography variant="h6" fontWeight="600" color="text.primary">
+                  Detailed CO Performance Table
+                </Typography>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails>
               <TableContainer component={Paper} elevation={0} sx={{ mt: 2 }}>
                 <Table>
                   <TableHead>
@@ -884,25 +1131,33 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                   </TableBody>
                 </Table>
               </TableContainer>
-            </CardContent>
-          </Card>
+            </AccordionDetails>
+          </Accordion>
 
           {/* Detailed Performance Analysis - IMPROVED UI */}
-          <Card sx={{ mb: 3, borderLeft: '4px solid #2196f3' }}>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-                <Box display="flex" alignItems="center" gap={1}>
-                  <AssessmentIcon color="primary" sx={{ fontSize: 32 }} />
-                  <Box>
-                    <Typography variant="h6" fontWeight="bold">
-                      Detailed Performance Analysis
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Click on each CO to expand question-wise breakdown
-                    </Typography>
-                  </Box>
+          <Accordion sx={{ mb: 2, boxShadow: 1 }}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              sx={{
+                backgroundColor: '#f8f9fa',
+                borderLeft: '4px solid #2196f3',
+                '&:hover': { backgroundColor: '#f0f1f2' },
+                '& .MuiAccordionSummary-content': { my: 1.5 }
+              }}
+            >
+              <Box display="flex" alignItems="center" gap={1.5}>
+                <AssessmentIcon sx={{ color: '#2196f3', fontSize: 24 }} />
+                <Box>
+                  <Typography variant="h6" fontWeight="600" color="text.primary">
+                    Question-wise Performance Breakdown
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Detailed analysis by assessment and question
+                  </Typography>
                 </Box>
               </Box>
+            </AccordionSummary>
+            <AccordionDetails>
 
               <Alert severity="info" icon={<InfoIcon />} sx={{ mb: 3 }}>
                 <AlertTitle sx={{ fontWeight: 'bold', mb: 0.5 }}>Understanding the Exam Structure</AlertTitle>
@@ -1256,18 +1511,31 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                   </AccordionDetails>
                 </Accordion>
               ))}
-            </CardContent>
-          </Card>
+            </AccordionDetails>
+          </Accordion>
             </>
           )}
 
           {/* Final CIE */}
           {studentData.finalCIE && (
-            <Card sx={{ mt: 3 }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  Final CIE Composition
-                </Typography>
+            <Accordion sx={{ mb: 2, boxShadow: 1 }}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                sx={{
+                  backgroundColor: '#f8f9fa',
+                  borderLeft: '4px solid #e91e63',
+                  '&:hover': { backgroundColor: '#f0f1f2' },
+                  '& .MuiAccordionSummary-content': { my: 1.5 }
+                }}
+              >
+                <Box display="flex" alignItems="center" gap={1.5}>
+                  <Calculate sx={{ color: '#e91e63', fontSize: 24 }} />
+                  <Typography variant="h6" fontWeight="600" color="text.primary">
+                    Final CIE Composition
+                  </Typography>
+                </Box>
+              </AccordionSummary>
+              <AccordionDetails>
                 <Grid container spacing={2} sx={{ mt: 1 }}>
                   <Grid item xs={6} md={2}>
                     <Typography variant="body2" color="text.secondary">
@@ -1318,8 +1586,8 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                     </Typography>
                   </Grid>
                 </Grid>
-              </CardContent>
-            </Card>
+              </AccordionDetails>
+            </Accordion>
           )}
         </>
       )}

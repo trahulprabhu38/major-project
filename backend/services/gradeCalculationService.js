@@ -27,11 +27,18 @@ class GradeCalculationService {
       );
 
       if (cieQuery.rows.length === 0) {
-        throw new Error('CIE marks not found. Please ensure CIE calculations are complete.');
+        const error = new Error('CIE marks not found for this student. Please ensure CIE calculations are complete before uploading SEE marks.');
+        error.code = 'CIE_NOT_FOUND';
+        throw error;
       }
 
-      const cieTotal = parseFloat(cieQuery.rows[0].final_cie_total) || 0;
-      const cieMax = parseFloat(cieQuery.rows[0].final_cie_max) || 50;
+      const cieTotal = parseFloat(cieQuery.rows[0].final_cie_total);
+      const cieMax = parseFloat(cieQuery.rows[0].final_cie_max);
+
+      // Validate CIE data
+      if (isNaN(cieTotal) || isNaN(cieMax)) {
+        throw new Error('Invalid CIE data found. Please recalculate CIE marks.');
+      }
 
       console.log(`CIE Total: ${cieTotal}/${cieMax}`);
 
@@ -51,25 +58,33 @@ class GradeCalculationService {
       console.log(`SEE Marks: ${seeMarksObtained}/${seeMaxMarks}`);
 
       // 3. Calculate final marks
-      // Formula: Final = (CIE Total / 2) + (SEE Marks / 2)
-      // CIE is already out of 50, so divide by 2 to get out of 25
-      // SEE is out of 100, so divide by 2 to get out of 50, then divide by 2 again to get out of 25
-      // Total = 25 + 25 = 50... wait, that's not right
+      // Formula: Final = CIE (out of 50) + SEE (scaled to 50) = 100
+      //
+      // Handle CIE scaling based on max marks:
+      // - If CIE is out of 100, divide by 2 to get out of 50
+      // - If CIE is out of 50, use as-is
+      // SEE is always out of 100, so scale to 50
 
-      // Actually, the formula should be:
-      // CIE max is 50, SEE max is 100
-      // Final should be out of 100
-      // So: Final = CIE (as is, out of 50) + (SEE / 2, to scale from 100 to 50) = 100
+      let cieTotalOutOf50;
+      if (cieMax === 100) {
+        // CIE is out of 100, so divide by 2 to get out of 50
+        cieTotalOutOf50 = cieTotal / 2;
+        console.log(`CIE scaling: ${cieTotal}/100 → ${cieTotalOutOf50}/50 (divided by 2)`);
+      } else {
+        // CIE is already out of 50
+        cieTotalOutOf50 = cieTotal;
+        console.log(`CIE: ${cieTotalOutOf50}/50 (no scaling needed)`);
+      }
 
-      const cieTotalOutOf50 = cieTotal; // Already out of 50
-      const seeTotalScaledTo50 = (seeMarksObtained / seeMaxMarks) * 50; // Scale SEE from 100 to 50
+      // Scale SEE from 100 to 50
+      const seeTotalScaledTo50 = (seeMarksObtained / seeMaxMarks) * 50;
+      console.log(`SEE scaling: ${seeMarksObtained}/100 → ${seeTotalScaledTo50.toFixed(2)}/50`);
 
-      const finalTotal = cieTotalOutOf50 + seeTotalScaledTo50; // Max 100
+      // Calculate final total (max 100)
+      const finalTotal = cieTotalOutOf50 + seeTotalScaledTo50;
       const finalMax = 100.00;
       const finalPercentage = (finalTotal / finalMax) * 100;
 
-      console.log(`CIE (out of 50): ${cieTotalOutOf50.toFixed(2)}`);
-      console.log(`SEE (scaled to 50): ${seeTotalScaledTo50.toFixed(2)}`);
       console.log(`Final Total: ${finalTotal.toFixed(2)}/${finalMax}`);
       console.log(`Final Percentage: ${finalPercentage.toFixed(2)}%`);
 
@@ -234,14 +249,31 @@ class GradeCalculationService {
           results.calculated++;
           console.log(`  ✓ Calculated grade for ${student.usn} (${student.name})`);
         } catch (err) {
-          console.error(`  ✗ Failed for ${student.usn}:`, err.message);
+          const errorCode = err.code || 'UNKNOWN_ERROR';
+          console.error(`  ✗ Failed for ${student.usn} [${errorCode}]:`, err.message);
           results.errors.push({
             studentId: student.student_id,
             usn: student.usn,
-            error: err.message
+            name: student.name,
+            error: err.message,
+            errorCode: errorCode
           });
           results.failed++;
         }
+      }
+
+      // If all students failed, throw an error with detailed information
+      if (results.calculated === 0 && results.failed > 0) {
+        const errorSummary = results.errors
+          .slice(0, 3)
+          .map(e => `${e.usn}: ${e.error}`)
+          .join('; ');
+
+        throw new Error(
+          `Failed to calculate grades for all ${results.failed} students. ` +
+          `Common errors: ${errorSummary}. ` +
+          `Please ensure CIE marks are calculated for all students before uploading SEE marks.`
+        );
       }
 
       console.log(`\n✅ GRADE CALCULATION COMPLETE`);

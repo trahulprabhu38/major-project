@@ -9,13 +9,17 @@ import {
   getStudentMarksFromMarksheets,
   getStudentCOAttainment,
   getRecommendations,
-  submitRecommendationFeedback
+  submitRecommendationFeedback,
+  getAllStudents
 } from '../controllers/studentController.js';
 import { authenticateToken, authorizeRoles } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// All routes require authentication and student role
+// Routes for teachers/admins (must be before the student-only middleware)
+router.get('/all', authenticateToken, authorizeRoles('teacher', 'admin'), getAllStudents);
+
+// All routes below require authentication and student role
 router.use(authenticateToken);
 router.use(authorizeRoles('student'));
 

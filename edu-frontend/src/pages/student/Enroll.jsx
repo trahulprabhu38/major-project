@@ -1,24 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Card,
-  CardContent,
-  TextField,
-  Button,
-  Typography,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Alert,
-  Grid,
-} from '@mui/material';
-import { PersonAdd, School } from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import { UserPlus, GraduationCap, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { studentAPI } from '../../services/api';
-import PageLayout from '../../components/shared/PageLayout';
+import { Card, CardContent } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Select } from '../../components/ui/select';
 
 const branches = ['CSE', 'ISE', 'AIML', 'ECE', 'ME', 'CIVIL'];
 const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -65,141 +54,151 @@ const Enroll = () => {
   };
 
   return (
-    <PageLayout
-      title="Enroll in Course"
-      subtitle="Register for a new course"
-      icon={PersonAdd}
-      breadcrumbs={[
-        { label: 'Dashboard', to: '/student/dashboard', icon: School },
-        { label: 'Enroll' },
-      ]}
-    >
-      <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+    <div className="p-4 md:p-6 space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-neutral-800 dark:text-dark-text-primary">
+          Enroll in Course
+        </h1>
+        <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mt-1">
+          Register for a new course
+        </p>
+      </div>
+
+      <div className="max-w-2xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Card sx={{ borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
-            <CardContent sx={{ p: 4 }}>
-              <Alert severity="info" sx={{ mb: 3 }}>
-                Please enter the course details provided by your instructor to enroll.
-              </Alert>
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              {/* Info Alert */}
+              <div className="flex gap-3 p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg">
+                <Info className="w-5 h-5 text-primary-600 dark:text-dark-green-500 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-primary-800 dark:text-primary-200">
+                  Please enter the course details provided by your instructor to enroll.
+                </p>
+              </div>
 
-              <form onSubmit={handleSubmit}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Course Code"
-                      name="course_code"
-                      value={formData.course_code}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Course Code */}
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-dark-text-primary mb-2">
+                    Course Code *
+                  </label>
+                  <Input
+                    name="course_code"
+                    value={formData.course_code}
+                    onChange={handleChange}
+                    required
+                    placeholder="e.g., 22AI071"
+                  />
+                  <p className="text-xs text-neutral-500 dark:text-dark-text-muted mt-1">
+                    Enter the course code (e.g., 22AI071)
+                  </p>
+                </div>
+
+                {/* Course Name */}
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-dark-text-primary mb-2">
+                    Course Name
+                  </label>
+                  <Input
+                    name="course_name"
+                    value={formData.course_name}
+                    onChange={handleChange}
+                    placeholder="e.g., Database Management Systems"
+                  />
+                  <p className="text-xs text-neutral-500 dark:text-dark-text-muted mt-1">
+                    Optional: Course name for reference
+                  </p>
+                </div>
+
+                {/* Teacher Name */}
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-dark-text-primary mb-2">
+                    Teacher Name *
+                  </label>
+                  <Input
+                    name="teacher_name"
+                    value={formData.teacher_name}
+                    onChange={handleChange}
+                    required
+                    placeholder="e.g., Rahul Prabhu"
+                  />
+                  <p className="text-xs text-neutral-500 dark:text-dark-text-muted mt-1">
+                    Enter the teacher's full name
+                  </p>
+                </div>
+
+                {/* Semester and Branch */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-dark-text-primary mb-2">
+                      Semester *
+                    </label>
+                    <Select
+                      name="semester"
+                      value={formData.semester}
                       onChange={handleChange}
                       required
-                      placeholder="e.g., 22AI071"
-                      helperText="Enter the course code (e.g., 22AI071)"
-                    />
-                  </Grid>
+                    >
+                      <option value="">Select Semester</option>
+                      {semesters.map((sem) => (
+                        <option key={sem} value={sem}>
+                          Semester {sem}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
 
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Course Name"
-                      name="course_name"
-                      value={formData.course_name}
-                      onChange={handleChange}
-                      placeholder="e.g., Database Management Systems"
-                      helperText="Optional: Course name for reference"
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Teacher Name"
-                      name="teacher_name"
-                      value={formData.teacher_name}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-dark-text-primary mb-2">
+                      Branch *
+                    </label>
+                    <Select
+                      name="branch"
+                      value={formData.branch}
                       onChange={handleChange}
                       required
-                      placeholder="e.g., Rahul Prabhu"
-                      helperText="Enter the teacher's full name"
-                    />
-                  </Grid>
+                    >
+                      <option value="">Select Branch</option>
+                      {branches.map((branch) => (
+                        <option key={branch} value={branch}>
+                          {branch}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                </div>
 
-                  <Grid item xs={12} sm={6}>
-                    <FormControl fullWidth required>
-                      <InputLabel>Semester</InputLabel>
-                      <Select
-                        name="semester"
-                        value={formData.semester}
-                        onChange={handleChange}
-                        label="Semester"
-                      >
-                        {semesters.map((sem) => (
-                          <MenuItem key={sem} value={sem}>
-                            Semester {sem}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <FormControl fullWidth required>
-                      <InputLabel>Branch</InputLabel>
-                      <Select
-                        name="branch"
-                        value={formData.branch}
-                        onChange={handleChange}
-                        label="Branch"
-                      >
-                        {branches.map((branch) => (
-                          <MenuItem key={branch} value={branch}>
-                            {branch}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
-                      <Button
-                        variant="outlined"
-                        onClick={() => navigate('/student/dashboard')}
-                        disabled={loading}
-                      >
-                        Cancel
-                      </Button>
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Button
-                          type="submit"
-                          variant="contained"
-                          disabled={loading}
-                          startIcon={<PersonAdd />}
-                          sx={{
-                            background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                            px: 4,
-                            '&:hover': {
-                              background: 'linear-gradient(135deg, #1e40af 0%, #6d28d9 100%)',
-                            },
-                          }}
-                        >
-                          {loading ? 'Enrolling...' : 'Enroll Now'}
-                        </Button>
-                      </motion.div>
-                    </Box>
-                  </Grid>
-                </Grid>
+                {/* Actions */}
+                <div className="flex gap-3 justify-end pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate('/student/dashboard')}
+                    disabled={loading}
+                  >
+                    Cancel
+                  </Button>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Button type="submit" disabled={loading} size="lg" className="px-6">
+                      <UserPlus className="w-5 h-5 mr-2" />
+                      {loading ? 'Enrolling...' : 'Enroll Now'}
+                    </Button>
+                  </motion.div>
+                </div>
               </form>
             </CardContent>
           </Card>
         </motion.div>
-      </Box>
-    </PageLayout>
+      </div>
+    </div>
   );
 };
 

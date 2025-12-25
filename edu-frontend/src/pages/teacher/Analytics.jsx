@@ -1,27 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  Alert,
-  CircularProgress,
-} from '@mui/material';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 import {
   BarChart,
   Bar,
@@ -34,22 +15,24 @@ import {
 } from 'recharts';
 import {
   TrendingUp,
-  School,
-  People,
-  Assessment,
+  GraduationCap,
+  Users,
+  FileText,
   Upload,
-  Visibility,
-} from '@mui/icons-material';
-import { motion } from 'framer-motion';
-import toast from 'react-hot-toast';
-import axios from 'axios';
+  Eye,
+  ChevronDown,
+} from 'lucide-react';
 import { courseAPI, marksheetAPI } from '../../services/api';
 import PageLayout from '../../components/shared/PageLayout';
 import { PageLoader } from '../../components/shared/Loading';
 import StatsCard from '../../components/shared/StatsCard';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
+import { Alert } from '../../components/ui/alert';
+import { CHART_COLORS } from '../../config/chartColors';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
-const COLORS = ['#2563eb', '#7c3aed', '#059669', '#ea580c', '#dc2626', '#ca8a04'];
 
 const Analytics = () => {
   const navigate = useNavigate();
@@ -97,7 +80,6 @@ const Analytics = () => {
     try {
       setLoadingData(true);
 
-      // Use the SAME endpoints as CourseDetail page
       const [courseRes, studentsRes, marksheetsRes] = await Promise.all([
         courseAPI.getById(courseId),
         courseAPI.getEnrolledStudents(courseId),
@@ -128,7 +110,6 @@ const Analytics = () => {
       setCOPOMapping(response.data.data);
     } catch (error) {
       console.error('Error loading CO-PO mapping:', error);
-      // Don't show error toast as mapping might not exist yet
     }
   };
 
@@ -159,271 +140,243 @@ const Analytics = () => {
         { label: 'Analytics' },
       ]}
       actions={
-        <FormControl size="small" sx={{ minWidth: 300 }}>
-          <InputLabel>Select Course</InputLabel>
-          <Select
-            value={selectedCourse}
-            onChange={(e) => setSelectedCourse(e.target.value)}
-            label="Select Course"
-          >
-            {courses.map((course) => (
-              <MenuItem key={course.id} value={course.id}>
-                {course.code} - {course.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <div className="relative">
+          <label htmlFor="course-select" className="block text-xs font-medium text-neutral-600 dark:text-dark-text-secondary mb-1">
+            Select Course
+          </label>
+          <div className="relative">
+            <select
+              id="course-select"
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+              className="appearance-none w-full min-w-[300px] px-4 py-2 pr-10 bg-white dark:bg-dark-bg-secondary border-2 border-neutral-300 dark:border-dark-border rounded-xl text-sm font-medium text-neutral-800 dark:text-dark-text-primary focus:outline-none focus:border-primary-500 dark:focus:border-dark-green-500"
+            >
+              {courses.map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.code} - {course.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500 pointer-events-none" />
+          </div>
+        </div>
       }
     >
       {courses.length === 0 ? (
-        <Alert severity="info" sx={{ borderRadius: 2 }}>
-          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-            No Courses Found
-          </Typography>
-          <Typography variant="body2">
-            You don't have any courses yet. Please create a course first to view analytics.
-          </Typography>
-          <Button
-            variant="contained"
-            sx={{ mt: 2 }}
-            onClick={() => navigate('/teacher/courses')}
-          >
-            Go to Courses
-          </Button>
+        <Alert className="border-2">
+          <div className="space-y-2">
+            <h4 className="text-lg font-bold text-neutral-800 dark:text-dark-text-primary">
+              No Courses Found
+            </h4>
+            <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+              You don't have any courses yet. Please create a course first to view analytics.
+            </p>
+            <Button
+              onClick={() => navigate('/teacher/courses')}
+              className="mt-4"
+            >
+              Go to Courses
+            </Button>
+          </div>
         </Alert>
       ) : !selectedCourse ? (
-        <Alert severity="info">Please select a course to view analytics</Alert>
+        <Alert>Please select a course to view analytics</Alert>
       ) : loadingData ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress size={60} />
-        </Box>
+        <div className="flex justify-center py-16">
+          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+        </div>
       ) : (
-        <Box>
+        <div className="space-y-6">
           {/* Course Info Banner */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <Card sx={{ mb: 3, borderRadius: 3, background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)', color: 'white' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item>
-                    <Box
-                      sx={{
-                        width: 64,
-                        height: 64,
-                        borderRadius: 2,
-                        bgcolor: 'rgba(255,255,255,0.2)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <School sx={{ fontSize: 36 }} />
-                    </Box>
-                  </Grid>
-                  <Grid item xs>
-                    <Typography variant="h4" fontWeight="bold">
+            <Card className="bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 text-white border-0">
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-[auto,1fr,auto] gap-4 items-center">
+                  <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center">
+                    <GraduationCap className="w-9 h-9" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold mb-2">
                       {selectedCourseInfo?.code}
-                    </Typography>
-                    <Typography variant="h6" sx={{ opacity: 0.9, mt: 0.5 }}>
+                    </h2>
+                    <p className="text-xl opacity-90 mb-3">
                       {selectedCourseInfo?.name}
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                      <Chip
-                        label={`Semester ${selectedCourseInfo?.semester}`}
-                        sx={{ bgcolor: 'rgba(255,255,255,0.9)', color: 'primary.main', fontWeight: 600 }}
-                      />
-                      <Chip
-                        label={`${selectedCourseInfo?.credits || 3} Credits`}
-                        sx={{ bgcolor: 'rgba(255,255,255,0.9)', color: 'primary.main', fontWeight: 600 }}
-                      />
-                      <Chip
-                        label={selectedCourseInfo?.year || 'N/A'}
-                        sx={{ bgcolor: 'rgba(255,255,255,0.9)', color: 'primary.main', fontWeight: 600 }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      size="large"
-                      startIcon={<Upload />}
-                      onClick={() => navigate('/teacher/upload')}
-                      sx={{
-                        bgcolor: 'white',
-                        color: 'primary.main',
-                        '&:hover': {
-                          bgcolor: 'rgba(255,255,255,0.9)',
-                        },
-                      }}
-                    >
-                      Upload Marks
-                    </Button>
-                  </Grid>
-                </Grid>
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
+                      <Badge className="bg-white/90 text-primary-700 dark:text-dark-green-700 hover:bg-white">
+                        Semester {selectedCourseInfo?.semester}
+                      </Badge>
+                      <Badge className="bg-white/90 text-primary-700 dark:text-dark-green-700 hover:bg-white">
+                        {selectedCourseInfo?.credits || 3} Credits
+                      </Badge>
+                      <Badge className="bg-white/90 text-primary-700 dark:text-dark-green-700 hover:bg-white">
+                        {selectedCourseInfo?.year || 'N/A'}
+                      </Badge>
+                    </div>
+                  </div>
+                  <Button
+                    size="lg"
+                    onClick={() => navigate('/teacher/upload')}
+                    className="bg-white text-primary-600 hover:bg-white/90 dark:text-dark-green-600"
+                  >
+                    <Upload className="w-5 h-5 mr-2" />
+                    Upload Marks
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
 
           {/* Stats Overview */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatsCard
-                title="Course Outcomes"
-                value={totalCOs}
-                icon={Assessment}
-                color="primary.main"
-                bgColor="primary.light"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatsCard
-                title="Enrolled Students"
-                value={totalStudents}
-                icon={People}
-                color="success.main"
-                bgColor="success.light"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatsCard
-                title="Assessments Uploaded"
-                value={totalAssessments}
-                icon={Upload}
-                color="warning.main"
-                bgColor="warning.light"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatsCard
-                title="Academic Year"
-                value={selectedCourseInfo?.year || '--'}
-                icon={School}
-                color="secondary.main"
-                bgColor="secondary.light"
-              />
-            </Grid>
-          </Grid>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <StatsCard
+              title="Course Outcomes"
+              value={totalCOs}
+              icon={FileText}
+              color="primary"
+            />
+            <StatsCard
+              title="Enrolled Students"
+              value={totalStudents}
+              icon={Users}
+              color="success"
+            />
+            <StatsCard
+              title="Assessments Uploaded"
+              value={totalAssessments}
+              icon={Upload}
+              color="warning"
+            />
+            <StatsCard
+              title="Academic Year"
+              value={selectedCourseInfo?.year || '--'}
+              icon={GraduationCap}
+              color="secondary"
+            />
+          </div>
 
           {marksheets.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <Card sx={{ borderRadius: 3, p: 6, textAlign: 'center', bgcolor: 'grey.50' }}>
-                <Upload sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
+              <Card className="p-12 text-center bg-neutral-50 dark:bg-dark-bg-secondary">
+                <Upload className="w-20 h-20 text-neutral-400 dark:text-dark-text-muted mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary mb-3">
                   No Assessment Data Available
-                </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}>
+                </h3>
+                <p className="text-neutral-600 dark:text-dark-text-secondary mb-6 max-w-2xl mx-auto">
                   Upload CIE (Continuous Internal Evaluation) marksheets to view comprehensive analytics,
                   attainment calculations, and performance insights for this course.
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                </p>
+                <div className="flex gap-4 justify-center">
                   <Button
-                    variant="contained"
-                    size="large"
-                    startIcon={<Upload />}
+                    size="lg"
                     onClick={() => navigate('/teacher/upload')}
-                    sx={{
-                      background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                      px: 4,
-                      py: 1.5,
-                    }}
+                    className="bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 px-8 py-3"
                   >
+                    <Upload className="w-5 h-5 mr-2" />
                     Upload Marks
                   </Button>
                   <Button
-                    variant="outlined"
-                    size="large"
+                    variant="outline"
+                    size="lg"
                     onClick={() => navigate(`/teacher/courses/${selectedCourse}`)}
                   >
                     View Course Details
                   </Button>
-                </Box>
+                </div>
               </Card>
             </motion.div>
           ) : (
             <>
               {/* Assessment Overview Chart */}
-              <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} lg={8}>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <Card sx={{ borderRadius: 3, p: 3, height: '100%' }}>
-                      <Typography variant="h6" fontWeight="bold" gutterBottom>
-                        Assessment Overview
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                        Students and columns per assessment
-                      </Typography>
-                      <ResponsiveContainer width="100%" height={320}>
-                        <BarChart data={assessmentData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" />
-                          <YAxis />
-                          <Tooltip />
-                          <Legend />
-                          <Bar dataKey="students" fill="#2563eb" name="Students" />
-                          <Bar dataKey="columns" fill="#7c3aed" name="Columns" />
-                        </BarChart>
-                      </ResponsiveContainer>
+                    <Card className="h-full">
+                      <CardContent className="p-6">
+                        <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
+                          Assessment Overview
+                        </h3>
+                        <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-6">
+                          Students and columns per assessment
+                        </p>
+                        <ResponsiveContainer width="100%" height={320}>
+                          <BarChart data={assessmentData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#D8CBC0" />
+                            <XAxis dataKey="name" stroke="#666" />
+                            <YAxis stroke="#666" />
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: '#fff',
+                                border: '1px solid #E9762B',
+                                borderRadius: '8px',
+                              }}
+                            />
+                            <Legend />
+                            <Bar dataKey="students" fill={CHART_COLORS.primary} name="Students" radius={[8, 8, 0, 0]} />
+                            <Bar dataKey="columns" fill={CHART_COLORS.accent} name="Columns" radius={[8, 8, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
                     </Card>
                   </motion.div>
-                </Grid>
+                </div>
 
-                <Grid item xs={12} lg={4}>
+                <div>
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <Card sx={{ borderRadius: 3, p: 3, height: '100%' }}>
-                      <Typography variant="h6" fontWeight="bold" gutterBottom>
-                        Quick Actions
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                        Manage your course data
-                      </Typography>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <Button
-                          variant="outlined"
-                          fullWidth
-                          startIcon={<Upload />}
-                          onClick={() => navigate('/teacher/upload')}
-                          sx={{ py: 1.5 }}
-                        >
-                          Upload New Assessment
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          fullWidth
-                          startIcon={<Visibility />}
-                          onClick={() => navigate(`/teacher/courses/${selectedCourse}`)}
-                          sx={{ py: 1.5 }}
-                        >
-                          View Course Details
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          fullWidth
-                          startIcon={<School />}
-                          onClick={() => navigate('/teacher/courses')}
-                          sx={{ py: 1.5 }}
-                        >
-                          All Courses
-                        </Button>
-                      </Box>
+                    <Card className="h-full">
+                      <CardContent className="p-6">
+                        <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
+                          Quick Actions
+                        </h3>
+                        <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-6">
+                          Manage your course data
+                        </p>
+                        <div className="flex flex-col gap-3">
+                          <Button
+                            variant="outline"
+                            onClick={() => navigate('/teacher/upload')}
+                            className="justify-start py-3 h-auto"
+                          >
+                            <Upload className="w-5 h-5 mr-3" />
+                            Upload New Assessment
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => navigate(`/teacher/courses/${selectedCourse}`)}
+                            className="justify-start py-3 h-auto"
+                          >
+                            <Eye className="w-5 h-5 mr-3" />
+                            View Course Details
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => navigate('/teacher/courses')}
+                            className="justify-start py-3 h-auto"
+                          >
+                            <GraduationCap className="w-5 h-5 mr-3" />
+                            All Courses
+                          </Button>
+                        </div>
+                      </CardContent>
                     </Card>
                   </motion.div>
-                </Grid>
-              </Grid>
-
+                </div>
+              </div>
 
               {/* Uploaded Marksheets Table */}
               <motion.div
@@ -431,93 +384,86 @@ const Analytics = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.2 }}
               >
-                <Card sx={{ borderRadius: 3, p: 3 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                    <Box>
-                      <Typography variant="h6" fontWeight="bold">
-                        Uploaded Assessments ({marksheets.length})
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        CIE and assessment marksheets
-                      </Typography>
-                    </Box>
-                    <Button
-                      variant="contained"
-                      startIcon={<Upload />}
-                      onClick={() => navigate('/teacher/upload')}
-                      sx={{
-                        background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                      }}
-                    >
-                      Upload More
-                    </Button>
-                  </Box>
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-center mb-6">
+                      <div>
+                        <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary">
+                          Uploaded Assessments ({marksheets.length})
+                        </h3>
+                        <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+                          CIE and assessment marksheets
+                        </p>
+                      </div>
+                      <Button
+                        onClick={() => navigate('/teacher/upload')}
+                        className="bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600"
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload More
+                      </Button>
+                    </div>
 
-                  <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
-                    <Table>
-                      <TableHead>
-                        <TableRow sx={{ bgcolor: 'grey.50' }}>
-                          <TableCell><strong>Assessment Name</strong></TableCell>
-                          <TableCell><strong>File Name</strong></TableCell>
-                          <TableCell align="center"><strong>Students</strong></TableCell>
-                          <TableCell align="center"><strong>Columns</strong></TableCell>
-                          <TableCell><strong>Uploaded On</strong></TableCell>
-                          <TableCell align="center"><strong>Actions</strong></TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {marksheets.map((marksheet) => (
-                          <TableRow key={marksheet.id} hover>
-                            <TableCell>
-                              <Typography variant="body2" fontWeight={600}>
-                                {marksheet.assessment_name || 'N/A'}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
-                                {marksheet.file_name}
-                              </Typography>
-                            </TableCell>
-                            <TableCell align="center">
-                              <Chip
-                                label={(marksheet.row_count || 1) - 1}
-                                size="small"
-                                color="primary"
-                                variant="outlined"
-                              />
-                            </TableCell>
-                            <TableCell align="center">
-                              <Chip
-                                label={marksheet.columns?.length || 0}
-                                size="small"
-                                color="secondary"
-                                variant="outlined"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="body2">
-                                {new Date(marksheet.created_at || marksheet.uploadDate).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric',
-                                })}
-                              </Typography>
-                            </TableCell>
-                            <TableCell align="center">
-                              <Button
-                                size="small"
-                                variant="outlined"
-                                startIcon={<Visibility />}
-                                onClick={() => navigate(`/teacher/courses/${selectedCourse}`)}
-                              >
-                                View
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
+                    <div className="border border-neutral-200 dark:border-dark-border rounded-2xl overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="bg-neutral-50 dark:bg-dark-bg-secondary">
+                              <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Assessment Name</th>
+                              <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">File Name</th>
+                              <th className="px-4 py-3 text-center text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Students</th>
+                              <th className="px-4 py-3 text-center text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Columns</th>
+                              <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Uploaded On</th>
+                              <th className="px-4 py-3 text-center text-sm font-semibold text-neutral-700 dark:text-dark-text-primary">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {marksheets.map((marksheet) => (
+                              <tr key={marksheet.id} className="border-t border-neutral-200 dark:border-dark-border hover:bg-neutral-50 dark:hover:bg-dark-bg-secondary">
+                                <td className="px-4 py-3">
+                                  <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
+                                    {marksheet.assessment_name || 'N/A'}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <span className="text-xs font-mono text-neutral-600 dark:text-dark-text-secondary">
+                                    {marksheet.file_name}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  <Badge variant="outline">
+                                    {(marksheet.row_count || 1) - 1}
+                                  </Badge>
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  <Badge variant="outline" className="border-secondary-500 text-secondary-600 dark:border-secondary-400 dark:text-secondary-400">
+                                    {marksheet.columns?.length || 0}
+                                  </Badge>
+                                </td>
+                                <td className="px-4 py-3 text-sm text-neutral-700 dark:text-dark-text-secondary">
+                                  {new Date(marksheet.created_at || marksheet.uploadDate).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                  })}
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => navigate(`/teacher/courses/${selectedCourse}`)}
+                                  >
+                                    <Eye className="w-4 h-4 mr-1" />
+                                    View
+                                  </Button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </CardContent>
                 </Card>
               </motion.div>
 
@@ -527,152 +473,110 @@ const Analytics = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.3 }}
-                  style={{ marginTop: '24px' }}
                 >
-                  <Card sx={{ borderRadius: 3, p: 3 }}>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom>
-                      CO-PO Mapping Heatmap
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                      Correlation levels: <strong style={{color: '#10b981'}}>High (3)</strong>, <strong style={{color: '#f59e0b'}}>Medium (2)</strong>, <strong style={{color: '#3b82f6'}}>Low (1)</strong>, <strong style={{color: '#e5e7eb'}}>None (0)</strong>
-                    </Typography>
+                  <Card>
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
+                        CO-PO Mapping Heatmap
+                      </h3>
+                      <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-6">
+                        Correlation levels: <strong className="text-success-600">High (3)</strong>, <strong className="text-warning-600">Medium (2)</strong>, <strong className="text-blue-600">Low (1)</strong>, <strong className="text-neutral-400">None (0)</strong>
+                      </p>
 
-                    <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, maxHeight: 600, overflow: 'auto' }}>
-                      <Table stickyHeader size="small">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell sx={{ fontWeight: 'bold', bgcolor: 'grey.100', minWidth: 100, position: 'sticky', left: 0, zIndex: 3 }}>
-                              CO / PO
-                            </TableCell>
-                            {coPoMapping.pos.map(po => (
-                              <TableCell
-                                key={po.po_number}
-                                align="center"
-                                sx={{
-                                  fontWeight: 'bold',
-                                  bgcolor: 'grey.100',
-                                  minWidth: 60,
-                                  whiteSpace: 'nowrap'
-                                }}
-                              >
-                                PO{po.po_number}
-                              </TableCell>
+                      <div className="border border-neutral-200 dark:border-dark-border rounded-2xl overflow-hidden max-h-[600px] overflow-y-auto">
+                        <table className="w-full">
+                          <thead className="sticky top-0 z-10">
+                            <tr>
+                              <th className="px-4 py-3 text-left text-sm font-bold bg-neutral-100 dark:bg-dark-bg-tertiary text-neutral-700 dark:text-dark-text-primary min-w-[100px] sticky left-0 z-20">
+                                CO / PO
+                              </th>
+                              {coPoMapping.pos.map(po => (
+                                <th
+                                  key={po.po_number}
+                                  className="px-4 py-3 text-center text-sm font-bold bg-neutral-100 dark:bg-dark-bg-tertiary text-neutral-700 dark:text-dark-text-primary min-w-[60px] whitespace-nowrap"
+                                >
+                                  PO{po.po_number}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {coPoMapping.cos.map(co => (
+                              <tr key={co.co_number} className="hover:bg-neutral-50 dark:hover:bg-dark-bg-secondary">
+                                <td className="px-4 py-3 font-bold text-neutral-800 dark:text-dark-text-primary bg-white dark:bg-dark-bg-primary sticky left-0 border-r border-neutral-200 dark:border-dark-border">
+                                  CO{co.co_number}
+                                </td>
+                                {coPoMapping.pos.map(po => {
+                                  const level = coPoMapping.mappingMatrix[co.co_number]?.[po.po_number] || 0;
+                                  const getColor = (level) => {
+                                    if (level === 3) return 'bg-success-500 hover:bg-success-600';
+                                    if (level === 2) return 'bg-warning-500 hover:bg-warning-600';
+                                    if (level === 1) return 'bg-blue-500 hover:bg-blue-600';
+                                    return 'bg-neutral-200 dark:bg-dark-bg-tertiary';
+                                  };
+                                  const getLabel = (level) => {
+                                    if (level === 3) return 'H';
+                                    if (level === 2) return 'M';
+                                    if (level === 1) return 'L';
+                                    return '-';
+                                  };
+                                  return (
+                                    <td
+                                      key={po.po_number}
+                                      className="px-4 py-3 text-center border-r border-neutral-200 dark:border-dark-border transition-all"
+                                    >
+                                      <span className={`inline-flex items-center justify-center min-w-[36px] h-7 rounded-lg px-2 font-bold text-sm ${getColor(level)} ${level > 0 ? 'text-white' : 'text-neutral-500'}`}>
+                                        {getLabel(level)}
+                                      </span>
+                                    </td>
+                                  );
+                                })}
+                              </tr>
                             ))}
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* CO Descriptions */}
+                      <div className="mt-6 p-4 rounded-2xl bg-neutral-50 dark:bg-dark-bg-secondary">
+                        <h4 className="text-sm font-bold text-neutral-700 dark:text-dark-text-primary mb-4">
+                          Course Outcomes
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {coPoMapping.cos.map(co => (
-                            <TableRow key={co.co_number} hover>
-                              <TableCell
-                                sx={{
-                                  fontWeight: 'bold',
-                                  bgcolor: 'background.paper',
-                                  position: 'sticky',
-                                  left: 0,
-                                  zIndex: 1,
-                                  borderRight: '1px solid',
-                                  borderColor: 'divider'
-                                }}
-                              >
-                                CO{co.co_number}
-                              </TableCell>
-                              {coPoMapping.pos.map(po => {
-
-                                console.log(coPoMapping)
-                                console.log(coPoMapping.mappingMatrix[co.co_number]?.[po.po_number])
-
-                                const level = coPoMapping.mappingMatrix[co.co_number]?.[po.po_number] || 0;
-                                const getColor = (level) => {
-                                  if (level === 3) return '#10b981';
-                                  if (level === 2) return '#f59e0b';
-                                  if (level === 1) return '#3b82f6';
-                                  return '#e5e7eb';
-                                };
-                                const getLabel = (level) => {
-                                  if (level === 3) return 'H';
-                                  if (level === 2) return 'M';
-                                  if (level === 1) return 'L';
-                                  return '-';
-                                };
-                                return (
-                                  <TableCell
-                                    key={po.po_number}
-                                    align="center"
-                                    sx={{
-                                      bgcolor: level > 0 ? `${getColor(level)}15` : 'transparent',
-                                      borderRight: '1px solid',
-                                      borderColor: 'divider',
-                                      transition: 'all 0.2s',
-                                      '&:hover': {
-                                        bgcolor: level > 0 ? `${getColor(level)}30` : 'grey.100',
-                                        transform: 'scale(1.1)',
-                                      }
-                                    }}
-                                  >
-                                    <Chip
-                                      label={getLabel(level)}
-                                      size="small"
-                                      sx={{
-                                        bgcolor: getColor(level),
-                                        color: level > 0 ? 'white' : 'text.secondary',
-                                        fontWeight: 'bold',
-                                        minWidth: 36,
-                                        height: 28,
-                                        fontSize: '0.85rem',
-                                      }}
-                                    />
-                                  </TableCell>
-                                );
-                              })}
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-
-                    {/* CO Descriptions */}
-                    <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-                      <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                        Course Outcomes
-                      </Typography>
-                      <Grid container spacing={2} sx={{ mt: 1 }}>
-                        {coPoMapping.cos.map(co => (
-                          <Grid item xs={12} md={6} key={co.co_number}>
-                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'start' }}>
-                              <Chip label={`CO${co.co_number}`} size="small" color="primary" sx={{ mt: 0.5 }} />
-                              <Typography variant="body2" color="text.secondary">
+                            <div key={co.co_number} className="flex gap-3">
+                              <Badge className="mt-1 flex-shrink-0">CO{co.co_number}</Badge>
+                              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
                                 {co.description}
-                              </Typography>
-                            </Box>
-                          </Grid>
-                        ))}
-                      </Grid>
-                    </Box>
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
 
-                    {/* PO Descriptions */}
-                    <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-                      <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                        Program Outcomes
-                      </Typography>
-                      <Grid container spacing={2} sx={{ mt: 1 }}>
-                        {coPoMapping.pos.map(po => (
-                          <Grid item xs={12} md={6} key={po.po_number}>
-                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'start' }}>
-                              <Chip label={`PO${po.po_number}`} size="small" color="secondary" sx={{ mt: 0.5 }} />
-                              <Typography variant="body2" color="text.secondary">
+                      {/* PO Descriptions */}
+                      <div className="mt-4 p-4 rounded-2xl bg-neutral-50 dark:bg-dark-bg-secondary">
+                        <h4 className="text-sm font-bold text-neutral-700 dark:text-dark-text-primary mb-4">
+                          Program Outcomes
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {coPoMapping.pos.map(po => (
+                            <div key={po.po_number} className="flex gap-3">
+                              <Badge variant="outline" className="mt-1 flex-shrink-0 border-secondary-500 text-secondary-600 dark:border-secondary-400 dark:text-secondary-400">PO{po.po_number}</Badge>
+                              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
                                 {po.description}
-                              </Typography>
-                            </Box>
-                          </Grid>
-                        ))}
-                      </Grid>
-                    </Box>
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
                   </Card>
                 </motion.div>
               )}
             </>
           )}
-        </Box>
+        </div>
       )}
     </PageLayout>
   );

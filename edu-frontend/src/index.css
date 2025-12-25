@@ -4,36 +4,107 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-neutral-100 text-neutral-800 dark:bg-dark-bg-primary dark:text-dark-text-primary;
   }
 
   :root {
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-neutral-100 dark:bg-dark-bg-secondary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-400 hover:bg-neutral-500 dark:bg-neutral-600 dark:hover:bg-neutral-500 rounded-full;
+  }
 }
 
 @layer components {
+  /* Primary button - Dark green */
   .btn-primary {
-    @apply px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors font-medium;
+    @apply px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600
+           focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2
+           transition-all duration-200 font-medium shadow-sm hover:shadow-md
+           dark:bg-dark-green-500 dark:hover:bg-dark-green-600;
   }
 
+  /* Accent button - Orange */
+  .btn-accent {
+    @apply px-4 py-2 bg-accent-500 text-white rounded-lg hover:bg-accent-600
+           focus:outline-none focus:ring-2 focus:ring-accent-400 focus:ring-offset-2
+           transition-all duration-200 font-medium shadow-sm hover:shadow-md
+           dark:bg-dark-accent-500 dark:hover:bg-accent-600;
+  }
+
+  /* Secondary button - Neutral */
   .btn-secondary {
-    @apply px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors font-medium;
+    @apply px-4 py-2 bg-neutral-200 text-neutral-800 rounded-lg hover:bg-neutral-300
+           focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-offset-2
+           transition-all duration-200 font-medium
+           dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:hover:bg-neutral-700;
   }
 
+  /* Ghost button */
   .btn-ghost {
-    @apply px-4 py-2 bg-transparent border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors;
+    @apply px-4 py-2 bg-transparent border border-neutral-300 text-neutral-700
+           rounded-lg hover:bg-neutral-100 focus:outline-none focus:ring-2
+           focus:ring-primary-400 focus:ring-offset-2 transition-all duration-200
+           dark:border-dark-border dark:text-dark-text-primary dark:hover:bg-dark-bg-tertiary;
   }
 
+  /* Input field */
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors;
+    @apply w-full px-3 py-2 border border-neutral-300 rounded-lg bg-white
+           focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent
+           transition-all duration-200 text-neutral-800
+           dark:bg-dark-bg-secondary dark:border-dark-border dark:text-dark-text-primary
+           dark:focus:ring-dark-green-500;
   }
 
+  /* Card */
   .card {
-    @apply bg-white rounded-lg shadow-md p-6 border border-gray-200;
+    @apply bg-white rounded-lg shadow-md p-6 border border-neutral-200
+           dark:bg-dark-card dark:border-dark-border;
   }
 
+  /* Container */
   .container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Gradient backgrounds */
+  .gradient-primary {
+    @apply bg-gradient-to-br from-primary-500 to-secondary-500;
+  }
+
+  .gradient-accent {
+    @apply bg-gradient-to-br from-accent-500 to-accent-400;
+  }
+
+  /* Badge variants */
+  .badge-success {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+           bg-success-100 text-success-700 dark:bg-success-700 dark:text-success-100;
+  }
+
+  .badge-warning {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+           bg-warning-100 text-warning-700 dark:bg-warning-700 dark:text-warning-100;
+  }
+
+  .badge-error {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+           bg-error-100 text-error-700 dark:bg-error-700 dark:text-error-100;
+  }
+
+  .badge-info {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+           bg-info-100 text-info-700 dark:bg-info-700 dark:text-info-100;
   }
 }

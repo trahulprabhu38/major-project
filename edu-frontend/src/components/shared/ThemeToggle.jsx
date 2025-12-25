@@ -15,8 +15,8 @@ const ThemeToggle = ({ className = "" }) => {
       aria-label="Toggle dark mode"
       className={`relative flex items-center justify-center p-2 rounded-xl transition-all duration-300 ${
         isDark
-          ? 'bg-gradient-to-r from-blue-500 to-violet-600 text-white shadow-glow-blue'
-          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white shadow-glow-green'
+          : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
       } ${className}`}
     >
       <motion.div

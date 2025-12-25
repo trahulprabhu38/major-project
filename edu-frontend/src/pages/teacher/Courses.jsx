@@ -1,41 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Chip,
-  IconButton,
-  Menu,
-  MenuItem,
-  Alert,
-} from '@mui/material';
-import {
-  Add,
-  School,
-  MoreVert,
-  Edit,
-  Delete,
-  BarChart,
-  People,
-  Dashboard,
-} from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import {
+  Plus,
+  GraduationCap,
+  MoreVertical,
+  Edit,
+  Trash2,
+  BarChart3,
+  Users,
+  LayoutDashboard,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import { courseAPI } from '../../services/api';
-import PageLayout from '../../components/shared/PageLayout';
-import { PageLoader } from '../../components/shared/Loading';
-import { ErrorState, EmptyState } from '../../components/shared/ErrorState';
-
-const MotionCard = motion(Card);
+import { Spinner } from '../../components/ui/progress';
+import { Card, CardContent } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
 
 const Courses = () => {
   const navigate = useNavigate();
@@ -148,293 +130,303 @@ const Courses = () => {
     setSelectedCourse(null);
   };
 
-  if (loading) return <PageLoader message="Loading courses..." />;
-  if (error) return <ErrorState onRetry={loadCourses} />;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <Spinner size="lg" />
+          <p className="mt-4 text-neutral-600 dark:text-dark-text-secondary">Loading courses...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <p className="text-error-600 mb-4">Error loading courses</p>
+          <button onClick={loadCourses} className="btn-primary">
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <PageLayout
-      title="My Courses"
-      subtitle="Manage your courses and view analytics"
-      icon={School}
-      breadcrumbs={[
-        { label: 'Dashboard', to: '/teacher/dashboard', icon: Dashboard },
-        { label: 'Courses' },
-      ]}
-      actions={
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => handleDialogOpen()}
-          sx={{
-            borderRadius: 2,
-            px: 3,
-            py: 1.5,
-            background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
-            '&:hover': {
-              background: 'linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%)',
-              boxShadow: '0 6px 16px rgba(37, 99, 235, 0.4)',
-            },
-          }}
-        >
+    <div className="p-4 md:p-6 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-neutral-800 dark:text-dark-text-primary">
+            My Courses
+          </h1>
+          <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mt-1">
+            Manage your courses and view analytics
+          </p>
+        </div>
+        <Button onClick={() => handleDialogOpen()} size="lg">
+          <Plus className="w-5 h-5 mr-2" />
           Create Course
         </Button>
-      }
-    >
+      </div>
       {courses.length === 0 ? (
-        <EmptyState
-          title="No Courses Created"
-          message="Get started by creating your first course"
-          action={() => handleDialogOpen()}
-          actionLabel="Create Course"
-        />
+        <Card className="text-center py-12 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-dark-bg-secondary dark:to-dark-bg-tertiary">
+          <CardContent className="space-y-4">
+            <div className="flex justify-center">
+              <GraduationCap className="w-20 h-20 text-primary-600 dark:text-dark-green-500 opacity-80" />
+            </div>
+            <h2 className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary">
+              No Courses Created
+            </h2>
+            <p className="text-neutral-600 dark:text-dark-text-secondary max-w-md mx-auto">
+              Get started by creating your first course
+            </p>
+            <div className="pt-2">
+              <Button onClick={() => handleDialogOpen()} size="lg">
+                <Plus className="w-5 h-5 mr-2" />
+                Create Course
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       ) : (
-        <Grid container spacing={3}>
-          {courses.map((course, index) => (
-            <Grid item xs={12} md={6} lg={4} key={course.id}>
-              <MotionCard
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {courses.map((course, index) => {
+            const gradientColors = [
+              'from-primary-500 to-primary-600 dark:from-dark-green-500 dark:to-dark-green-600',
+              'from-secondary-500 to-secondary-600 dark:from-secondary-600 dark:to-secondary-700',
+              'from-success-500 to-success-600 dark:from-success-600 dark:to-success-700',
+              'from-accent-500 to-accent-600 dark:from-accent-600 dark:to-accent-700',
+            ];
+
+            return (
+              <motion.div
+                key={course.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.4 }}
                 whileHover={{ scale: 1.02, y: -4 }}
-                onClick={() => navigate(`/teacher/courses/${course.id}`)}
-                sx={{
-                  cursor: 'pointer',
-                  borderRadius: 3,
-                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-                  overflow: 'hidden',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-                  },
-                }}
               >
-                {/* Header with Gradient */}
-                <Box
-                  sx={{
-                    background: `linear-gradient(135deg, ${
-                      index % 4 === 0
-                        ? '#2563eb'
-                        : index % 4 === 1
-                        ? '#7c3aed'
-                        : index % 4 === 2
-                        ? '#059669'
-                        : '#ea580c'
-                    } 0%, ${
-                      index % 4 === 0
-                        ? '#1e40af'
-                        : index % 4 === 1
-                        ? '#6d28d9'
-                        : index % 4 === 2
-                        ? '#047857'
-                        : '#c2410c'
-                    } 100%)`,
-                    p: 3,
-                    color: 'white',
-                    position: 'relative',
-                  }}
+                <Card
+                  onClick={() => navigate(`/teacher/courses/${course.id}`)}
+                  className="cursor-pointer hover:shadow-xl transition-all duration-300 overflow-hidden"
                 >
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 1 }}>
-                    <Typography variant="h6" fontWeight="bold">
-                      {course.code}
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                      <Chip
-                        label={`Sem ${course.semester}`}
-                        size="small"
-                        sx={{
-                          bgcolor: 'rgba(255,255,255,0.25)',
-                          color: 'white',
-                          fontWeight: 600,
-                        }}
-                      />
-                      <IconButton
-                        size="small"
-                        onClick={(e) => handleMenuOpen(e, course)}
-                        sx={{ color: 'white', ml: 1 }}
-                      >
-                        <MoreVert />
-                      </IconButton>
-                    </Box>
-                  </Box>
-                  <Typography variant="body2" sx={{ opacity: 0.95 }}>
-                    {course.name}
-                  </Typography>
-                </Box>
+                  {/* Header with Gradient */}
+                  <div className={`bg-gradient-to-br ${gradientColors[index % 4]} p-6 text-white relative`}>
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-lg font-bold">{course.code}</h3>
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-white/25 text-white border-white/30 hover:bg-white/35">
+                          Sem {course.semester}
+                        </Badge>
+                        <button
+                          onClick={(e) => handleMenuOpen(e, course)}
+                          className="text-white hover:bg-white/20 p-1 rounded transition-colors"
+                        >
+                          <MoreVertical className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-sm text-white/95">{course.name}</p>
+                  </div>
 
-                <CardContent>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="body2" color="text.secondary">
+                  <CardContent className="p-6 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">
                         Credits
-                      </Typography>
-                      <Chip label={course.credits || 3} size="small" variant="outlined" />
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="body2" color="text.secondary">
+                      </span>
+                      <Badge variant="outline">{course.credits || 3}</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">
                         Academic Year
-                      </Typography>
-                      <Typography variant="body2" fontWeight={600}>
+                      </span>
+                      <span className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
                         {course.year}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="body2" color="text.secondary">
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">
                         Students Enrolled
-                      </Typography>
-                      <Chip
-                        icon={<People fontSize="small" />}
-                        label={course.enrolled_students || 0}
-                        size="small"
-                        color="primary"
-                      />
-                    </Box>
-                  </Box>
+                      </span>
+                      <Badge>
+                        <Users className="w-3 h-3 mr-1" />
+                        {course.enrolled_students || 0}
+                      </Badge>
+                    </div>
 
-                  {course.description && (
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{
-                        mt: 2,
-                        display: 'block',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {course.description}
-                    </Typography>
-                  )}
+                    {course.description && (
+                      <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mt-2 truncate">
+                        {course.description}
+                      </p>
+                    )}
 
-                  <Box
-                    sx={{
-                      mt: 2,
-                      pt: 2,
-                      borderTop: '1px solid',
-                      borderColor: 'divider',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 1,
-                      color: 'primary.main',
-                    }}
-                  >
-                    <BarChart fontSize="small" />
-                    <Typography variant="body2" fontWeight={600}>
-                      View Analytics
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </MotionCard>
-            </Grid>
-          ))}
-        </Grid>
+                    <div className="pt-3 mt-3 border-t border-neutral-200 dark:border-dark-border flex items-center justify-center gap-2 text-primary-600 dark:text-dark-green-500">
+                      <BarChart3 className="w-4 h-4" />
+                      <span className="text-sm font-semibold">View Analytics</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
       )}
 
       {/* Course Menu */}
-      <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleMenuClose}>
-        <MenuItem
-          onClick={() => {
-            handleDialogOpen(selectedCourse);
-          }}
-        >
-          <Edit fontSize="small" sx={{ mr: 1 }} /> Edit Course
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleDelete(selectedCourse.id);
-            handleMenuClose();
-          }}
-          sx={{ color: 'error.main' }}
-        >
-          <Delete fontSize="small" sx={{ mr: 1 }} /> Delete Course
-        </MenuItem>
-      </Menu>
+      {menuAnchor && (
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={handleMenuClose}
+          />
+          <div
+            className="fixed z-50 bg-white dark:bg-dark-card rounded-lg shadow-lg border border-neutral-200 dark:border-dark-border overflow-hidden min-w-[180px]"
+            style={{
+              top: `${menuAnchor.getBoundingClientRect().bottom + 8}px`,
+              left: `${menuAnchor.getBoundingClientRect().left}px`,
+            }}
+          >
+            <button
+              onClick={() => {
+                handleDialogOpen(selectedCourse);
+              }}
+              className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-neutral-700 dark:text-dark-text-primary hover:bg-neutral-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+            >
+              <Edit className="w-4 h-4" />
+              Edit Course
+            </button>
+            <button
+              onClick={() => {
+                handleDelete(selectedCourse.id);
+                handleMenuClose();
+              }}
+              className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-error-600 dark:text-error-500 hover:bg-error-50 dark:hover:bg-error-900/20 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete Course
+            </button>
+          </div>
+        </>
+      )}
 
       {/* Create/Edit Dialog */}
-      <Dialog open={dialogOpen} onClose={handleDialogClose} maxWidth="sm" fullWidth>
-        <form onSubmit={handleSubmit}>
-          <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
-            {editMode ? 'Edit Course' : 'Create New Course'}
-          </DialogTitle>
-          <DialogContent dividers>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-              <TextField
-                label="Course Code"
-                value={formData.code}
-                onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                required
-                fullWidth
-                placeholder="e.g., CS101"
-                disabled={editMode}
-              />
-              <TextField
-                label="Course Name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-                fullWidth
-                placeholder="e.g., Data Structures"
-              />
-              <TextField
-                label="Description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                multiline
-                rows={3}
-                fullWidth
-                placeholder="Brief description of the course"
-              />
-              <Box sx={{ display: 'flex', gap: 2 }}>
-                <TextField
-                  label="Semester"
-                  type="number"
-                  value={formData.semester}
-                  onChange={(e) => setFormData({ ...formData, semester: parseInt(e.target.value) })}
-                  required
-                  fullWidth
-                  InputProps={{ inputProps: { min: 1, max: 8 } }}
-                />
-                <TextField
-                  label="Academic Year"
-                  type="number"
-                  value={formData.year}
-                  onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
-                  required
-                  fullWidth
-                  InputProps={{ inputProps: { min: 2020, max: 2030 } }}
-                />
-              </Box>
-              <TextField
-                label="Credits"
-                type="number"
-                value={formData.credits}
-                onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })}
-                required
-                fullWidth
-                InputProps={{ inputProps: { min: 1, max: 6 } }}
-              />
-            </Box>
-          </DialogContent>
-          <DialogActions sx={{ p: 2 }}>
-            <Button onClick={handleDialogClose} variant="outlined" sx={{ borderRadius: 2 }}>
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                borderRadius: 2,
-                background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-              }}
-            >
-              {editMode ? 'Update Course' : 'Create Course'}
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-    </PageLayout>
+      {dialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white dark:bg-dark-card rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <form onSubmit={handleSubmit}>
+              {/* Header */}
+              <div className="p-6 border-b border-neutral-200 dark:border-dark-border">
+                <h2 className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary">
+                  {editMode ? 'Edit Course' : 'Create New Course'}
+                </h2>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-dark-text-primary mb-2">
+                    Course Code *
+                  </label>
+                  <Input
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                    required
+                    placeholder="e.g., CS101"
+                    disabled={editMode}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-dark-text-primary mb-2">
+                    Course Name *
+                  </label>
+                  <Input
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    placeholder="e.g., Data Structures"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-dark-text-primary mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={3}
+                    placeholder="Brief description of the course"
+                    className="flex w-full rounded-lg border border-neutral-300 dark:border-dark-border bg-white dark:bg-dark-bg-secondary text-neutral-800 dark:text-dark-text-primary px-3 py-2 text-sm transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 dark:focus-visible:ring-dark-green-500 focus-visible:ring-offset-2 dark:ring-offset-dark-bg-primary resize-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-dark-text-primary mb-2">
+                      Semester *
+                    </label>
+                    <Input
+                      type="number"
+                      value={formData.semester}
+                      onChange={(e) => setFormData({ ...formData, semester: parseInt(e.target.value) })}
+                      required
+                      min={1}
+                      max={8}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-dark-text-primary mb-2">
+                      Academic Year *
+                    </label>
+                    <Input
+                      type="number"
+                      value={formData.year}
+                      onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
+                      required
+                      min={2020}
+                      max={2030}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-dark-text-primary mb-2">
+                    Credits *
+                  </label>
+                  <Input
+                    type="number"
+                    value={formData.credits}
+                    onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })}
+                    required
+                    min={1}
+                    max={6}
+                  />
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="p-6 border-t border-neutral-200 dark:border-dark-border flex gap-3 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleDialogClose}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  {editMode ? 'Update Course' : 'Create Course'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

@@ -241,7 +241,7 @@ const StudentAnalysis = () => {
         background: (theme) =>
           theme.palette.mode === "dark"
             ? "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)"
-            : "linear-gradient(135deg, rgb(248, 250, 252) 0%, rgb(226, 232, 240) 100%)",
+            : "#EBE1D1",
         py: 4,
       }}
     >
@@ -269,7 +269,7 @@ const StudentAnalysis = () => {
               onClick={runCalculations}
               disabled={!selectedCourse || calculating}
               sx={{
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                background: "linear-gradient(135deg, #41644A 0%, #0D4715 100%)",
                 px: 4,
                 py: 1.5,
               }}

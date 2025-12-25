@@ -1,26 +1,18 @@
 import React, { useState } from 'react';
 import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Typography,
-  Alert,
-  LinearProgress,
-  IconButton,
-  Chip,
-  Stack
-} from '@mui/material';
-import {
-  CloudUpload as UploadIcon,
-  Download as DownloadIcon,
-  CheckCircle as CheckIcon,
-  Error as ErrorIcon,
-  Info as InfoIcon,
-  Delete as DeleteIcon,
-  Refresh as RefreshIcon
-} from '@mui/icons-material';
+  CloudUpload,
+  Download,
+  CheckCircle,
+  AlertCircle,
+  Info,
+  Trash2,
+  RefreshCw
+} from 'lucide-react';
 import axios from 'axios';
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Alert } from '../ui/alert';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
@@ -39,13 +31,13 @@ const COMappingUpload = ({ courseId, marksheet }) => {
   // Load existing mappings on mount and when marksheet changes
   React.useEffect(() => {
     if (marksheet?.id) {
-    loadExistingMappings();
+      loadExistingMappings();
     }
   }, [marksheet?.id]);
 
   const loadExistingMappings = async () => {
     if (!marksheet?.id) return;
-    
+
     try {
       setLoadingMappings(true);
       const token = localStorage.getItem('token');
@@ -81,13 +73,13 @@ const COMappingUpload = ({ courseId, marksheet }) => {
           headers: { 'Authorization': `Bearer ${token}` }
         }
       );
-      
+
       setExistingMappings([]);
       setUploadStatus({
         success: true,
         message: 'CO mappings deleted successfully'
       });
-      
+
       // Clear status after 3 seconds
       setTimeout(() => setUploadStatus(null), 3000);
     } catch (err) {
@@ -174,39 +166,38 @@ const COMappingUpload = ({ courseId, marksheet }) => {
   };
 
   return (
-    <Card variant="outlined" sx={{ mb: 2 }}>
-      <CardContent>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-          <Typography variant="subtitle1" fontWeight="bold">
+    <Card className="mb-4 border-2 border-neutral-200 dark:border-dark-border">
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <h3 className="text-lg font-bold text-neutral-800 dark:text-dark-text-primary">
             CO Mapping for {marksheet.assessment_name}
-          </Typography>
-          <Chip
-            size="small"
-            icon={<InfoIcon />}
-            label="Upload CSV to map questions to COs"
-            color="info"
-            variant="outlined"
-          />
-        </Stack>
+          </h3>
+          <Badge variant="outline" className="border-primary-500 text-primary-600 dark:border-dark-green-500 dark:text-dark-green-500">
+            <Info className="w-3 h-3 mr-1" />
+            Upload CSV to map questions to COs
+          </Badge>
+        </div>
 
         {/* Upload Progress */}
         {uploading && (
-          <Box mb={2}>
-            <LinearProgress />
-            <Typography variant="caption" color="text.secondary" mt={1}>
+          <div className="mb-4">
+            <div className="w-full h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-primary-500 to-secondary-500 animate-pulse" style={{ width: '100%' }} />
+            </div>
+            <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mt-2">
               Uploading CO mapping...
-            </Typography>
-          </Box>
+            </p>
+          </div>
         )}
 
         {/* Success Message */}
         {uploadStatus?.success && (
           <Alert
-            severity="success"
-            icon={<CheckIcon />}
+            variant="success"
             onClose={() => setUploadStatus(null)}
-            sx={{ mb: 2 }}
+            className="mb-4"
           >
+            <CheckCircle className="w-4 h-4" />
             {uploadStatus.message}
           </Alert>
         )}
@@ -214,115 +205,114 @@ const COMappingUpload = ({ courseId, marksheet }) => {
         {/* Error Message */}
         {error && (
           <Alert
-            severity="error"
-            icon={<ErrorIcon />}
+            variant="error"
             onClose={() => setError(null)}
-            sx={{ mb: 2 }}
+            className="mb-4"
           >
+            <AlertCircle className="w-4 h-4" />
             {error}
           </Alert>
         )}
 
         {/* Action Buttons */}
-        <Stack direction="row" spacing={2} flexWrap="wrap">
+        <div className="flex flex-wrap gap-3 mb-4">
           <Button
-            variant="contained"
-            component="label"
-            startIcon={<UploadIcon />}
+            variant="default"
+            className="bg-gradient-to-r from-primary-500 to-secondary-500"
             disabled={uploading || deleting}
+            asChild
           >
-            {existingMappings.length > 0 ? 'Re-upload CO Mapping' : 'Upload CO Mapping'}
-            <input
-              type="file"
-              accept=".csv"
-              hidden
-              onChange={handleFileSelect}
-            />
+            <label className="cursor-pointer">
+              <CloudUpload className="w-4 h-4 mr-2" />
+              {existingMappings.length > 0 ? 'Re-upload CO Mapping' : 'Upload CO Mapping'}
+              <input
+                type="file"
+                accept=".csv"
+                className="hidden"
+                onChange={handleFileSelect}
+              />
+            </label>
           </Button>
 
           <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
+            variant="outline"
             onClick={downloadTemplate}
             disabled={uploading || deleting}
           >
+            <Download className="w-4 h-4 mr-2" />
             Download Template
           </Button>
 
           {existingMappings.length > 0 && (
             <>
               <Button
-                variant="outlined"
-                color="error"
-                startIcon={<DeleteIcon />}
+                variant="outline"
                 onClick={handleDeleteMappings}
                 disabled={uploading || deleting}
+                className="border-error-500 text-error-600 hover:bg-error-50 dark:border-error-500 dark:text-error-500 dark:hover:bg-error-900/20"
               >
+                <Trash2 className="w-4 h-4 mr-2" />
                 {deleting ? 'Deleting...' : 'Delete Mappings'}
               </Button>
-              <Button
-                variant="outlined"
-                color="primary"
-                startIcon={<RefreshIcon />}
+              {/* <Button
+                variant="outline"
                 onClick={loadExistingMappings}
                 disabled={uploading || deleting || loadingMappings}
               >
+                <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh
-              </Button>
+              </Button> */}
             </>
           )}
-        </Stack>
+        </div>
 
         {/* Loading State */}
         {loadingMappings && (
-          <Box mt={2}>
-            <LinearProgress />
-            <Typography variant="caption" color="text.secondary" mt={1}>
+          <div className="mt-4">
+            <div className="w-full h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-primary-500 to-secondary-500 animate-pulse" style={{ width: '100%' }} />
+            </div>
+            <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mt-2">
               Loading existing mappings...
-            </Typography>
-          </Box>
+            </p>
+          </div>
         )}
 
-        {/* Existing Mappings Display */}
+        {/* Existing Mappings Display
         {!loadingMappings && existingMappings.length > 0 && (
-          <Box mt={2} p={2} bgcolor="success.50" borderRadius={1} border="1px solid" borderColor="success.200">
-            <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-              <Typography variant="subtitle2" fontWeight="bold" color="success.dark">
+          <div className="mt-4 p-4 bg-success-50 dark:bg-success-900/20 border-2 border-success-200 dark:border-success-800 rounded-xl">
+            <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+              <h4 className="text-sm font-bold text-success-700 dark:text-success-500">
                 ✅ CO Mapping Uploaded ({existingMappings.length} questions)
-              </Typography>
-              <Chip
-                size="small"
-                label="Active"
-                color="success"
-                variant="filled"
-              />
-            </Stack>
-            <Typography variant="caption" color="text.secondary" display="block" mb={1}>
-              <strong>Mapped Questions:</strong> {existingMappings.slice(0, 5).map(m => 
+              </h4>
+              <Badge variant="success">Active</Badge>
+            </div>
+            <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mb-2">
+              <strong>Mapped Questions:</strong> {existingMappings.slice(0, 5).map(m =>
                 `${m.question_column}→CO${m.co_number}${m.max_marks ? ` (${m.max_marks} marks)` : ''}`
               ).join(', ')}
               {existingMappings.length > 5 && ` +${existingMappings.length - 5} more`}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" display="block" fontSize="0.7rem">
+            </p>
+            <p className="text-[0.65rem] text-neutral-500 dark:text-dark-text-muted">
               Last updated: {new Date().toLocaleString()}
-            </Typography>
-          </Box>
-        )}
+            </p>
+          </div>
+        )} */}
 
         {/* No Mappings State */}
         {!loadingMappings && existingMappings.length === 0 && (
-          <Box mt={2} p={2} bgcolor="warning.50" borderRadius={1} border="1px solid" borderColor="warning.200">
-            <Typography variant="caption" color="text.secondary" component="div">
+          <div className="mt-4 p-4 bg-warning-50 dark:bg-warning-900/20 border-2 border-warning-200 dark:border-warning-800 rounded-xl">
+            <p className="text-xs text-neutral-600 dark:text-dark-text-secondary">
               <strong>⚠️ No CO mapping uploaded yet</strong>
               <br />
               Please upload a CO mapping CSV file to map questions to Course Outcomes.
-            </Typography>
-          </Box>
+            </p>
+          </div>
         )}
 
-        {/* Instructions */}
-        <Box mt={2} p={2} bgcolor="grey.50" borderRadius={1}>
-          <Typography variant="caption" color="text.secondary" component="div">
+        {/* Instructions
+        <div className="mt-4 p-4 bg-neutral-100 dark:bg-dark-bg-tertiary border-2 border-neutral-200 dark:border-dark-border rounded-xl">
+          <p className="text-xs text-neutral-600 dark:text-dark-text-secondary leading-relaxed">
             <strong>CSV Format (New):</strong>
             <br />
             • Column 1: Column name (e.g., q1a, q1b, q2a) - lowercase
@@ -334,9 +324,10 @@ const COMappingUpload = ({ courseId, marksheet }) => {
             • Example: q1a,10,co1
             <br />
             • Questions with max_marks = 0 will be ignored
-            <br />• Download the template above to see the format
-          </Typography>
-        </Box>
+            <br />
+            • Download the template above to see the format
+          </p>
+        </div> */}
       </CardContent>
     </Card>
   );

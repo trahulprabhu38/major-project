@@ -1,27 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  CircularProgress,
-  Alert,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  LinearProgress,
-  Tooltip,
-  IconButton,
-} from '@mui/material';
-import {
   BarChart,
   Bar,
   XAxis,
@@ -42,22 +21,26 @@ import {
   Line,
 } from 'recharts';
 import {
-  Assessment,
+  BarChart3,
   TrendingUp,
-  People,
-  EmojiEvents,
-  Refresh,
+  Users,
+  Trophy,
+  RefreshCw,
   Download,
-  Visibility,
-  ArrowBack,
-  School,
+  Eye,
+  ArrowLeft,
+  GraduationCap,
   Upload,
-} from '@mui/icons-material';
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import PageLayout from '../../components/shared/PageLayout';
 import StatsCard from '../../components/shared/StatsCard';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent } from '../../components/ui/card';
+import { Alert } from '../../components/ui/alert';
+import { CHART_COLORS } from '../../config/chartColors';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
@@ -99,14 +82,12 @@ const DynamicDashboard = () => {
       setError(null);
       const token = localStorage.getItem('token');
 
-      // Validate courseId
       if (!courseId) {
         setError('Invalid course ID');
         setLoading(false);
         return;
       }
 
-      // Load all data in parallel
       const [dashboardRes, coRes, coThresholdRes, poRes, studentsRes] = await Promise.all([
         axios.get(`${API_URL}/attainment/course/${courseId}/dashboard`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -133,7 +114,6 @@ const DynamicDashboard = () => {
         bloomDistribution: [],
         assessmentTrends: []
       });
-      console.log('Dashboard data:', dashboardRes);
       setCOAttainment(coRes.data.coAttainment || []);
       setCOAttainmentWithThreshold(coThresholdRes.data.coAttainment || []);
       setThreshold(coThresholdRes.data.threshold || 70);
@@ -167,22 +147,22 @@ const DynamicDashboard = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-        <CircularProgress size={60} /> 
-      </Box>
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Box sx={{ p: 4 }}>
-        <Alert severity="error" sx={{ mb: 2 }}>
+      <div className="p-8">
+        <Alert variant="error" className="mb-4">
           {error}
         </Alert>
-        <Button variant="contained" onClick={loadDashboardData}>
+        <Button onClick={loadDashboardData}>
           Retry
         </Button>
-      </Box>
+      </div>
     );
   }
 
@@ -191,45 +171,42 @@ const DynamicDashboard = () => {
       <PageLayout
         title={`Attainment Dashboard - ${course?.code || 'Course'}`}
         subtitle={course?.name || 'Dynamic CO/PO Attainment Analysis'}
-        icon={Assessment}
+        icon={BarChart3}
         breadcrumbs={[
           { label: 'Dashboard', to: '/teacher/dashboard' },
           { label: course?.code || 'Course' },
         ]}
       >
-        <Box sx={{ p: 4, textAlign: 'center' }}>
-          <Assessment sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
-          <Alert severity="info" sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}>
-            <Typography variant="h6" gutterBottom>No Attainment Data Available</Typography>
-            <Typography variant="body2">
+        <div className="p-8 text-center">
+          <BarChart3 className="w-20 h-20 text-neutral-400 dark:text-dark-text-muted mx-auto mb-4" />
+          <Alert variant="info" className="mb-6 max-w-2xl mx-auto">
+            <h3 className="text-lg font-bold mb-2">No Attainment Data Available</h3>
+            <p className="text-sm">
               Upload assessment marks and the system will automatically calculate CO/PO attainment for this course.
-            </Typography>
+            </p>
           </Alert>
-          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="flex gap-4 justify-center flex-wrap">
             <Button
-              variant="contained"
-              startIcon={<Upload />}
               onClick={() => navigate('/teacher/upload')}
-              size="large"
+              className="bg-gradient-to-r from-primary-500 to-secondary-500"
             >
+              <Upload className="w-4 h-4 mr-2" />
               Upload Marks
             </Button>
             <Button
-              variant="outlined"
-              startIcon={<ArrowBack />}
+              variant="outline"
               onClick={() => navigate('/teacher/courses')}
-              size="large"
             >
+              <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Courses
             </Button>
-          </Box>
-        </Box>
+          </div>
+        </div>
       </PageLayout>
     );
   }
 
   // Prepare chart data
-  // CO Attainment vs Threshold
   const coThresholdChartData = coAttainmentWithThreshold.map(co => ({
     name: `CO${co.co_number}`,
     Attainment: parseFloat(co.attainment || 0),
@@ -242,114 +219,81 @@ const DynamicDashboard = () => {
     fullMark: 3,
   }));
 
-  // Bloom's Taxonomy Distribution
-  const bloomColors = {
-    Remember: '#10b981',
-    Understand: '#3b82f6',
-    Apply: '#8b5cf6',
-    Analyze: '#f59e0b',
-    Evaluate: '#f97316',
-    Create: '#ef4444',
-  };
-
   const bloomChartData = (dashboardData.bloomDistribution || []).map(b => ({
     name: b.bloom_level,
     value: parseInt(b.count),
-    color: bloomColors[b.bloom_level] || '#6b7280',
+    color: CHART_COLORS.bloomColors[b.bloom_level] || CHART_COLORS.neutral,
   }));
 
-  // Assessment Performance Trends
   const assessmentTrendsChartData = (dashboardData.assessmentTrends || []).map(a => ({
     name: a.name,
     score: parseFloat(a.avg_percentage || 0).toFixed(1),
     date: new Date(a.assessment_date).toLocaleDateString('en-US', { month: 'short' }),
   }));
 
-  const gradeColors = {
-    S: '#10b981',
-    A: '#3b82f6',
-    B: '#8b5cf6',
-    C: '#f59e0b',
-    D: '#f97316',
-    E: '#ef4444',
-    F: '#991b1b',
-  };
-
   const gradeChartData = (dashboardData.gradeDistribution || []).map(g => ({
     name: g.grade,
     value: parseInt(g.count),
-    color: gradeColors[g.grade] || '#6b7280',
+    color: CHART_COLORS.gradeColors[g.grade] || CHART_COLORS.neutral,
   }));
 
   return (
     <PageLayout
       title={`Attainment Dashboard - ${course?.code || 'Course'}`}
       subtitle={course?.name || 'Dynamic CO/PO Attainment Analysis'}
-      icon={Assessment}
+      icon={BarChart3}
       breadcrumbs={[
         { label: 'Dashboard', to: '/teacher/dashboard' },
         { label: course?.code || 'Course' },
       ]}
       actions={
-        <Box sx={{ display: 'flex', gap: 2 }}>
+        <div className="flex gap-2">
           <Button
-            variant="outlined"
-            startIcon={<ArrowBack />}
+            variant="outline"
             onClick={() => navigate('/teacher/courses')}
           >
+            <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Courses
           </Button>
           <Button
-            variant="outlined"
-            startIcon={<Refresh />}
+            variant="outline"
             onClick={handleRecalculate}
             disabled={refreshing}
           >
+            <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             {refreshing ? 'Recalculating...' : 'Recalculate'}
           </Button>
-        </Box>
+        </div>
       }
     >
       {/* Summary Stats */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Avg CO Attainment"
-            value={`${parseInt(dashboardData.coSummary?.avg_co_attainment || 0).toFixed(2)}%`}
-            icon={TrendingUp}
-            color="primary.main"
-            bgColor="primary.light"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Avg PO Level"
-            value={parseFloat(dashboardData.poSummary?.avg_po_level || 0).toFixed(2)}
-            subtitle="out of 3.0"
-            icon={EmojiEvents}
-            color="success.main"
-            bgColor="success.light"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Total Students"
-            value={dashboardData.studentStats?.total_students || 0}
-            icon={People}
-            color="warning.main"
-            bgColor="warning.light"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Avg Student Score"
-            value={`${parseFloat(dashboardData.studentStats?.avg_percentage || 0).toFixed(1)}%`}
-            icon={School}
-            color="secondary.main"
-            bgColor="secondary.light"
-          />
-        </Grid>
-      </Grid>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <StatsCard
+          title="Avg CO Attainment"
+          value={`${parseFloat(dashboardData.coSummary?.avg_co_attainment || 0).toFixed(2)}%`}
+          icon={TrendingUp}
+          color="primary"
+        />
+        <StatsCard
+          title="Avg PO Level"
+          value={parseFloat(dashboardData.poSummary?.avg_po_level || 0).toFixed(2)}
+          subtitle="out of 3.0"
+          icon={Trophy}
+          color="success"
+        />
+        <StatsCard
+          title="Total Students"
+          value={dashboardData.studentStats?.total_students || 0}
+          icon={Users}
+          color="warning"
+        />
+        <StatsCard
+          title="Avg Student Score"
+          value={`${parseFloat(dashboardData.studentStats?.avg_percentage || 0).toFixed(1)}%`}
+          icon={GraduationCap}
+          color="secondary"
+        />
+      </div>
 
       {/* CO Attainment vs Threshold Chart */}
       <motion.div
@@ -357,201 +301,193 @@ const DynamicDashboard = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <Card sx={{ mb: 4 }}>
-          <CardContent>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
+        <Card className="mb-8">
+          <CardContent className="p-6">
+            <h2 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
               Course Outcome (CO) Attainment Levels
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            </h2>
+            <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-6">
               Comparison of actual attainment vs. target threshold ({threshold}%)
-            </Typography>
+            </p>
             <ResponsiveContainer width="100%" height={350}>
               <BarChart data={coThresholdChartData}>
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#D8CBC0" />
                 <XAxis dataKey="name" />
                 <YAxis domain={[0, 100]} label={{ value: 'Attainment %', angle: -90, position: 'insideLeft' }} />
                 <RechartsTooltip />
                 <Legend />
-                <Bar dataKey="Attainment" fill="#3b82f6" name="Attainment %" />
-                <Bar dataKey="Target" fill="#ef4444" name="Target %" />
+                <Bar dataKey="Attainment" fill={CHART_COLORS.primary} name="Attainment %" />
+                <Bar dataKey="Target" fill={CHART_COLORS.error} name="Target %" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </motion.div>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Bloom's Taxonomy Distribution */}
-        <Grid item xs={12} md={6}>
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  Bloom's Taxonomy Distribution
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Distribution of COs across cognitive levels
-                </Typography>
-                {bloomChartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={350}>
-                    <BarChart data={bloomChartData} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" />
-                      <YAxis dataKey="name" type="category" width={100} />
-                      <RechartsTooltip />
-                      <Bar dataKey="value" name="Count">
-                        {bloomChartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <Box sx={{ textAlign: 'center', py: 4 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      No Bloom's level data available
-                    </Typography>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        </Grid>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card className="h-full">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
+                Bloom's Taxonomy Distribution
+              </h2>
+              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-4">
+                Distribution of COs across cognitive levels
+              </p>
+              {bloomChartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={350}>
+                  <BarChart data={bloomChartData} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#D8CBC0" />
+                    <XAxis type="number" />
+                    <YAxis dataKey="name" type="category" width={100} />
+                    <RechartsTooltip />
+                    <Bar dataKey="value" name="Count">
+                      {bloomChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-center py-16">
+                  <p className="text-neutral-600 dark:text-dark-text-secondary">
+                    No Bloom's level data available
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* PO Attainment Radar Chart */}
-        <Grid item xs={12} md={6}>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  Program Outcome (PO) Attainment
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Performance across program outcomes
-                </Typography>
-                {poRadarData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={350}>
-                    <RadarChart data={poRadarData}>
-                      <PolarGrid />
-                      <PolarAngleAxis dataKey="po" />
-                      <PolarRadiusAxis angle={90} domain={[0, 3]} />
-                      <Radar
-                        name="Attainment Level"
-                        dataKey="attainment"
-                        stroke="#8b5cf6"
-                        fill="#8b5cf6"
-                        fillOpacity={0.6}
-                      />
-                      <RechartsTooltip />
-                    </RadarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <Box sx={{ textAlign: 'center', py: 4 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      No PO attainment data available
-                    </Typography>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        </Grid>
-      </Grid>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Card className="h-full">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
+                Program Outcome (PO) Attainment
+              </h2>
+              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-4">
+                Performance across program outcomes
+              </p>
+              {poRadarData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={350}>
+                  <RadarChart data={poRadarData}>
+                    <PolarGrid stroke="#D8CBC0" />
+                    <PolarAngleAxis dataKey="po" />
+                    <PolarRadiusAxis angle={90} domain={[0, 3]} />
+                    <Radar
+                      name="Attainment Level"
+                      dataKey="attainment"
+                      stroke={CHART_COLORS.secondary}
+                      fill={CHART_COLORS.secondary}
+                      fillOpacity={0.6}
+                    />
+                    <RechartsTooltip />
+                  </RadarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-center py-16">
+                  <p className="text-neutral-600 dark:text-dark-text-secondary">
+                    No PO attainment data available
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Assessment Performance Trends */}
-        <Grid item xs={12} md={6}>
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  Assessment Performance Trends
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Average scores across internal assessments
-                </Typography>
-                {assessmentTrendsChartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={350}>
-                    <LineChart data={assessmentTrendsChartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis domain={[0, 100]} label={{ value: 'Score %', angle: -90, position: 'insideLeft' }} />
-                      <RechartsTooltip />
-                      <Legend />
-                      <Line type="monotone" dataKey="score" stroke="#3b82f6" strokeWidth={2} name="Avg Score %" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <Box sx={{ textAlign: 'center', py: 4 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      No assessment data available
-                    </Typography>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        </Grid>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <Card className="h-full">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
+                Assessment Performance Trends
+              </h2>
+              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-4">
+                Average scores across internal assessments
+              </p>
+              {assessmentTrendsChartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={350}>
+                  <LineChart data={assessmentTrendsChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#D8CBC0" />
+                    <XAxis dataKey="name" />
+                    <YAxis domain={[0, 100]} label={{ value: 'Score %', angle: -90, position: 'insideLeft' }} />
+                    <RechartsTooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="score" stroke={CHART_COLORS.primary} strokeWidth={2} name="Avg Score %" />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-center py-16">
+                  <p className="text-neutral-600 dark:text-dark-text-secondary">
+                    No assessment data available
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Grade Distribution Pie Chart */}
-        <Grid item xs={12} md={6}>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  Grade Distribution
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Student performance breakdown by grade
-                </Typography>
-                {gradeChartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={350}>
-                    <PieChart>
-                      <Pie
-                        data={gradeChartData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, value }) => `${name}: ${value}`}
-                        outerRadius={100}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {gradeChartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <RechartsTooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <Box sx={{ textAlign: 'center', py: 4 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      No grade data available
-                    </Typography>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        </Grid>
-      </Grid>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <Card className="h-full">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
+                Grade Distribution
+              </h2>
+              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-4">
+                Student performance breakdown by grade
+              </p>
+              {gradeChartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={350}>
+                  <PieChart>
+                    <Pie
+                      data={gradeChartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value }) => `${name}: ${value}`}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {gradeChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-center py-16">
+                  <p className="text-neutral-600 dark:text-dark-text-secondary">
+                    No grade data available
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
 
       {/* Student Performance Table */}
       <motion.div
@@ -560,99 +496,93 @@ const DynamicDashboard = () => {
         transition={{ delay: 0.4 }}
       >
         <Card>
-          <CardContent>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6" fontWeight="bold">
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary">
                 Student Performance ({students.length})
-              </Typography>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<Download />}
-              >
+              </h2>
+              <Button variant="outline" size="sm">
+                <Download className="w-4 h-4 mr-2" />
                 Export
               </Button>
-            </Box>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow sx={{ bgcolor: 'grey.100' }}>
-                    <TableCell><strong>Rank</strong></TableCell>
-                    <TableCell><strong>USN</strong></TableCell>
-                    <TableCell><strong>Name</strong></TableCell>
-                    <TableCell align="center"><strong>CIE %</strong></TableCell>
-                    <TableCell align="center"><strong>SEE %</strong></TableCell>
-                    <TableCell align="center"><strong>Total %</strong></TableCell>
-                    <TableCell align="center"><strong>Grade</strong></TableCell>
-                    <TableCell align="center"><strong>Actions</strong></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-neutral-100 dark:bg-dark-bg-secondary">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">Rank</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">USN</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">Name</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">CIE %</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">SEE %</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">Total %</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">Grade</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-200 dark:divide-dark-border">
                   {students.slice(0, 20).map((student, index) => (
-                    <TableRow key={student.id} hover>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{student.usn}</TableCell>
-                      <TableCell>{student.name}</TableCell>
-                      <TableCell align="center">
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <LinearProgress
-                            variant="determinate"
-                            value={parseFloat(student.cie_percentage || 0)}
-                            sx={{ flexGrow: 1, height: 8, borderRadius: 4 }}
-                          />
-                          <Typography variant="caption">
+                    <tr key={student.id} className="hover:bg-neutral-50 dark:hover:bg-dark-bg-secondary transition-colors">
+                      <td className="px-4 py-3 text-sm text-neutral-800 dark:text-dark-text-primary">{index + 1}</td>
+                      <td className="px-4 py-3 text-sm text-neutral-800 dark:text-dark-text-primary">{student.usn}</td>
+                      <td className="px-4 py-3 text-sm text-neutral-800 dark:text-dark-text-primary">{student.name}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-primary-500 to-secondary-500"
+                              style={{ width: `${parseFloat(student.cie_percentage || 0)}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-neutral-600 dark:text-dark-text-secondary min-w-[45px]">
                             {parseFloat(student.cie_percentage || 0).toFixed(1)}%
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <LinearProgress
-                            variant="determinate"
-                            value={parseFloat(student.see_percentage || 0)}
-                            sx={{ flexGrow: 1, height: 8, borderRadius: 4 }}
-                          />
-                          <Typography variant="caption">
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-primary-500 to-secondary-500"
+                              style={{ width: `${parseFloat(student.see_percentage || 0)}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-neutral-600 dark:text-dark-text-secondary min-w-[45px]">
                             {parseFloat(student.see_percentage || 0).toFixed(1)}%
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Typography variant="body2" fontWeight="bold">
-                          {parseFloat(student.percentage || 0).toFixed(1)}%
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          label={student.grade}
-                          sx={{
-                            bgcolor: gradeColors[student.grade],
-                            color: 'white',
-                            fontWeight: 'bold',
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        <Tooltip title="View Details">
-                          <IconButton
-                            size="small"
-                            onClick={() => navigate(`/teacher/student/${student.id}/course/${courseId}`)}
-                          >
-                            <Visibility fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-center text-sm font-bold text-neutral-800 dark:text-dark-text-primary">
+                        {parseFloat(student.percentage || 0).toFixed(1)}%
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span
+                          className="inline-block px-3 py-1 rounded-lg text-white font-bold text-sm"
+                          style={{ backgroundColor: CHART_COLORS.gradeColors[student.grade] || CHART_COLORS.neutral }}
+                        >
+                          {student.grade}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => navigate(`/teacher/student/${student.id}/course/${courseId}`)}
+                          className="p-2 rounded-lg text-primary-600 hover:bg-primary-50 dark:text-dark-green-500 dark:hover:bg-primary-900/20 transition-colors"
+                          title="View Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                </tbody>
+              </table>
+            </div>
             {students.length > 20 && (
-              <Box sx={{ mt: 2, textAlign: 'center' }}>
-                <Typography variant="caption" color="text.secondary">
+              <div className="mt-4 text-center">
+                <p className="text-xs text-neutral-500 dark:text-dark-text-muted">
                   Showing top 20 students. {students.length - 20} more available.
-                </Typography>
-              </Box>
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>

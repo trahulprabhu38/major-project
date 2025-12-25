@@ -1,37 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
-import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  CircularProgress,
-  Snackbar,
-  Alert,
-  alpha,
-  LinearProgress,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Card,
-  CardContent,
-  TextField,
-} from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import SchoolIcon from "@mui/icons-material/School";
+import { CloudUpload, RotateCcw, GraduationCap } from "lucide-react";
+import toast from 'react-hot-toast';
 
-// Import our new components
+// Import our components
 import UploadZone from "../../components/upload/UploadZone";
 import UploadSummary from "../../components/upload/UploadSummary";
 import DatasetTable from "../../components/upload/DatasetTable";
 import { courseAPI } from "../../services/api";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
+import { Alert } from "../../components/ui/alert";
 
 const UPLOAD_SERVICE_URL = import.meta.env.VITE_UPLOAD_SERVICE_URL || "http://localhost:8001";
-
-const MotionBox = motion.create(Box);
 
 const UploadMarksNew = () => {
   const [file, setFile] = useState(null);
@@ -39,7 +21,6 @@ const UploadMarksNew = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const tableRef = useRef(null);
 
   // Course selection states
@@ -60,11 +41,7 @@ const UploadMarksNew = () => {
       setCourses(response.data.data || []);
     } catch (err) {
       console.error("Error loading courses:", err);
-      setSnackbar({
-        open: true,
-        message: "Failed to load courses",
-        severity: "error",
-      });
+      toast.error("Failed to load courses");
     } finally {
       setLoadingCourses(false);
     }
@@ -78,29 +55,17 @@ const UploadMarksNew = () => {
 
   const handleUpload = async () => {
     if (!file) {
-      setSnackbar({
-        open: true,
-        message: "Please select a file first",
-        severity: "error",
-      });
+      toast.error("Please select a file first");
       return;
     }
 
     if (!selectedCourse) {
-      setSnackbar({
-        open: true,
-        message: "Please select a course first",
-        severity: "error",
-      });
+      toast.error("Please select a course first");
       return;
     }
 
     if (!assessmentName.trim()) {
-      setSnackbar({
-        open: true,
-        message: "Please enter an assessment name",
-        severity: "error",
-      });
+      toast.error("Please enter an assessment name");
       return;
     }
 
@@ -122,7 +87,7 @@ const UploadMarksNew = () => {
         });
       }, 200);
 
-      // Upload to the upload service (this handles everything: table creation, enrollment, marksheet record)
+      // Upload to the upload service
       const uploadResponse = await axios.post(`${UPLOAD_SERVICE_URL}/upload`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -139,11 +104,7 @@ const UploadMarksNew = () => {
       setUploadProgress(100);
 
       setResult(uploadResponse.data);
-      setSnackbar({
-        open: true,
-        message: "Marks uploaded and saved successfully! 🎉",
-        severity: "success",
-      });
+      toast.success("Marks uploaded and saved successfully!");
 
       // Scroll to table after a brief delay
       setTimeout(() => {
@@ -155,11 +116,7 @@ const UploadMarksNew = () => {
       console.error("Upload error:", err);
       const errorMessage = err.response?.data?.detail || err.response?.data?.message || err.message || "Upload failed";
       setError(errorMessage);
-      setSnackbar({
-        open: true,
-        message: errorMessage,
-        severity: "error",
-      });
+      toast.error(errorMessage);
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -199,167 +156,114 @@ const UploadMarksNew = () => {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
 
-    setSnackbar({
-      open: true,
-      message: "Data exported successfully!",
-      severity: "success",
-    });
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
+    toast.success("Data exported successfully!");
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        background: (theme) =>
-          theme.palette.mode === "dark"
-            ? `linear-gradient(135deg, ${alpha("#0f172a", 0.95)} 0%, ${alpha(
-                "#1e293b",
-                0.95
-              )} 100%)`
-            : `linear-gradient(135deg, ${alpha("#f8fafc", 1)} 0%, ${alpha(
-                "#e2e8f0",
-                1
-              )} 100%)`,
-        py: 6,
-      }}
-    >
-      <Container maxWidth="xl">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-dark-bg-primary dark:to-dark-bg-secondary py-12">
+      <div className="container mx-auto px-4 md:px-6 max-w-7xl">
         {/* Header */}
-        <MotionBox
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          sx={{ mb: 5 }}
+          className="mb-8"
         >
-          <Box
-            sx={{
-              background: (theme) =>
-                `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-              borderRadius: 4,
-              p: 4,
-              color: "white",
-              position: "relative",
-              overflow: "hidden",
-              boxShadow: (theme) => `0 12px 32px ${alpha(theme.palette.primary.main, 0.3)}`,
-            }}
-          >
-            <Box
-              sx={{
-                position: "absolute",
-                top: -50,
-                right: -50,
-                width: 200,
-                height: 200,
-                borderRadius: "50%",
-                background: alpha("#fff", 0.1),
-              }}
-            />
-            <Box sx={{ position: "relative", zIndex: 1 }}>
-              <Typography variant="h3" fontWeight="bold" gutterBottom>
+          <div className="bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl">
+            {/* Decorative circle */}
+            <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-white/10" />
+
+            <div className="relative z-10">
+              <h1 className="text-4xl md:text-5xl font-bold mb-3">
                 Upload Assessment Data
-              </Typography>
-              <Typography variant="h6" sx={{ opacity: 0.95 }}>
+              </h1>
+              <p className="text-xl opacity-95">
                 Transform your CSV or Excel files into structured database tables
-              </Typography>
-            </Box>
-          </Box>
-        </MotionBox>
+              </p>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Course Selection Card */}
-        <MotionBox
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          sx={{ mb: 4 }}
+          className="mb-8"
         >
           <Card
-            sx={{
-              borderRadius: 3,
-              boxShadow: (theme) => `0 8px 24px ${alpha(theme.palette.primary.main, 0.15)}`,
-              border: '2px solid',
-              borderColor: selectedCourse ? 'primary.main' : 'divider',
-              transition: 'all 0.3s ease',
-            }}
+            className={`transition-all duration-300 ${
+              selectedCourse
+                ? 'border-2 border-primary-500 dark:border-dark-green-500 shadow-lg shadow-primary-500/20'
+                : 'border-2'
+            }`}
           >
-            <CardContent sx={{ p: 4 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                <SchoolIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-                <Typography variant="h5" fontWeight="bold">
+            <CardContent className="p-8">
+              <div className="flex items-center gap-4 mb-6">
+                <GraduationCap className="w-8 h-8 text-primary-600 dark:text-dark-green-500" />
+                <h2 className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary">
                   Select Course & Assessment Details
-                </Typography>
-              </Box>
+                </h2>
+              </div>
 
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                <FormControl fullWidth required>
-                  <InputLabel id="course-select-label">Select Course</InputLabel>
-                  <Select
-                    labelId="course-select-label"
-                    id="course-select"
-                    value={selectedCourse}
-                    label="Select Course"
-                    onChange={(e) => setSelectedCourse(e.target.value)}
-                    disabled={loadingCourses || uploading}
-                    sx={{
-                      borderRadius: 2,
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderWidth: 2,
-                      },
-                    }}
-                  >
-                    {courses.length === 0 ? (
-                      <MenuItem disabled>No courses available</MenuItem>
-                    ) : (
-                      courses.map((course) => (
-                        <MenuItem key={course.id} value={course.id}>
-                          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                            <Typography variant="body1" fontWeight={600}>
-                              {course.code} - {course.name}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              Semester {course.semester} | {course.year}
-                            </Typography>
-                          </Box>
-                        </MenuItem>
-                      ))
-                    )}
-                  </Select>
-                </FormControl>
+              <div className="space-y-6">
+                {/* Course Select */}
+                <div>
+                  <label htmlFor="course-select" className="block text-sm font-semibold text-neutral-700 dark:text-dark-text-primary mb-2">
+                    Select Course *
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="course-select"
+                      value={selectedCourse}
+                      onChange={(e) => setSelectedCourse(e.target.value)}
+                      disabled={loadingCourses || uploading}
+                      className="w-full px-4 py-3 bg-white dark:bg-dark-bg-secondary border-2 border-neutral-300 dark:border-dark-border rounded-xl text-neutral-800 dark:text-dark-text-primary font-medium focus:outline-none focus:border-primary-500 dark:focus:border-dark-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <option value="">-- Select a course --</option>
+                      {courses.length === 0 ? (
+                        <option disabled>No courses available</option>
+                      ) : (
+                        courses.map((course) => (
+                          <option key={course.id} value={course.id}>
+                            {course.code} - {course.name} (Semester {course.semester}, {course.year})
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                </div>
 
-                <TextField
-                  fullWidth
-                  required
-                  label="Assessment Name"
-                  value={assessmentName}
-                  onChange={(e) => setAssessmentName(e.target.value)}
-                  placeholder="e.g., Internal Assessment 1, Mid Term Exam, Assignment 1"
-                  disabled={uploading}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      '& fieldset': {
-                        borderWidth: 2,
-                      },
-                    },
-                  }}
-                />
+                {/* Assessment Name */}
+                <div>
+                  <label htmlFor="assessment-name" className="block text-sm font-semibold text-neutral-700 dark:text-dark-text-primary mb-2">
+                    Assessment Name *
+                  </label>
+                  <input
+                    id="assessment-name"
+                    type="text"
+                    value={assessmentName}
+                    onChange={(e) => setAssessmentName(e.target.value)}
+                    placeholder="e.g., Internal Assessment 1, Mid Term Exam, Assignment 1"
+                    disabled={uploading}
+                    className="w-full px-4 py-3 bg-white dark:bg-dark-bg-secondary border-2 border-neutral-300 dark:border-dark-border rounded-xl text-neutral-800 dark:text-dark-text-primary placeholder:text-neutral-500 dark:placeholder:text-dark-text-muted focus:outline-none focus:border-primary-500 dark:focus:border-dark-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                </div>
 
+                {/* Confirmation Alert */}
                 {selectedCourse && assessmentName && (
-                  <Alert severity="info" sx={{ borderRadius: 2 }}>
-                    <Typography variant="body2">
+                  <Alert className="bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800">
+                    <p className="text-sm text-primary-800 dark:text-primary-200">
                       <strong>Ready to upload:</strong> Marks will be saved for{' '}
                       <strong>{courses.find((c) => c.id === selectedCourse)?.code}</strong> -{' '}
                       <strong>{assessmentName}</strong>
-                    </Typography>
+                    </p>
                   </Alert>
                 )}
-              </Box>
+              </div>
             </CardContent>
           </Card>
-        </MotionBox>
+        </motion.div>
 
         {/* Upload Zone */}
         <UploadZone
@@ -371,168 +275,91 @@ const UploadMarksNew = () => {
         {/* Upload Button */}
         <AnimatePresence>
           {file && !result && (
-            <MotionBox
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              sx={{
-                mt: 3,
-                display: "flex",
-                gap: 2,
-                justifyContent: "center",
-                flexWrap: "wrap",
-              }}
+              className="mt-6 flex gap-4 justify-center flex-wrap"
             >
               <Button
-                variant="contained"
-                size="large"
-                startIcon={uploading ? <CircularProgress size={20} color="inherit" /> : <CloudUploadIcon />}
+                size="lg"
                 onClick={handleUpload}
                 disabled={uploading}
-                sx={{
-                  px: 6,
-                  py: 2,
-                  borderRadius: 3,
-                  fontSize: "1.1rem",
-                  fontWeight: 700,
-                  textTransform: "none",
-                  background: (theme) =>
-                    `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                  boxShadow: (theme) =>
-                    `0 8px 24px ${alpha(theme.palette.primary.main, 0.4)}`,
-                  "&:hover": {
-                    boxShadow: (theme) =>
-                      `0 12px 32px ${alpha(theme.palette.primary.main, 0.5)}`,
-                    transform: "translateY(-2px)",
-                  },
-                  "&:disabled": {
-                    background: (theme) => alpha(theme.palette.primary.main, 0.5),
-                  },
-                }}
+                className="bg-gradient-to-r from-primary-500 to-primary-600 dark:from-dark-green-500 dark:to-dark-green-600 hover:from-primary-600 hover:to-primary-700 dark:hover:from-dark-green-600 dark:hover:to-dark-green-700 px-8 py-6 text-lg font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
+                {uploading ? (
+                  <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin mr-3" />
+                ) : (
+                  <CloudUpload className="w-5 h-5 mr-3" />
+                )}
                 {uploading ? "Uploading..." : "Upload to Database"}
               </Button>
 
               <Button
-                variant="outlined"
-                size="large"
-                startIcon={<RestartAltIcon />}
+                variant="outline"
+                size="lg"
                 onClick={handleReset}
                 disabled={uploading}
-                sx={{
-                  px: 4,
-                  py: 2,
-                  borderRadius: 3,
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  textTransform: "none",
-                  borderWidth: 2,
-                  "&:hover": {
-                    borderWidth: 2,
-                  },
-                }}
+                className="px-6 py-6 text-base font-semibold border-2 hover:bg-neutral-50 dark:hover:bg-dark-bg-tertiary"
               >
+                <RotateCcw className="w-5 h-5 mr-2" />
                 Reset
               </Button>
-            </MotionBox>
+            </motion.div>
           )}
         </AnimatePresence>
 
         {/* Upload Progress */}
         <AnimatePresence>
           {uploading && (
-            <MotionBox
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              sx={{ mt: 3 }}
+              className="mt-6"
             >
-              <Box
-                sx={{
-                  p: 3,
-                  borderRadius: 3,
-                  background: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? alpha(theme.palette.background.paper, 0.6)
-                      : alpha(theme.palette.background.paper, 0.9),
-                  backdropFilter: "blur(10px)",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    mb: 1,
-                  }}
-                >
-                  <Typography variant="body2" fontWeight="medium">
-                    Processing your file...
-                  </Typography>
-                  <Typography variant="body2" fontWeight="bold" color="primary">
-                    {uploadProgress}%
-                  </Typography>
-                </Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={uploadProgress}
-                  sx={{
-                    height: 8,
-                    borderRadius: 4,
-                    backgroundColor: (theme) =>
-                      alpha(theme.palette.primary.main, 0.2),
-                    "& .MuiLinearProgress-bar": {
-                      borderRadius: 4,
-                      background: (theme) =>
-                        `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                    },
-                  }}
-                />
-              </Box>
-            </MotionBox>
+              <Card className="bg-white/90 dark:bg-dark-bg-secondary/90 backdrop-blur-lg">
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-neutral-700 dark:text-dark-text-primary">
+                      Processing your file...
+                    </span>
+                    <span className="text-sm font-bold text-primary-600 dark:text-dark-green-500">
+                      {uploadProgress}%
+                    </span>
+                  </div>
+                  <div className="h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 transition-all duration-300 rounded-full"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           )}
         </AnimatePresence>
 
         {/* Upload Summary */}
         {result && (
-          <Box sx={{ mt: 5 }}>
+          <div className="mt-8">
             <UploadSummary
               result={result}
               onViewTable={handleViewTable}
               onExport={handleExport}
             />
-          </Box>
+          </div>
         )}
 
         {/* Dataset Table */}
         {result?.preview && (
-          <Box ref={tableRef} sx={{ mt: 5 }}>
+          <div ref={tableRef} className="mt-8">
             <DatasetTable data={result.preview} columns={result.columns} />
-          </Box>
+          </div>
         )}
-
-        {/* Snackbar Notifications */}
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        >
-          <Alert
-            onClose={handleCloseSnackbar}
-            severity={snackbar.severity}
-            variant="filled"
-            sx={{
-              borderRadius: 2,
-              fontWeight: 600,
-            }}
-          >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 };
 

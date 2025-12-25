@@ -1,82 +1,37 @@
 import { useState, useEffect } from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Button,
-  Grid,
-  Card,
-  CardContent,
-  Chip,
-  LinearProgress,
-  Alert,
-  AlertTitle,
-  IconButton,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Slider,
-  FormControlLabel,
-  Switch,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  CircularProgress,
-  Divider,
-  Stack,
-  Stepper,
-  Step,
-  StepLabel,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Avatar,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-} from '@mui/material';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   CloudUpload,
-  Psychology,
-  AutoAwesome,
+  Sparkles,
   CheckCircle,
-  Cancel,
-  Refresh,
+  RotateCcw,
   Download,
-  ExpandMore,
+  ChevronDown,
   Info,
   TrendingUp,
-  Speed,
-  Assessment,
-  Lightbulb,
-  School,
+  GraduationCap,
   Save,
-  ArrowForward,
-  ArrowBack,
-  Verified,
+  ArrowRight,
+  ArrowLeft,
+  BadgeCheck,
   Star,
-  EmojiEvents,
-} from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
+  Plus,
+  Trash2,
+} from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useTheme } from '../../contexts/ThemeContext';
 import { courseAPI, aiCOAPI } from '../../services/api';
 import {
   generateCOs,
   regenerateCO,
   getDashboardMetrics,
-  getProfilerStats,
-  exportMetrics,
   submitFeedback as submitCOFeedback,
-  getBloomTaxonomy,
-  getPODescriptions,
   healthCheck,
 } from '../../services/coGeneratorAPI';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
+import { Alert } from '../../components/ui/alert';
 
 const COGenerator = () => {
   const { isDark } = useTheme();
@@ -107,7 +62,6 @@ const COGenerator = () => {
   const [savingToDB, setSavingToDB] = useState(false);
 
   // Dashboard metrics
-  const [dashboardMetrics, setDashboardMetrics] = useState(null);
   const [serviceHealth, setServiceHealth] = useState(null);
 
   // Dialog states
@@ -137,7 +91,7 @@ const COGenerator = () => {
     } catch (err) {
       console.error('Error loading courses:', err);
       setError('Failed to load courses');
-      setCourses([]); // Ensure courses is always an array
+      setCourses([]);
       setLoadingCourses(false);
     }
   };
@@ -157,15 +111,6 @@ const COGenerator = () => {
       setServiceHealth(health);
     } catch (err) {
       console.error('Error loading initial data:', err);
-    }
-  };
-
-  const loadDashboardMetrics = async () => {
-    try {
-      const dashboard = await getDashboardMetrics();
-      setDashboardMetrics(dashboard);
-    } catch (err) {
-      console.error('Error loading dashboard metrics:', err);
     }
   };
 
@@ -221,9 +166,7 @@ const COGenerator = () => {
       setPipelineMetrics(result.pipeline_metrics);
       setSessionId(result.session_id);
       setSuccess(`Successfully generated ${result.cos.length} Course Outcomes!`);
-      setActiveStep(3); // Move to review step
-
-      loadDashboardMetrics();
+      setActiveStep(3);
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to generate COs. Please try again.');
     } finally {
@@ -249,9 +192,8 @@ const COGenerator = () => {
 
       await aiCOAPI.save(saveData);
       setSavedToDB(true);
-      setSuccess('🎉 COs saved to database successfully! They are now visible in the course detail page.');
+      setSuccess('COs saved to database successfully! They are now visible in the course detail page.');
 
-      // Reload statistics
       loadCourseStatistics();
     } catch (err) {
       setError('Failed to save COs to database');
@@ -316,12 +258,12 @@ const COGenerator = () => {
 
   const getBloomLevelColor = (level) => {
     const colors = {
-      Apply: '#3b82f6',
-      Analyze: '#8b5cf6',
-      Evaluate: '#ec4899',
-      Create: '#10b981',
+      Apply: 'bg-blue-500',
+      Analyze: 'bg-purple-500',
+      Evaluate: 'bg-pink-500',
+      Create: 'bg-success-500',
     };
-    return colors[level] || '#6b7280';
+    return colors[level] || 'bg-neutral-500';
   };
 
   const getQualityColor = (score) => {
@@ -330,7 +272,7 @@ const COGenerator = () => {
     return 'error';
   };
 
-  // Render different steps
+  // Render step content
   const renderStepContent = () => {
     switch (activeStep) {
       case 0:
@@ -352,102 +294,105 @@ const COGenerator = () => {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Paper sx={{ p: 4, bgcolor: isDark ? '#1e293b' : 'white' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-          <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
-            <School sx={{ fontSize: 32 }} />
-          </Avatar>
-          <Box>
-            <Typography variant="h5" fontWeight="bold">
-              Select Course / Subject
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Choose the course for which you want to generate COs
-            </Typography>
-          </Box>
-        </Box>
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 flex items-center justify-center">
+              <GraduationCap className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary">
+                Select Course / Subject
+              </h2>
+              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+                Choose the course for which you want to generate COs
+              </p>
+            </div>
+          </div>
 
-        {/* Course Statistics if previously generated */}
-        {courseStatistics && courseStatistics.total_cos > 0 && selectedCourse && (
-          <Alert severity="info" sx={{ mb: 3 }} icon={<Info />}>
-            <AlertTitle>Existing COs Found</AlertTitle>
-            This course already has {courseStatistics.total_cos} AI-generated COs
-            ({courseStatistics.approved_cos} approved). Generating new COs will replace them.
-          </Alert>
-        )}
+          {courseStatistics && courseStatistics.total_cos > 0 && selectedCourse && (
+            <Alert className="mb-6 bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800">
+              <Info className="w-4 h-4" />
+              <div className="ml-2">
+                <p className="font-semibold text-primary-800 dark:text-primary-200">Existing COs Found</p>
+                <p className="text-sm text-primary-700 dark:text-primary-300">
+                  This course already has {courseStatistics.total_cos} AI-generated COs
+                  ({courseStatistics.approved_cos} approved). Generating new COs will replace them.
+                </p>
+              </div>
+            </Alert>
+          )}
 
-        <FormControl fullWidth size="large">
-          <InputLabel>Select Course *</InputLabel>
-          <Select
-            value={selectedCourse}
-            onChange={(e) => handleCourseSelect(e.target.value)}
-            label="Select Course *"
-            disabled={loadingCourses}
-          >
-            {loadingCourses ? (
-              <MenuItem disabled>
-                <CircularProgress size={20} sx={{ mr: 2 }} />
-                Loading courses...
-              </MenuItem>
-            ) : !Array.isArray(courses) || courses.length === 0 ? (
-              <MenuItem disabled>No courses available</MenuItem>
-            ) : (
-              courses.map((course) => (
-                <MenuItem key={course.id} value={course.id}>
-                  <Box sx={{ py: 1 }}>
-                    <Typography variant="body1" fontWeight={600}>
-                      {course.code} - {course.name}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Semester {course.semester} • {course.department} • {course.credits} Credits
-                    </Typography>
-                  </Box>
-                </MenuItem>
-              ))
-            )}
-          </Select>
-        </FormControl>
+          <div className="relative">
+            <label htmlFor="course-select" className="block text-sm font-semibold text-neutral-700 dark:text-dark-text-primary mb-2">
+              Select Course *
+            </label>
+            <select
+              id="course-select"
+              value={selectedCourse}
+              onChange={(e) => handleCourseSelect(e.target.value)}
+              disabled={loadingCourses}
+              className="w-full px-4 py-3 bg-white dark:bg-dark-bg-secondary border-2 border-neutral-300 dark:border-dark-border rounded-xl text-neutral-800 dark:text-dark-text-primary focus:outline-none focus:border-primary-500 dark:focus:border-dark-green-500 disabled:opacity-50"
+            >
+              {loadingCourses ? (
+                <option>Loading courses...</option>
+              ) : !Array.isArray(courses) || courses.length === 0 ? (
+                <option>No courses available</option>
+              ) : (
+                <>
+                  <option value="">-- Select a course --</option>
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.id}>
+                      {course.code} - {course.name} (Semester {course.semester}, {course.credits} Credits)
+                    </option>
+                  ))}
+                </>
+              )}
+            </select>
+          </div>
 
-        {selectedCourseDetails && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card sx={{ mt: 3, bgcolor: isDark ? '#0f172a' : '#f8fafc', border: '1px solid', borderColor: 'primary.main' }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  Selected Course Details
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary">Code</Typography>
-                    <Typography variant="body1" fontWeight={600}>{selectedCourseDetails.code}</Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary">Name</Typography>
-                    <Typography variant="body1" fontWeight={600}>{selectedCourseDetails.name}</Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary">Semester</Typography>
-                    <Typography variant="body1">{selectedCourseDetails.semester}</Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary">Credits</Typography>
-                    <Typography variant="body1">{selectedCourseDetails.credits}</Typography>
-                  </Grid>
-                  {selectedCourseDetails.description && (
-                    <Grid item xs={12}>
-                      <Typography variant="caption" color="text.secondary">Description</Typography>
-                      <Typography variant="body2">{selectedCourseDetails.description}</Typography>
-                    </Grid>
-                  )}
-                </Grid>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-      </Paper>
+          {selectedCourseDetails && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mt-6"
+            >
+              <Card className="border-2 border-primary-500 dark:border-dark-green-500 bg-primary-50/30 dark:bg-primary-900/10">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-bold text-neutral-800 dark:text-dark-text-primary mb-4">
+                    Selected Course Details
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-neutral-600 dark:text-dark-text-secondary">Code</p>
+                      <p className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">{selectedCourseDetails.code}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-neutral-600 dark:text-dark-text-secondary">Name</p>
+                      <p className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">{selectedCourseDetails.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-neutral-600 dark:text-dark-text-secondary">Semester</p>
+                      <p className="text-sm text-neutral-800 dark:text-dark-text-primary">{selectedCourseDetails.semester}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-neutral-600 dark:text-dark-text-secondary">Credits</p>
+                      <p className="text-sm text-neutral-800 dark:text-dark-text-primary">{selectedCourseDetails.credits}</p>
+                    </div>
+                    {selectedCourseDetails.description && (
+                      <div className="col-span-2">
+                        <p className="text-xs text-neutral-600 dark:text-dark-text-secondary">Description</p>
+                        <p className="text-sm text-neutral-800 dark:text-dark-text-primary">{selectedCourseDetails.description}</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </CardContent>
+      </Card>
     </motion.div>
   );
 
@@ -457,90 +402,80 @@ const COGenerator = () => {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Paper sx={{ p: 4, bgcolor: isDark ? '#1e293b' : 'white' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-          <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
-            <CloudUpload sx={{ fontSize: 32 }} />
-          </Avatar>
-          <Box>
-            <Typography variant="h5" fontWeight="bold">
-              Upload Course Materials
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Upload syllabi, lecture notes, or course content (PDF, PPTX, DOCX, TXT)
-            </Typography>
-          </Box>
-        </Box>
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 flex items-center justify-center">
+              <CloudUpload className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary">
+                Upload Course Materials
+              </h2>
+              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+                Upload syllabi, lecture notes, or course content (PDF, PPTX, DOCX, TXT)
+              </p>
+            </div>
+          </div>
 
-        <Button
-          variant="outlined"
-          component="label"
-          fullWidth
-          startIcon={<CloudUpload />}
-          sx={{
-            py: 6,
-            borderStyle: 'dashed',
-            borderWidth: 3,
-            borderColor: 'primary.main',
-            background: isDark ? 'rgba(59, 130, 246, 0.05)' : 'rgba(59, 130, 246, 0.02)',
-            '&:hover': {
-              borderStyle: 'dashed',
-              borderWidth: 3,
-              background: isDark ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.05)',
-            },
-          }}
-        >
-          <Box>
-            <Typography variant="h6">Click to Choose Files or Drag & Drop</Typography>
-            <Typography variant="caption" color="text.secondary">
-              Supported formats: PDF, PPTX, DOCX, TXT (Multiple files allowed)
-            </Typography>
-          </Box>
-          <input
-            type="file"
-            hidden
-            multiple
-            accept=".pdf,.ppt,.pptx,.doc,.docx,.txt"
-            onChange={handleFileChange}
-          />
-        </Button>
+          <label className="block">
+            <div className="border-4 border-dashed border-primary-500 dark:border-dark-green-500 rounded-2xl p-12 text-center bg-primary-50/30 dark:bg-primary-900/10 hover:bg-primary-50/50 dark:hover:bg-primary-900/20 transition-colors cursor-pointer">
+              <CloudUpload className="w-16 h-16 text-primary-600 dark:text-dark-green-500 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-neutral-800 dark:text-dark-text-primary mb-2">
+                Click to Choose Files or Drag & Drop
+              </h3>
+              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+                Supported formats: PDF, PPTX, DOCX, TXT (Multiple files allowed)
+              </p>
+            </div>
+            <input
+              type="file"
+              className="hidden"
+              multiple
+              accept=".pdf,.ppt,.pptx,.doc,.docx,.txt"
+              onChange={handleFileChange}
+            />
+          </label>
 
-        {files.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+          {files.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mt-6"
+            >
+              <h3 className="text-lg font-bold text-neutral-800 dark:text-dark-text-primary mb-4">
                 Selected Files ({files.length})
-              </Typography>
-              <Stack spacing={1}>
+              </h3>
+              <div className="space-y-2">
                 {files.map((file, index) => (
-                  <Card key={index} sx={{ bgcolor: isDark ? '#0f172a' : '#f8fafc' }}>
-                    <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <CloudUpload color="primary" />
-                          <Box>
-                            <Typography variant="body1" fontWeight={600}>{file.name}</Typography>
-                            <Typography variant="caption" color="text.secondary">
+                  <Card key={index} className="bg-neutral-50 dark:bg-dark-bg-secondary">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                          <CloudUpload className="w-5 h-5 text-primary-600 dark:text-dark-green-500" />
+                          <div>
+                            <p className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">{file.name}</p>
+                            <p className="text-xs text-neutral-600 dark:text-dark-text-secondary">
                               {(file.size / 1024 / 1024).toFixed(2)} MB
-                            </Typography>
-                          </Box>
-                        </Box>
-                        <IconButton onClick={() => handleRemoveFile(index)} color="error">
-                          <Cancel />
-                        </IconButton>
-                      </Box>
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleRemoveFile(index)}
+                          className="p-2 rounded-lg text-error-600 hover:bg-error-50 dark:text-error-500 dark:hover:bg-error-900/20 transition-colors"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
-              </Stack>
-            </Box>
-          </motion.div>
-        )}
-      </Paper>
+              </div>
+            </motion.div>
+          )}
+        </CardContent>
+      </Card>
     </motion.div>
   );
 
@@ -550,148 +485,127 @@ const COGenerator = () => {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Paper sx={{ p: 4, bgcolor: isDark ? '#1e293b' : 'white' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-          <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
-            <AutoAwesome sx={{ fontSize: 32 }} />
-          </Avatar>
-          <Box>
-            <Typography variant="h5" fontWeight="bold">
-              Configure & Generate
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Set CO distribution and generate AI-powered course outcomes
-            </Typography>
-          </Box>
-        </Box>
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 flex items-center justify-center">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary">
+                Configure & Generate
+              </h2>
+              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+                Set CO distribution and generate AI-powered course outcomes
+              </p>
+            </div>
+          </div>
 
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Card sx={{ bgcolor: isDark ? '#0f172a' : '#f8fafc', height: '100%' }}>
-              <CardContent>
-                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                  Apply-level COs (CO1-CO4)
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary">Count</Typography>
-                  <Chip label={numApply} color="primary" size="small" />
-                </Box>
-                <Slider
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <Card className="bg-neutral-50 dark:bg-dark-bg-secondary">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-bold text-neutral-800 dark:text-dark-text-primary mb-4">
+                  Apply-level COs
+                </h3>
+                <div className="flex justify-between mb-3">
+                  <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">Count</span>
+                  <Badge className="bg-primary-500 text-white">{numApply}</Badge>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="4"
                   value={numApply}
-                  onChange={(_, value) => {
-                    setNumApply(value);
-                    setNumAnalyze(4 - value);
+                  onChange={(e) => {
+                    setNumApply(parseInt(e.target.value));
+                    setNumAnalyze(4 - parseInt(e.target.value));
                   }}
-                  min={0}
-                  max={4}
-                  marks
-                  valueLabelDisplay="auto"
-                  sx={{ mt: 2 }}
+                  className="w-full h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-lg appearance-none cursor-pointer accent-primary-500"
                 />
-                <Typography variant="caption" color="text.secondary">
+                <p className="text-xs text-neutral-500 dark:text-dark-text-muted mt-2">
                   Apply: Demonstrate, Implement, Use, Execute
-                </Typography>
+                </p>
               </CardContent>
             </Card>
-          </Grid>
 
-          <Grid item xs={12} md={6}>
-            <Card sx={{ bgcolor: isDark ? '#0f172a' : '#f8fafc', height: '100%' }}>
-              <CardContent>
-                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                  Analyze-level COs (CO1-CO4)
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary">Count</Typography>
-                  <Chip label={numAnalyze} color="secondary" size="small" />
-                </Box>
-                <Slider
+            <Card className="bg-neutral-50 dark:bg-dark-bg-secondary">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-bold text-neutral-800 dark:text-dark-text-primary mb-4">
+                  Analyze-level COs
+                </h3>
+                <div className="flex justify-between mb-3">
+                  <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">Count</span>
+                  <Badge className="bg-secondary-500 text-white">{numAnalyze}</Badge>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="4"
                   value={numAnalyze}
-                  onChange={(_, value) => {
-                    setNumAnalyze(value);
-                    setNumApply(4 - value);
+                  onChange={(e) => {
+                    setNumAnalyze(parseInt(e.target.value));
+                    setNumApply(4 - parseInt(e.target.value));
                   }}
-                  min={0}
-                  max={4}
-                  marks
-                  valueLabelDisplay="auto"
-                  sx={{ mt: 2 }}
+                  className="w-full h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-lg appearance-none cursor-pointer accent-secondary-500"
                 />
-                <Typography variant="caption" color="text.secondary">
+                <p className="text-xs text-neutral-500 dark:text-dark-text-muted mt-2">
                   Analyze: Examine, Compare, Investigate, Differentiate
-                </Typography>
+                </p>
               </CardContent>
             </Card>
-          </Grid>
+          </div>
 
-          <Grid item xs={12}>
-            <Card sx={{ bgcolor: isDark ? '#0f172a' : '#f8fafc' }}>
-              <CardContent>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={useChromaDB}
-                      onChange={(e) => setUseChromaDB(e.target.checked)}
-                      color="primary"
-                    />
-                  }
-                  label={
-                    <Box>
-                      <Typography variant="body1" fontWeight={600}>
-                        Use ChromaDB for Enhanced Context Retrieval
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        Leverages vector database for better syllabus-aligned CO generation
-                      </Typography>
-                    </Box>
-                  }
+          <Card className="bg-neutral-50 dark:bg-dark-bg-secondary mb-6">
+            <CardContent className="p-6">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={useChromaDB}
+                  onChange={(e) => setUseChromaDB(e.target.checked)}
+                  className="w-5 h-5 rounded border-neutral-300 dark:border-dark-border text-primary-500 focus:ring-primary-500"
                 />
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+                <div>
+                  <p className="text-sm font-semibold text-neutral-800 dark:text-dark-text-primary">
+                    Use ChromaDB for Enhanced Context Retrieval
+                  </p>
+                  <p className="text-xs text-neutral-600 dark:text-dark-text-secondary">
+                    Leverages vector database for better syllabus-aligned CO generation
+                  </p>
+                </div>
+              </label>
+            </CardContent>
+          </Card>
 
-        <Divider sx={{ my: 3 }} />
+          <Button
+            onClick={handleGenerateCOs}
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 text-white py-6 text-lg font-bold shadow-lg hover:shadow-xl transition-all"
+          >
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin mr-3" />
+                Generating Course Outcomes...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5 mr-3" />
+                Generate Course Outcomes with AI
+              </>
+            )}
+          </Button>
 
-        <Button
-          variant="contained"
-          fullWidth
-          size="large"
-          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <AutoAwesome />}
-          onClick={handleGenerateCOs}
-          disabled={loading}
-          sx={{
-            py: 2,
-            background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-            boxShadow: '0 4px 20px rgba(37, 99, 235, 0.4)',
-            '&:hover': {
-              background: 'linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%)',
-              boxShadow: '0 6px 30px rgba(37, 99, 235, 0.6)',
-            },
-          }}
-        >
-          {loading ? 'Generating Course Outcomes...' : '✨ Generate Course Outcomes with AI'}
-        </Button>
-
-        {loading && (
-          <Box sx={{ mt: 3 }}>
-            <LinearProgress
-              sx={{
-                height: 8,
-                borderRadius: 4,
-                background: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                '& .MuiLinearProgress-bar': {
-                  background: 'linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899)',
-                  borderRadius: 4,
-                },
-              }}
-            />
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 2, textAlign: 'center' }}>
-              🚀 Processing {files.length} file(s) and generating COs with AI magic...
-            </Typography>
-          </Box>
-        )}
-      </Paper>
+          {loading && (
+            <div className="mt-6">
+              <div className="h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-primary-500 via-secondary-500 to-accent-500 animate-pulse" style={{ width: '100%' }} />
+              </div>
+              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mt-3 text-center">
+                Processing {files.length} file(s) and generating COs with AI magic...
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </motion.div>
   );
 
@@ -701,469 +615,442 @@ const COGenerator = () => {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Grid container spacing={3}>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Generated COs */}
-        <Grid item xs={12} lg={8}>
-          <Paper sx={{ p: 3, bgcolor: isDark ? '#1e293b' : 'white' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar sx={{ bgcolor: 'success.main', width: 56, height: 56 }}>
-                  <EmojiEvents sx={{ fontSize: 32 }} />
-                </Avatar>
-                <Box>
-                  <Typography variant="h5" fontWeight="bold">
-                    Generated Course Outcomes
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Review, approve, and save to {selectedCourseDetails?.code}
-                  </Typography>
-                </Box>
-              </Box>
-              {!savedToDB && (
-                <Chip
-                  label="Not Saved"
-                  color="warning"
-                  size="small"
-                  icon={<Info />}
-                />
+        <div className="lg:col-span-2">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-success-500 to-success-600 flex items-center justify-center">
+                    <BadgeCheck className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary">
+                      Generated Course Outcomes
+                    </h2>
+                    <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+                      Review, approve, and save to {selectedCourseDetails?.code}
+                    </p>
+                  </div>
+                </div>
+                {!savedToDB && (
+                  <Badge variant="warning" className="flex items-center gap-1">
+                    <Info className="w-3 h-3" />
+                    Not Saved
+                  </Badge>
+                )}
+              </div>
+
+              <div className="space-y-4">
+                {generatedCOs.map((co, index) => {
+                  const bloomColor = getBloomLevelColor(co.bloom_level);
+                  return (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <Card className={`border-2 ${co.approved ? 'border-success-500' : 'border-neutral-200 dark:border-dark-border'}`}>
+                        <CardContent className="p-6">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex-1">
+                              <div className="flex gap-2 flex-wrap mb-3">
+                                <span className={`inline-flex items-center px-3 py-1 rounded-lg ${bloomColor} text-white font-bold text-sm`}>
+                                  CO{co.co_num}
+                                </span>
+                                <Badge variant="outline" className={`${bloomColor.replace('bg-', 'border-')} ${bloomColor.replace('bg-', 'text-')}`}>
+                                  {co.bloom_level}
+                                </Badge>
+                                {co.approved && (
+                                  <Badge variant="success" className="flex items-center gap-1">
+                                    <BadgeCheck className="w-3 h-3" />
+                                    Approved
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-neutral-800 dark:text-dark-text-primary mb-2">
+                                {co.co_text}
+                              </p>
+                              <p className="text-xs text-neutral-600 dark:text-dark-text-secondary">
+                                PO Mappings: {co.po_mappings}
+                              </p>
+                            </div>
+
+                            <div className="flex gap-2 ml-4">
+                              <button
+                                onClick={() => handleApproveCO(co, true)}
+                                className={`p-2 rounded-lg ${co.approved ? 'bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-500' : 'bg-neutral-100 text-neutral-600 dark:bg-dark-bg-tertiary dark:text-dark-text-secondary'} hover:bg-success-200 dark:hover:bg-success-900/50 transition-colors`}
+                              >
+                                <CheckCircle className="w-5 h-5" />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setSelectedCO(co);
+                                  setRegenerateDialog(true);
+                                }}
+                                className="p-2 rounded-lg bg-neutral-100 text-neutral-600 dark:bg-dark-bg-tertiary dark:text-dark-text-secondary hover:bg-neutral-200 dark:hover:bg-dark-bg-secondary transition-colors"
+                              >
+                                <RotateCcw className="w-5 h-5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Quality Metrics */}
+                          <details className="group">
+                            <summary className="cursor-pointer flex items-center gap-2 text-sm font-semibold text-neutral-700 dark:text-dark-text-primary p-3 bg-neutral-50 dark:bg-dark-bg-secondary rounded-lg">
+                              <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform" />
+                              Quality Metrics Breakdown
+                            </summary>
+                            <div className="grid grid-cols-2 gap-4 p-4">
+                              {Object.entries(co.individual_scores || {}).map(([key, value]) => (
+                                <div key={key}>
+                                  <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mb-1 capitalize">
+                                    {key === 'vtu' ? 'VTU Compliance' : key === 'obe' ? 'OBE Alignment' : key}
+                                  </p>
+                                  <div className="h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+                                    <div
+                                      className={`h-full ${value >= 0.8 ? 'bg-success-500' : value >= 0.6 ? 'bg-warning-500' : 'bg-error-500'}`}
+                                      style={{ width: `${value * 100}%` }}
+                                    />
+                                  </div>
+                                  <p className="text-xs font-bold text-neutral-800 dark:text-dark-text-primary mt-1">
+                                    {(value * 100).toFixed(0)}%
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </details>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              <div className="h-px bg-neutral-200 dark:bg-dark-border my-6" />
+
+              <Button
+                onClick={handleSaveToDB}
+                disabled={savingToDB || savedToDB}
+                className={`w-full py-6 text-lg font-bold ${
+                  savedToDB
+                    ? 'bg-gradient-to-r from-success-500 to-success-600'
+                    : 'bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600'
+                }`}
+              >
+                {savingToDB ? (
+                  <>
+                    <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin mr-3" />
+                    Saving to Database...
+                  </>
+                ) : savedToDB ? (
+                  <>
+                    <BadgeCheck className="w-5 h-5 mr-3" />
+                    Saved to Database Successfully!
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-5 h-5 mr-3" />
+                    Save COs to {selectedCourseDetails?.code}
+                  </>
+                )}
+              </Button>
+
+              {savedToDB && (
+                <Alert className="mt-4 bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-800">
+                  <BadgeCheck className="w-4 h-4 text-success-600 dark:text-success-500" />
+                  <div className="ml-2">
+                    <p className="font-semibold text-success-800 dark:text-success-200">Success!</p>
+                    <p className="text-sm text-success-700 dark:text-success-300">
+                      COs have been saved to <strong>{selectedCourseDetails?.code}</strong>.
+                      They are now visible in the course detail page.
+                    </p>
+                  </div>
+                </Alert>
               )}
-            </Box>
-
-            <Stack spacing={2}>
-              {generatedCOs.map((co, index) => (
-                <motion.div
-                  key={`co-item-${index}`}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card
-                    sx={{
-                      border: '2px solid',
-                      borderColor: co.approved ? 'success.main' : 'divider',
-                      bgcolor: isDark ? '#0f172a' : 'background.paper',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        boxShadow: 4,
-                      },
-                    }}
-                  >
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
-                        <Box sx={{ flex: 1 }}>
-                          <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-                            <Chip
-                              label={`CO${co.co_num}`}
-                              sx={{
-                                bgcolor: getBloomLevelColor(co.bloom_level),
-                                color: 'white',
-                                fontWeight: 'bold',
-                              }}
-                            />
-                            <Chip
-                              label={co.bloom_level}
-                              variant="outlined"
-                              size="small"
-                              sx={{ borderColor: getBloomLevelColor(co.bloom_level) }}
-                            />
-                            {/* <Chip
-                              label={`Quality: ${(co.reward_score * 100).toFixed(0)}%`}
-                              color={getQualityColor(co.reward_score)}
-                              size="small"
-                              icon={<Star />}
-                            /> */}
-                            {co.approved && (
-                              <Chip
-                                label="Approved"
-                                color="success"
-                                size="small"
-                                icon={<Verified />}
-                              />
-                            )}
-                          </Stack>
-                          <Typography variant="body1" sx={{ mb: 1 }}>
-                            {co.co_text}
-                          </Typography>
-                          <Typography variant="caption" color="text">
-                             PO Mappings: {co.po_mappings}
-                          </Typography>
-                        </Box>
-
-                        <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
-                          <Tooltip title={co.approved ? "Approved" : "Approve"}>
-                            <IconButton
-                              size="small"
-                              color={co.approved ? 'success' : 'default'}
-                              onClick={() => handleApproveCO(co, true)}
-                            >
-                              <CheckCircle />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Regenerate">
-                            <IconButton
-                              size="small"
-                              onClick={() => {
-                                setSelectedCO(co);
-                                setRegenerateDialog(true);
-                              }}
-                            >
-                              <Refresh />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                      </Box>
-
-                      {/* Quality Metrics */}
-                      <Accordion sx={{ bgcolor: isDark ? '#1e293b' : '#f8fafc' }}>
-                        <AccordionSummary expandIcon={<ExpandMore />}>
-                          <Typography variant="caption" fontWeight="bold">
-                             Quality Metrics Breakdown
-                          </Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <Grid container spacing={2}>
-                            {Object.entries(co.individual_scores || {}).map(([key, value], idx) => (
-                              <Grid item xs={6} key={`score-${index}-${key}`}>
-                                <Typography variant="caption" color="text.secondary" textTransform="capitalize">
-                                  {key === 'vtu' ? 'VTU Compliance' : key === 'obe' ? 'OBE Alignment' : key}
-                                </Typography>
-                                <LinearProgress
-                                  variant="determinate"
-                                  value={value * 100}
-                                  color={getQualityColor(value)}
-                                  sx={{
-                                    mt: 0.5,
-                                    height: 8,
-                                    borderRadius: 4,
-                                    background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-                                  }}
-                                />
-                                <Typography variant="caption" fontWeight="bold">
-                                  {(value * 100).toFixed(0)}%
-                                </Typography>
-                              </Grid>
-                            ))}
-                          </Grid>
-                        </AccordionDetails>
-                      </Accordion>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </Stack>
-
-            <Divider sx={{ my: 3 }} />
-
-            {/* Save Button */}
-            <Button
-              variant="contained"
-              fullWidth
-              size="large"
-              startIcon={savingToDB ? <CircularProgress size={20} color="inherit" /> : savedToDB ? <Verified /> : <Save />}
-              onClick={handleSaveToDB}
-              disabled={savingToDB || savedToDB}
-              color={savedToDB ? 'success' : 'primary'}
-              sx={{
-                py: 2,
-                background: savedToDB
-                  ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                  : 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-              }}
-            >
-              {savingToDB ? 'Saving to Database...' : savedToDB ? '✅ Saved to Database Successfully!' : `💾 Save COs to ${selectedCourseDetails?.code}`}
-            </Button>
-
-            {savedToDB && (
-              <Alert severity="success" sx={{ mt: 2 }} icon={<EmojiEvents />}>
-                <AlertTitle>Success!</AlertTitle>
-                COs have been saved to <strong>{selectedCourseDetails?.code}</strong>.
-                They are now visible in the course detail page for both teachers and students.
-              </Alert>
-            )}
-          </Paper>
-        </Grid>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Pipeline Metrics */}
-        <Grid item xs={12} lg={4}>
+        <div>
           {pipelineMetrics && (
-            <Paper sx={{ p: 3, bgcolor: isDark ? '#1e293b' : 'white', position: 'sticky', top: 20 }}>
-              <Typography variant="h6" fontWeight="bold" sx={{ mb: 3 }}>
-                 Pipeline Metrics
-              </Typography>
+            <Card className="sticky top-20">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-bold text-neutral-800 dark:text-dark-text-primary mb-4 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  Pipeline Metrics
+                </h3>
 
-              <Stack spacing={2}>
-                {/* Quality Metrics */}
-                <Card sx={{ bgcolor: isDark ? '#0f172a' : '#f8fafc' }}>
-                  <CardContent>
-                    <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                      Quality Scores
-                    </Typography>
-                    <Box sx={{ mt: 2 }}>
-                      <Box sx={{ mb: 2 }}>
-                        <Typography variant="caption" color="text.secondary">Avg Quality</Typography>
-                        <LinearProgress
-                          variant="determinate"
-                          value={pipelineMetrics.average_quality_score * 100}
-                          color="primary"
-                          sx={{ mt: 0.5, height: 6, borderRadius: 3 }}
-                        />
-                        <Typography variant="caption" fontWeight="bold">
-                          {(pipelineMetrics.average_quality_score * 100).toFixed(0)}%
-                        </Typography>
-                      </Box>
-                      <Box sx={{ mb: 2 }}>
-                        <Typography variant="caption" color="text.secondary">VTU Compliance</Typography>
-                        <LinearProgress
-                          variant="determinate"
-                          value={pipelineMetrics.average_vtu_compliance * 100}
-                          color="success"
-                          sx={{ mt: 0.5, height: 6, borderRadius: 3 }}
-                        />
-                        <Typography variant="caption" fontWeight="bold">
-                          {(pipelineMetrics.average_vtu_compliance * 100).toFixed(0)}%
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary">Bloom Accuracy</Typography>
-                        <LinearProgress
-                          variant="determinate"
-                          value={pipelineMetrics.bloom_classification_accuracy * 100}
-                          color="warning"
-                          sx={{ mt: 0.5, height: 6, borderRadius: 3 }}
-                        />
-                        <Typography variant="caption" fontWeight="bold">
-                          {(pipelineMetrics.bloom_classification_accuracy * 100).toFixed(0)}%
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-
-                {/* Performance Metrics */}
-                <Card sx={{ bgcolor: isDark ? '#0f172a' : '#f8fafc' }}>
-                  <CardContent>
-                    <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                      Performance
-                    </Typography>
-                    <Stack spacing={1} sx={{ mt: 2 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="caption" color="text.secondary">Document Processing</Typography>
-                        <Typography variant="caption" fontWeight="bold">
-                          {pipelineMetrics.document_processing_ms.toFixed(0)}ms
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="caption" color="text.secondary">LLM Inference</Typography>
-                        <Typography variant="caption" fontWeight="bold">
-                          {pipelineMetrics.llm_inference_ms.toFixed(0)}ms
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="caption" color="text.secondary">Refinement</Typography>
-                        <Typography variant="caption" fontWeight="bold">
-                          {pipelineMetrics.refinement_ms.toFixed(0)}ms
-                        </Typography>
-                      </Box>
-                      <Divider />
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="caption" fontWeight="bold">Total Time</Typography>
-                        <Typography variant="caption" fontWeight="bold" color="primary.main">
-                          {pipelineMetrics.total_pipeline_ms.toFixed(0)}ms
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </CardContent>
-                </Card>
-
-                {/* ML Metrics */}
-                {pipelineMetrics.ml_metrics && (
-                  <Card sx={{ bgcolor: isDark ? '#0f172a' : '#f8fafc' }}>
-                    <CardContent>
-                      <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                      ML Performance
-                      </Typography>
-                      <Stack spacing={1} sx={{ mt: 2 }}>
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">Inference Latency</Typography>
-                          <Typography variant="h6" color="primary.main">
-                            {pipelineMetrics.ml_metrics.inference_latency_ms.toFixed(1)}ms
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">Throughput</Typography>
-                          <Typography variant="h6" color="success.main">
-                            {pipelineMetrics.ml_metrics.throughput_cos_per_sec.toFixed(2)} CO/s
-                          </Typography>
-                        </Box>
-                      </Stack>
+                <div className="space-y-4">
+                  <Card className="bg-neutral-50 dark:bg-dark-bg-secondary">
+                    <CardContent className="p-4">
+                      <p className="text-xs font-bold text-neutral-600 dark:text-dark-text-secondary mb-3">Quality Scores</p>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mb-1">Avg Quality</p>
+                          <div className="h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+                            <div className="h-full bg-primary-500" style={{ width: `${pipelineMetrics.average_quality_score * 100}%` }} />
+                          </div>
+                          <p className="text-xs font-bold text-neutral-800 dark:text-dark-text-primary mt-1">
+                            {(pipelineMetrics.average_quality_score * 100).toFixed(0)}%
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mb-1">VTU Compliance</p>
+                          <div className="h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+                            <div className="h-full bg-success-500" style={{ width: `${pipelineMetrics.average_vtu_compliance * 100}%` }} />
+                          </div>
+                          <p className="text-xs font-bold text-neutral-800 dark:text-dark-text-primary mt-1">
+                            {(pipelineMetrics.average_vtu_compliance * 100).toFixed(0)}%
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-neutral-600 dark:text-dark-text-secondary mb-1">Bloom Accuracy</p>
+                          <div className="h-2 bg-neutral-200 dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+                            <div className="h-full bg-warning-500" style={{ width: `${pipelineMetrics.bloom_classification_accuracy * 100}%` }} />
+                          </div>
+                          <p className="text-xs font-bold text-neutral-800 dark:text-dark-text-primary mt-1">
+                            {(pipelineMetrics.bloom_classification_accuracy * 100).toFixed(0)}%
+                          </p>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
-                )}
-              </Stack>
-            </Paper>
+
+                  <Card className="bg-neutral-50 dark:bg-dark-bg-secondary">
+                    <CardContent className="p-4">
+                      <p className="text-xs font-bold text-neutral-600 dark:text-dark-text-secondary mb-3">Performance</p>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-xs text-neutral-600 dark:text-dark-text-secondary">Document Processing</span>
+                          <span className="text-xs font-bold text-neutral-800 dark:text-dark-text-primary">
+                            {pipelineMetrics.document_processing_ms.toFixed(0)}ms
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-xs text-neutral-600 dark:text-dark-text-secondary">LLM Inference</span>
+                          <span className="text-xs font-bold text-neutral-800 dark:text-dark-text-primary">
+                            {pipelineMetrics.llm_inference_ms.toFixed(0)}ms
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-xs text-neutral-600 dark:text-dark-text-secondary">Refinement</span>
+                          <span className="text-xs font-bold text-neutral-800 dark:text-dark-text-primary">
+                            {pipelineMetrics.refinement_ms.toFixed(0)}ms
+                          </span>
+                        </div>
+                        <div className="h-px bg-neutral-200 dark:bg-dark-border my-2" />
+                        <div className="flex justify-between">
+                          <span className="text-xs font-bold text-neutral-700 dark:text-dark-text-primary">Total Time</span>
+                          <span className="text-xs font-bold text-primary-600 dark:text-dark-green-500">
+                            {pipelineMetrics.total_pipeline_ms.toFixed(0)}ms
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
           )}
-        </Grid>
-      </Grid>
+        </div>
+      </div>
     </motion.div>
   );
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Box sx={{ mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-            <Avatar
-              sx={{
-                width: 72,
-                height: 72,
-                background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-              }}
-            >
-              <Psychology sx={{ fontSize: 40 }} />
-            </Avatar>
-            <Box>
-              <Typography
-                variant="h4"
-                fontWeight="bold"
-                sx={{
-                  background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
+    <div className="min-h-screen bg-neutral-100 dark:bg-dark-bg-primary py-8">
+      <div className="container mx-auto px-4 max-w-7xl">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8"
+        >
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-18 h-18 rounded-3xl bg-gradient-to-br from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 flex items-center justify-center shadow-lg">
+              <Sparkles className="w-10 h-10 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600 bg-clip-text text-transparent">
                 AI-Powered CO Generator
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
+              </h1>
+              <p className="text-neutral-600 dark:text-dark-text-secondary">
                 Generate VTU-aligned Course Outcomes with advanced AI pipeline
-              </Typography>
-            </Box>
-          </Box>
+              </p>
+            </div>
+          </div>
 
-          {/* Service Health */}
           {serviceHealth && (
-            <Alert
-              severity={serviceHealth.status === 'healthy' ? 'success' : 'error'}
-              icon={<Verified />}
-              sx={{ mt: 2 }}
+            <Alert className={serviceHealth.status === 'healthy' ? 'bg-success-50 dark:bg-success-900/20 border-success-200' : 'bg-error-50 border-error-200'}>
+              <BadgeCheck className="w-4 h-4" />
+              <p className="ml-2 text-sm">
+                Service Status: <strong>{serviceHealth.status.toUpperCase()}</strong>
+              </p>
+            </Alert>
+          )}
+        </motion.div>
+
+        {/* Alerts */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-6"
             >
-              Service Status: <strong>{serviceHealth.status.toUpperCase()}</strong>
-            </Alert>
+              <Alert className="bg-error-50 dark:bg-error-900/20 border-error-200 dark:border-error-800">
+                <Info className="w-4 h-4 text-error-600 dark:text-error-500" />
+                <div className="ml-2">
+                  <p className="text-sm text-error-800 dark:text-error-200">{error}</p>
+                  <button
+                    onClick={() => setError(null)}
+                    className="text-xs text-error-600 dark:text-error-400 underline mt-1"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </Alert>
+            </motion.div>
           )}
-        </Box>
-      </motion.div>
-
-      {/* Alerts */}
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3 }}>
-              {error}
-            </Alert>
-          </motion.div>
-        )}
-        {success && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            <Alert severity="success" onClose={() => setSuccess(null)} sx={{ mb: 3 }}>
-              {success}
-            </Alert>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Stepper */}
-      <Paper sx={{ p: 3, mb: 3, bgcolor: isDark ? '#1e293b' : 'white' }}>
-        <Stepper activeStep={activeStep} alternativeLabel>
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-      </Paper>
-
-      {/* Step Content */}
-      <Box sx={{ mb: 3 }}>
-        {renderStepContent()}
-      </Box>
-
-      {/* Navigation Buttons */}
-      <Paper sx={{ p: 3, bgcolor: isDark ? '#1e293b' : 'white' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button
-            disabled={activeStep === 0}
-            onClick={handleBack}
-            startIcon={<ArrowBack />}
-            size="large"
-          >
-            Back
-          </Button>
-          {activeStep < steps.length - 1 && (
-            <Button
-              variant="contained"
-              onClick={handleNext}
-              endIcon={<ArrowForward />}
-              size="large"
+          {success && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-6"
             >
-              {activeStep === steps.length - 2 ? 'Review' : 'Next'}
-            </Button>
+              <Alert className="bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-800">
+                <CheckCircle className="w-4 h-4 text-success-600 dark:text-success-500" />
+                <div className="ml-2">
+                  <p className="text-sm text-success-800 dark:text-success-200">{success}</p>
+                  <button
+                    onClick={() => setSuccess(null)}
+                    className="text-xs text-success-600 dark:text-success-400 underline mt-1"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </Alert>
+            </motion.div>
           )}
-        </Box>
-      </Paper>
+        </AnimatePresence>
 
-      {/* Regenerate Dialog */}
-      <Dialog
-        open={regenerateDialog}
-        onClose={() => setRegenerateDialog(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Regenerate Course Outcome</DialogTitle>
-        <DialogContent>
-          {selectedCO && (
-            <>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Current CO: {selectedCO.co_text}
-              </Typography>
-              <TextField
-                fullWidth
-                multiline
-                rows={4}
-                label="Feedback / Instructions"
-                placeholder="Enter specific feedback or instructions for regeneration..."
-                value={feedbackText}
-                onChange={(e) => setFeedbackText(e.target.value)}
-                sx={{ mt: 2 }}
-              />
-            </>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setRegenerateDialog(false)}>Cancel</Button>
-          <Button
-            onClick={handleRegenerateCO}
-            variant="contained"
-            disabled={loading}
-            startIcon={loading ? <CircularProgress size={16} /> : <Refresh />}
-          >
-            Regenerate
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+        {/* Stepper */}
+        <Card className="mb-6">
+          <CardContent className="p-6">
+            <div className="flex justify-between">
+              {steps.map((label, index) => (
+                <div key={label} className="flex-1 flex items-center">
+                  <div className="flex flex-col items-center flex-1">
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+                        index <= activeStep
+                          ? 'bg-primary-500 dark:bg-dark-green-500 text-white'
+                          : 'bg-neutral-200 dark:bg-dark-bg-tertiary text-neutral-500'
+                      }`}
+                    >
+                      {index + 1}
+                    </div>
+                    <p className={`text-xs mt-2 text-center ${index <= activeStep ? 'text-neutral-800 dark:text-dark-text-primary font-semibold' : 'text-neutral-500'}`}>
+                      {label}
+                    </p>
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div className={`flex-1 h-1 ${index < activeStep ? 'bg-primary-500 dark:bg-dark-green-500' : 'bg-neutral-200 dark:bg-dark-bg-tertiary'}`} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Step Content */}
+        <div className="mb-6">
+          {renderStepContent()}
+        </div>
+
+        {/* Navigation */}
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                disabled={activeStep === 0}
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+              {activeStep < steps.length - 1 && (
+                <Button
+                  onClick={handleNext}
+                  className="bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600"
+                >
+                  {activeStep === steps.length - 2 ? 'Review' : 'Next'}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Regenerate Dialog */}
+        {regenerateDialog && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white dark:bg-dark-bg-secondary rounded-3xl shadow-2xl max-w-md w-full"
+            >
+              <div className="p-6 border-b border-neutral-200 dark:border-dark-border">
+                <h2 className="text-2xl font-bold text-neutral-800 dark:text-dark-text-primary">
+                  Regenerate Course Outcome
+                </h2>
+              </div>
+              <div className="p-6">
+                {selectedCO && (
+                  <>
+                    <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-4">
+                      Current CO: {selectedCO.co_text}
+                    </p>
+                    <textarea
+                      rows={4}
+                      placeholder="Enter specific feedback or instructions for regeneration..."
+                      value={feedbackText}
+                      onChange={(e) => setFeedbackText(e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-neutral-300 dark:border-dark-border rounded-xl bg-white dark:bg-dark-bg-primary text-neutral-800 dark:text-dark-text-primary placeholder:text-neutral-500 focus:outline-none focus:border-primary-500 dark:focus:border-dark-green-500"
+                    />
+                  </>
+                )}
+              </div>
+              <div className="p-6 border-t border-neutral-200 dark:border-dark-border flex gap-3 justify-end">
+                <Button variant="outline" onClick={() => setRegenerateDialog(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleRegenerateCO}
+                  disabled={loading}
+                  className="bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-dark-green-500 dark:to-secondary-600"
+                >
+                  {loading ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  ) : (
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                  )}
+                  Regenerate
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
