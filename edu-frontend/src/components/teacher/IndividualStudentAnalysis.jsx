@@ -594,12 +594,12 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                         </Table>
                       </TableContainer>
                       <Box sx={{ mt: 2 }}>
-                        <Alert severity={finalGrade.is_passed ? 'success' : 'error'}>
+                        {/* <Alert severity={finalGrade.is_passed ? 'success' : 'error'}>
                           <AlertTitle>
                             {finalGrade.is_passed ? 'Passed' : 'Failed'}
                           </AlertTitle>
                           Status: {finalGrade.is_passed ? 'Student has passed the course' : 'Student needs to retake the course'}
-                        </Alert>
+                        </Alert> */}
                       </Box>
                     </Grid>
                   )}
@@ -609,93 +609,7 @@ const IndividualStudentAnalysis = ({ courseId }) => {
           )}
 
           {/* Performance Insights Card */}
-          {studentData && studentData.coPerformance && studentData.coPerformance.length > 0 && (
-            <Accordion sx={{ mb: 2, boxShadow: 1 }}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                sx={{
-                  backgroundColor: '#f8f9fa',
-                  borderLeft: '4px solid #4caf50',
-                  '&:hover': { backgroundColor: '#f0f1f2' },
-                  '& .MuiAccordionSummary-content': { my: 1.5 }
-                }}
-              >
-                <Box display="flex" alignItems="center" gap={1.5}>
-                  <CheckCircle sx={{ color: '#4caf50', fontSize: 24 }} />
-                  <Typography variant="h6" fontWeight="600" color="text.primary">
-                    Performance Insights
-                  </Typography>
-                </Box>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={2}>
-                  {studentData.overallStats.avg_performance >= 80 && (
-                    <Grid item xs={12}>
-                      <Alert severity="success" icon={<EmojiEvents />}>
-                        <AlertTitle>Excellent Performance!</AlertTitle>
-                        The student is performing exceptionally well with an average of{' '}
-                        {studentData.overallStats.avg_performance.toFixed(1)}%. Keep up the great work!
-                      </Alert>
-                    </Grid>
-                  )}
-                  {studentData.overallStats.avg_performance >= 60 && studentData.overallStats.avg_performance < 80 && (
-                    <Grid item xs={12}>
-                      <Alert severity="info">
-                        <AlertTitle>Good Performance</AlertTitle>
-                        The student is performing well with an average of{' '}
-                        {studentData.overallStats.avg_performance.toFixed(1)}%. Focus on improving weaker COs to reach excellence.
-                      </Alert>
-                    </Grid>
-                  )}
-                  {studentData.overallStats.avg_performance < 60 && (
-                    <Grid item xs={12}>
-                      <Alert severity="warning">
-                        <AlertTitle>Needs Improvement</AlertTitle>
-                        The student's average performance is {studentData.overallStats.avg_performance.toFixed(1)}%.
-                        Additional support and practice are recommended.
-                      </Alert>
-                    </Grid>
-                  )}
 
-                  {studentData.overallStats.weakest_co && studentData.overallStats.weakest_co.percentage < 60 && (
-                    <Grid item xs={12} md={6}>
-                      <Paper sx={{ p: 2, bgcolor: alpha('#ff9800', 0.1), border: '1px solid #ff9800' }}>
-                        <Box display="flex" alignItems="center" gap={1} mb={1}>
-                          <TrendingDown sx={{ color: '#ff9800' }} />
-                          <Typography variant="subtitle2" fontWeight="bold">
-                            Focus Area
-                          </Typography>
-                        </Box>
-                        <Typography variant="body2">
-                          CO{studentData.overallStats.weakest_co.co_number} needs attention
-                          ({studentData.overallStats.weakest_co.percentage.toFixed(1)}%).
-                          Consider additional practice and review materials.
-                        </Typography>
-                      </Paper>
-                    </Grid>
-                  )}
-
-                  {studentData.overallStats.strongest_co && (
-                    <Grid item xs={12} md={6}>
-                      <Paper sx={{ p: 2, bgcolor: alpha('#4caf50', 0.1), border: '1px solid #4caf50' }}>
-                        <Box display="flex" alignItems="center" gap={1} mb={1}>
-                          <TrendingUp sx={{ color: '#4caf50' }} />
-                          <Typography variant="subtitle2" fontWeight="bold">
-                            Strength
-                          </Typography>
-                        </Box>
-                        <Typography variant="body2">
-                          CO{studentData.overallStats.strongest_co.co_number} is a strong point
-                          ({studentData.overallStats.strongest_co.percentage.toFixed(1)}%).
-                          Excellent understanding demonstrated!
-                        </Typography>
-                      </Paper>
-                    </Grid>
-                  )}
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-          )}
 
           {/* Only show CO-dependent sections if COs are defined */}
           {studentData.coPerformance && studentData.coPerformance.length > 0 && (
@@ -1000,7 +914,7 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                   transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                   '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 }
                 }}>
-                  <CardContent>
+                  {/* <CardContent>
                     <Typography variant="h6" fontWeight="bold" gutterBottom>
                       Assessment-wise Performance Trend
                     </Typography>
@@ -1023,7 +937,7 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                         ))}
                       </LineChart>
                     </ResponsiveContainer>
-                  </CardContent>
+                  </CardContent> */}
                 </Card>
               </Grid>
             )}
@@ -1516,79 +1430,6 @@ const IndividualStudentAnalysis = ({ courseId }) => {
             </>
           )}
 
-          {/* Final CIE */}
-          {studentData.finalCIE && (
-            <Accordion sx={{ mb: 2, boxShadow: 1 }}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                sx={{
-                  backgroundColor: '#f8f9fa',
-                  borderLeft: '4px solid #e91e63',
-                  '&:hover': { backgroundColor: '#f0f1f2' },
-                  '& .MuiAccordionSummary-content': { my: 1.5 }
-                }}
-              >
-                <Box display="flex" alignItems="center" gap={1.5}>
-                  <Calculate sx={{ color: '#e91e63', fontSize: 24 }} />
-                  <Typography variant="h6" fontWeight="600" color="text.primary">
-                    Final CIE Composition
-                  </Typography>
-                </Box>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={2} sx={{ mt: 1 }}>
-                  <Grid item xs={6} md={2}>
-                    <Typography variant="body2" color="text.secondary">
-                      CIE1 (30)
-                    </Typography>
-                    <Typography variant="h6" color="primary.main">
-                      {parseFloat(studentData.finalCIE.scaled_cie1 || 0).toFixed(2)}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6} md={2}>
-                    <Typography variant="body2" color="text.secondary">
-                      CIE2 (30)
-                    </Typography>
-                    <Typography variant="h6" color="primary.main">
-                      {parseFloat(studentData.finalCIE.scaled_cie2 || 0).toFixed(2)}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6} md={2}>
-                    <Typography variant="body2" color="text.secondary">
-                      CIE3 (30)
-                    </Typography>
-                    <Typography variant="h6" color="primary.main">
-                      {parseFloat(studentData.finalCIE.scaled_cie3 || 0).toFixed(2)}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6} md={2}>
-                    <Typography variant="body2" color="text.secondary">
-                      Avg CIE
-                    </Typography>
-                    <Typography variant="h6" fontWeight="bold" color="success.main">
-                      {parseFloat(studentData.finalCIE.avg_cie_scaled || 0).toFixed(2)}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6} md={2}>
-                    <Typography variant="body2" color="text.secondary">
-                      AAT + QUIZ
-                    </Typography>
-                    <Typography variant="h6">
-                      {(parseFloat(studentData.finalCIE.aat_marks || 0) + parseFloat(studentData.finalCIE.quiz_marks || 0)).toFixed(2)}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6} md={2}>
-                    <Typography variant="body2" color="text.secondary">
-                      Final Total (50)
-                    </Typography>
-                    <Typography variant="h6" fontWeight="bold">
-                      {parseFloat(studentData.finalCIE.final_cie_total || 0).toFixed(2)}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-          )}
         </>
       )}
 
@@ -1615,6 +1456,93 @@ const IndividualStudentAnalysis = ({ courseId }) => {
           </Typography>
         </Box>
       )}
+                {studentData && studentData.coPerformance && studentData.coPerformance.length > 0 && (
+            <Accordion sx={{ mb: 2, boxShadow: 1 }}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                sx={{
+                  backgroundColor: '#f8f9fa',
+                  borderLeft: '4px solid #4caf50',
+                  '&:hover': { backgroundColor: '#f0f1f2' },
+                  '& .MuiAccordionSummary-content': { my: 1.5 }
+                }}
+              >
+                <Box display="flex" alignItems="center" gap={1.5}>
+                  <CheckCircle sx={{ color: '#4caf50', fontSize: 24 }} />
+                  <Typography variant="h6" fontWeight="600" color="text.primary">
+                    Performance Insights
+                  </Typography>
+                </Box>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  {studentData.overallStats.avg_performance >= 80 && (
+                    <Grid item xs={12}>
+                      <Alert severity="success" icon={<EmojiEvents />}>
+                        <AlertTitle>Excellent Performance!</AlertTitle>
+                        The student is performing exceptionally well with an average of{' '}
+                        {studentData.overallStats.avg_performance.toFixed(1)}%. Keep up the great work!
+                      </Alert>
+                    </Grid>
+                  )}
+                  {studentData.overallStats.avg_performance >= 60 && studentData.overallStats.avg_performance < 80 && (
+                    <Grid item xs={12}>
+                      <Alert severity="info">
+                        <AlertTitle>Good Performance</AlertTitle>
+                        The student is performing well with an average of{' '}
+                        {studentData.overallStats.avg_performance.toFixed(1)}%. Focus on improving weaker COs to reach excellence.
+                      </Alert>
+                    </Grid>
+                  )}
+                  {studentData.overallStats.avg_performance < 60 && (
+                    <Grid item xs={12}>
+                      <Alert severity="warning">
+                        <AlertTitle>Needs Improvement</AlertTitle>
+                        The student's average performance is {studentData.overallStats.avg_performance.toFixed(1)}%.
+                        Additional support and practice are recommended.
+                      </Alert>
+                    </Grid>
+                  )}
+
+                  {studentData.overallStats.weakest_co && studentData.overallStats.weakest_co.percentage < 60 && (
+                    <Grid item xs={12} md={6}>
+                      <Paper sx={{ p: 2, bgcolor: alpha('#ff9800', 0.1), border: '1px solid #ff9800' }}>
+                        <Box display="flex" alignItems="center" gap={1} mb={1}>
+                          <TrendingDown sx={{ color: '#ff9800' }} />
+                          <Typography variant="subtitle2" fontWeight="bold">
+                            Focus Area
+                          </Typography>
+                        </Box>
+                        <Typography variant="body2">
+                          CO{studentData.overallStats.weakest_co.co_number} needs attention
+                          ({studentData.overallStats.weakest_co.percentage.toFixed(1)}%).
+                          Consider additional practice and review materials.
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  )}
+
+                  {studentData.overallStats.strongest_co && (
+                    <Grid item xs={12} md={6}>
+                      <Paper sx={{ p: 2, bgcolor: alpha('#4caf50', 0.1), border: '1px solid #4caf50' }}>
+                        <Box display="flex" alignItems="center" gap={1} mb={1}>
+                          <TrendingUp sx={{ color: '#4caf50' }} />
+                          <Typography variant="subtitle2" fontWeight="bold">
+                            Strength
+                          </Typography>
+                        </Box>
+                        <Typography variant="body2">
+                          CO{studentData.overallStats.strongest_co.co_number} is a strong point
+                          ({studentData.overallStats.strongest_co.percentage.toFixed(1)}%).
+                          Excellent understanding demonstrated!
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  )}
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+          )}
     </Box>
   );
 };
