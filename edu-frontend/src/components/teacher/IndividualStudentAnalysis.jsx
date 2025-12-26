@@ -75,6 +75,8 @@ const IndividualStudentAnalysis = ({ courseId }) => {
   const [studentData, setStudentData] = useState(null);
   const [seeMarks, setSeeMarks] = useState(null);
   const [finalGrade, setFinalGrade] = useState(null);
+  const [selectedCIE, setSelectedCIE] = useState(null);
+  const [highlightedCOs, setHighlightedCOs] = useState([]);
 
   useEffect(() => {
     if (courseId) {
@@ -226,6 +228,30 @@ const IndividualStudentAnalysis = ({ courseId }) => {
         return 'Needs Improvement (<40%)';
       default:
         return 'Not Attempted';
+    }
+  };
+
+  // Handle CIE click to highlight related COs
+  const handleCIEClick = (cieName) => {
+    if (selectedCIE === cieName) {
+      // Deselect if clicking the same CIE
+      setSelectedCIE(null);
+      setHighlightedCOs([]);
+    } else {
+      // Select new CIE and find related COs
+      setSelectedCIE(cieName);
+
+      // Find all COs that have this CIE
+      const relatedCOs = [];
+      studentData.coPerformance.forEach((co) => {
+        const hasThisCIE = co.assessments.some(
+          (assessment) => assessment.assessment_name === cieName
+        );
+        if (hasThisCIE) {
+          relatedCOs.push(co.co_number);
+        }
+      });
+      setHighlightedCOs(relatedCOs);
     }
   };
 
@@ -633,9 +659,45 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                   </Box>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                    Overall performance in each Continuous Internal Evaluation (CIE) across all Course Outcomes
-                  </Typography>
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      Overall performance in each Continuous Internal Evaluation (CIE) across all Course Outcomes
+                    </Typography>
+                    <Alert
+                      severity="info"
+                      icon={<InfoIcon />}
+                      sx={{ mb: 2 }}
+                      action={
+                        selectedCIE && (
+                          <Chip
+                            label="Clear Selection"
+                            size="small"
+                            onClick={() => {
+                              setSelectedCIE(null);
+                              setHighlightedCOs([]);
+                            }}
+                            sx={{
+                              bgcolor: 'white',
+                              fontWeight: 'bold',
+                              cursor: 'pointer',
+                              '&:hover': {
+                                bgcolor: '#f5f5f5'
+                              }
+                            }}
+                          />
+                        )
+                      }
+                    >
+                      <Typography variant="body2">
+                        <strong>💡 Interactive Feature:</strong> Click on any CIE card below to highlight the corresponding Course Outcomes (COs) throughout the page.
+                        {selectedCIE && (
+                          <span style={{ display: 'block', marginTop: 4, color: '#ffd700', fontWeight: 'bold' }}>
+                            ✨ Currently highlighting COs for: {selectedCIE}
+                          </span>
+                        )}
+                      </Typography>
+                    </Alert>
+                  </Box>
 
               <Grid container spacing={2}>
                 {(() => {
@@ -668,23 +730,42 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                     return (
                       <Grid item xs={12} sm={6} md={3} key={cie.name}>
                         <Paper
-                          elevation={2}
+                          elevation={selectedCIE === cie.name ? 8 : 2}
+                          onClick={() => handleCIEClick(cie.name)}
                           sx={{
                             p: 2,
                             height: '100%',
                             borderTop: `4px solid ${performanceColor}`,
-                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                            transition: 'transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease',
+                            cursor: 'pointer',
+                            border: selectedCIE === cie.name ? `3px solid ${performanceColor}` : '3px solid transparent',
+                            transform: selectedCIE === cie.name ? 'translateY(-4px) scale(1.02)' : 'none',
                             '&:hover': {
-                              transform: 'translateY(-4px)',
+                              transform: selectedCIE === cie.name ? 'translateY(-4px) scale(1.02)' : 'translateY(-4px)',
                               boxShadow: 6
                             }
                           }}
                         >
                           <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
                             <Box>
-                              <Typography variant="h6" fontWeight="bold">
-                                {cie.name}
-                              </Typography>
+                              <Box display="flex" alignItems="center" gap={1}>
+                                <Typography variant="h6" fontWeight="bold">
+                                  {cie.name}
+                                </Typography>
+                                {selectedCIE === cie.name && (
+                                  <Chip
+                                    label="Selected"
+                                    size="small"
+                                    sx={{
+                                      bgcolor: performanceColor,
+                                      color: 'white',
+                                      fontWeight: 'bold',
+                                      fontSize: '0.7rem',
+                                      height: 20
+                                    }}
+                                  />
+                                )}
+                              </Box>
                               <Chip
                                 label={cie.type}
                                 size="small"
@@ -740,6 +821,18 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                           <Box mt={2}>
                             <Typography variant="caption" color="text.secondary">
                               Evaluated across {cie.co_count} CO{cie.co_count !== 1 ? 's' : ''}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                display: 'block',
+                                mt: 0.5,
+                                color: performanceColor,
+                                fontWeight: 'bold',
+                                fontStyle: 'italic'
+                              }}
+                            >
+                              {selectedCIE === cie.name ? 'Click to deselect' : 'Click to highlight COs'}
                             </Typography>
                           </Box>
                         </Paper>
@@ -989,10 +1082,45 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {studentData.coPerformance.map((co) => (
-                      <TableRow key={co.co_number} hover>
+                    {studentData.coPerformance.map((co) => {
+                      const isHighlighted = highlightedCOs.includes(co.co_number);
+                      return (
+                      <TableRow
+                        key={co.co_number}
+                        hover
+                        sx={{
+                          bgcolor: isHighlighted ? alpha('#ffd700', 0.2) : 'inherit',
+                          borderLeft: isHighlighted ? '4px solid #ffd700' : '4px solid transparent',
+                          transition: 'all 0.3s ease',
+                          '&:hover': {
+                            bgcolor: isHighlighted ? alpha('#ffd700', 0.3) : 'rgba(0, 0, 0, 0.04)'
+                          }
+                        }}
+                      >
                         <TableCell>
-                          <Chip label={`CO${co.co_number}`} color="primary" />
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <Chip
+                              label={`CO${co.co_number}`}
+                              color="primary"
+                              sx={{
+                                fontWeight: isHighlighted ? 'bold' : 'normal',
+                                boxShadow: isHighlighted ? '0 0 8px rgba(255, 215, 0, 0.6)' : 'none'
+                              }}
+                            />
+                            {isHighlighted && (
+                              <Chip
+                                label="Highlighted"
+                                size="small"
+                                sx={{
+                                  bgcolor: '#ffd700',
+                                  color: '#000',
+                                  fontWeight: 'bold',
+                                  fontSize: '0.65rem',
+                                  height: 18
+                                }}
+                              />
+                            )}
+                          </Box>
                         </TableCell>
                         <TableCell sx={{ maxWidth: 300 }}>
                           <Typography variant="body2">{co.description}</Typography>
@@ -1041,7 +1169,8 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                           />
                         </TableCell>
                       </TableRow>
-                    ))}
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -1084,29 +1213,41 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                 </Typography>
               </Alert>
 
-              {studentData.coPerformance.map((co, coIdx) => (
+              {studentData.coPerformance.map((co, coIdx) => {
+                const isHighlighted = highlightedCOs.includes(co.co_number);
+                return (
                 <Accordion
                   key={co.co_number}
                   defaultExpanded={coIdx === 0}
                   sx={{
                     mb: 2,
                     borderRadius: 2,
-                    border: '2px solid',
-                    borderColor: alpha(getPerformanceColor(co.percentage), 0.3),
+                    border: isHighlighted ? '3px solid #ffd700' : '2px solid',
+                    borderColor: isHighlighted ? '#ffd700' : alpha(getPerformanceColor(co.percentage), 0.3),
                     '&:before': { display: 'none' },
-                    boxShadow: `0 2px 8px ${alpha(getPerformanceColor(co.percentage), 0.1)}`,
+                    boxShadow: isHighlighted
+                      ? '0 4px 16px rgba(255, 215, 0, 0.4)'
+                      : `0 2px 8px ${alpha(getPerformanceColor(co.percentage), 0.1)}`,
                     '&.Mui-expanded': {
-                      boxShadow: `0 4px 12px ${alpha(getPerformanceColor(co.percentage), 0.2)}`
-                    }
+                      boxShadow: isHighlighted
+                        ? '0 6px 20px rgba(255, 215, 0, 0.5)'
+                        : `0 4px 12px ${alpha(getPerformanceColor(co.percentage), 0.2)}`
+                    },
+                    transition: 'all 0.3s ease',
+                    bgcolor: isHighlighted ? alpha('#ffd700', 0.05) : 'inherit'
                   }}
                 >
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     sx={{
-                      bgcolor: alpha(getPerformanceColor(co.percentage), 0.05),
+                      bgcolor: isHighlighted
+                        ? alpha('#ffd700', 0.15)
+                        : alpha(getPerformanceColor(co.percentage), 0.05),
                       borderRadius: 1,
                       '&:hover': {
-                        bgcolor: alpha(getPerformanceColor(co.percentage), 0.1)
+                        bgcolor: isHighlighted
+                          ? alpha('#ffd700', 0.25)
+                          : alpha(getPerformanceColor(co.percentage), 0.1)
                       },
                       '& .MuiAccordionSummary-content': {
                         my: 2
@@ -1119,14 +1260,33 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                           <Chip
                             label={`CO${co.co_number}`}
                             sx={{
-                              bgcolor: getPerformanceColor(co.percentage),
-                              color: 'white',
+                              bgcolor: isHighlighted ? '#ffd700' : getPerformanceColor(co.percentage),
+                              color: isHighlighted ? '#000' : 'white',
                               fontWeight: 'bold',
                               fontSize: '1rem',
                               height: 36,
-                              px: 1
+                              px: 1,
+                              boxShadow: isHighlighted ? '0 0 12px rgba(255, 215, 0, 0.8)' : 'none'
                             }}
                           />
+                          {isHighlighted && (
+                            <Chip
+                              label="Highlighted"
+                              size="small"
+                              sx={{
+                                bgcolor: '#ffd700',
+                                color: '#000',
+                                fontWeight: 'bold',
+                                fontSize: '0.7rem',
+                                height: 22,
+                                animation: 'pulse 2s ease-in-out infinite',
+                                '@keyframes pulse': {
+                                  '0%, 100%': { opacity: 1 },
+                                  '50%': { opacity: 0.7 }
+                                }
+                              }}
+                            />
+                          )}
                           <Tooltip title={co.description} arrow>
                             <Typography
                               variant="body1"
@@ -1424,7 +1584,8 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                     ))}
                   </AccordionDetails>
                 </Accordion>
-              ))}
+                );
+              })}
             </AccordionDetails>
           </Accordion>
             </>
