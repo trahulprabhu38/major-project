@@ -660,9 +660,9 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                 </AccordionSummary>
                 <AccordionDetails>
                   <Box sx={{ mb: 3 }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    {/* <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                       Overall performance in each Continuous Internal Evaluation (CIE) across all Course Outcomes
-                    </Typography>
+                    </Typography> */}
                     <Alert
                       severity="info"
                       icon={<InfoIcon />}
@@ -974,7 +974,7 @@ const IndividualStudentAnalysis = ({ courseId }) => {
             )}
 
             {/* Bar Chart */}
-            {hasBarData && (
+            {/* {hasBarData && (
               <Grid item xs={12}>
                 <Card sx={{
                   transition: 'transform 0.2s ease, box-shadow 0.2s ease',
@@ -998,7 +998,7 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                   </CardContent>
                 </Card>
               </Grid>
-            )}
+            )} */}
 
             {/* Assessment-wise Performance */}
             {hasLineData && (
@@ -1073,12 +1073,12 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                   <TableHead>
                     <TableRow sx={{ bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1) }}>
                       <TableCell><strong>CO</strong></TableCell>
-                      <TableCell><strong>Description</strong></TableCell>
+                      {/* <TableCell><strong>Description</strong></TableCell> */}
                       <TableCell><strong>Bloom Level</strong></TableCell>
                       <TableCell align="center"><strong>Obtained</strong></TableCell>
                       <TableCell align="center"><strong>Max</strong></TableCell>
                       <TableCell align="center"><strong>Percentage</strong></TableCell>
-                      <TableCell align="center"><strong>Status</strong></TableCell>
+                      <TableCell align="center"><strong>Status</strong></TableCell> 
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -1122,9 +1122,9 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                             )}
                           </Box>
                         </TableCell>
-                        <TableCell sx={{ maxWidth: 300 }}>
+                        {/* <TableCell sx={{ maxWidth: 300 }}>
                           <Typography variant="body2">{co.description}</Typography>
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell>
                           <Chip label={co.bloom_level} size="small" variant="outlined" />
                         </TableCell>
@@ -1201,7 +1201,7 @@ const IndividualStudentAnalysis = ({ courseId }) => {
               </Box>
             </AccordionSummary>
             <AccordionDetails>
-
+{/* 
               <Alert severity="info" icon={<InfoIcon />} sx={{ mb: 3 }}>
                 <AlertTitle sx={{ fontWeight: 'bold', mb: 0.5 }}>Understanding the Exam Structure</AlertTitle>
                 <Typography variant="body2">
@@ -1211,7 +1211,7 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                   Only selected questions are counted in totals. "Not Selected" means the student chose another option from the pair.
                 </Typography>
-              </Alert>
+              </Alert> */}
 
               {studentData.coPerformance.map((co, coIdx) => {
                 const isHighlighted = highlightedCOs.includes(co.co_number);
@@ -1287,7 +1287,7 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                               }}
                             />
                           )}
-                          <Tooltip title={co.description} arrow>
+                          {/* <Tooltip title={co.description} arrow>
                             <Typography
                               variant="body1"
                               fontWeight="600"
@@ -1301,7 +1301,7 @@ const IndividualStudentAnalysis = ({ courseId }) => {
                             >
                               {co.description}
                             </Typography>
-                          </Tooltip>
+                          </Tooltip> */}
                         </Box>
                       </Grid>
 
