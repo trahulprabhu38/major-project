@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -6,6 +7,7 @@ import dotenv from 'dotenv';
 import { testConnection as testPostgres } from './config/db.js';
 import { connectMongoDB } from './config/mongodb.js';
 import logger, { requestLogger } from './middleware/logging.js';
+import { initializeSocket } from './config/socket.js';
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -24,11 +26,14 @@ import gradesRoutes from './routes/grades.js';
 import cgpaRoutes from './routes/cgpa.js';
 import progressionRoutes from './routes/progression.js';
 import semesterSubjectsRoutes from './routes/semesterSubjects.js';
+import materialsRoutes from './routes/materials.js';
+import chatRoutes from './routes/chat.js';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 8080;
 
 // Middleware
@@ -66,6 +71,8 @@ app.use('/api/cgpa', cgpaRoutes);
 app.use('/api/progression', progressionRoutes);
 app.use('/api/semester-subjects', semesterSubjectsRoutes);
 app.use('/api/teacher', courseRoutes);
+app.use('/api/materials', materialsRoutes);
+app.use('/api/chat', chatRoutes);
 
 
 // 404 handler
@@ -128,8 +135,13 @@ const startServer = async () => {
       logger.warn('   To fix: docker-compose up -d mongodb');
     }
 
+    // Initialize Socket.io
+    logger.info('🔌 Initializing Socket.io...');
+    initializeSocket(server);
+    logger.info('✅ Socket.io initialized');
+
     // Start Express server
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       logger.info('='.repeat(80));
       logger.info('✅ OBE Backend Server Ready!');
       logger.info(`   - Port: ${PORT}`);

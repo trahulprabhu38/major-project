@@ -586,3 +586,105 @@ BEGIN
   RAISE NOTICE '   - VTU credit validation enabled (max 20 credits per semester)';
   RAISE NOTICE '   - Automatic credit limit enforcement via trigger';
 END $$;
+
+
+-- ==================================================================================
+-- COURSE FOLDERS - Hierarchical folder structure for organizing materials
+-- ==================================================================================
+CREATE TABLE IF NOT EXISTS course_folders (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    parent_folder_id UUID REFERENCES course_folders(id) ON DELETE CASCADE,
+    created_by UUID NOT NULL REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    -- Prevent duplicate folder names within the same parent
+    CONSTRAINT unique_folder_name_per_parent UNIQUE(course_id, parent_folder_id, name)
+);
+
+-- Indexes for fast lookups
+CREATE INDEX IF NOT EXISTS idx_course_folders_course ON course_folders(course_id);
+CREATE INDEX IF NOT EXISTS idx_course_folders_parent ON course_folders(parent_folder_id);
+CREATE INDEX IF NOT EXISTS idx_course_folders_created_by ON course_folders(created_by);
+
+-- Auto-update timestamp trigger
+CREATE TRIGGER update_course_folders_updated_at
+BEFORE UPDATE ON course_folders
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ==================================================================================
+-- COURSE MATERIALS - File metadata for uploaded course materials
+-- ==================================================================================
+CREATE TABLE IF NOT EXISTS course_materials (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    folder_id UUID REFERENCES course_folders(id) ON DELETE SET NULL,
+
+    -- File information
+    file_name VARCHAR(255) NOT NULL,
+    original_name VARCHAR(255) NOT NULL,
+    file_path TEXT NOT NULL,
+    file_size BIGINT NOT NULL,
+    file_type VARCHAR(100),
+    mime_type VARCHAR(100),
+
+    -- Metadata
+    description TEXT,
+    uploaded_by UUID NOT NULL REFERENCES users(id) ON DELETE SET NULL,
+    upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for fast lookups
+CREATE INDEX IF NOT EXISTS idx_course_materials_course ON course_materials(course_id);
+CREATE INDEX IF NOT EXISTS idx_course_materials_folder ON course_materials(folder_id);
+CREATE INDEX IF NOT EXISTS idx_course_materials_uploaded_by ON course_materials(uploaded_by);
+CREATE INDEX IF NOT EXISTS idx_course_materials_upload_date ON course_materials(upload_date DESC);
+
+-- Auto-update timestamp trigger
+CREATE TRIGGER update_course_materials_updated_at
+BEFORE UPDATE ON course_materials
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ==================================================================================
+-- COURSE MESSAGES - Chat messages for course discussions
+-- ==================================================================================
+CREATE TABLE IF NOT EXISTS course_messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
+    -- Message content
+    message TEXT NOT NULL,
+    message_type VARCHAR(20) DEFAULT 'text' CHECK (message_type IN ('text', 'file', 'system')),
+
+    -- Optional reference to a material (for file-share messages)
+    material_id UUID REFERENCES course_materials(id) ON DELETE SET NULL,
+
+    -- Additional metadata (JSON)
+    metadata JSONB,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for fast lookups
+CREATE INDEX IF NOT EXISTS idx_course_messages_course ON course_messages(course_id);
+CREATE INDEX IF NOT EXISTS idx_course_messages_user ON course_messages(user_id);
+CREATE INDEX IF NOT EXISTS idx_course_messages_created_at ON course_messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_course_messages_course_time ON course_messages(course_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_course_messages_type ON course_messages(message_type);
+
+-- Auto-update timestamp trigger
+CREATE TRIGGER update_course_messages_updated_at
+BEFORE UPDATE ON course_messages
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ==================================================================================
+-- COMPLETED
+-- ==================================================================================
+-- Migration 002 completed successfully

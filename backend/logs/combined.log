@@ -74,3 +74,78 @@
 {"level":"warn","message":"   To fix: docker-compose up -d postgres mongodb","service":"backend-api","timestamp":"2025-12-01 16:53:42.579"}
 {"level":"info","message":"📊 Connecting to MongoDB...","service":"backend-api","timestamp":"2025-12-01 16:53:42.579"}
 {"level":"info","message":"✅ MongoDB connected","service":"backend-api","timestamp":"2025-12-01 16:53:42.604"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-27 00:49:13.411"}
+{"level":"info","message":"🚀 Starting OBE Backend Server","service":"backend-api","timestamp":"2025-12-27 00:49:13.415"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-27 00:49:13.415"}
+{"level":"info","message":"📊 Connecting to PostgreSQL...","service":"backend-api","timestamp":"2025-12-27 00:49:13.415"}
+{"level":"warn","message":"⚠️ PostgreSQL connection failed - server will start anyway","service":"backend-api","timestamp":"2025-12-27 00:49:13.432"}
+{"level":"warn","message":"   Some features may not work without database connection","service":"backend-api","timestamp":"2025-12-27 00:49:13.432"}
+{"level":"warn","message":"   To fix: docker-compose up -d postgres mongodb","service":"backend-api","timestamp":"2025-12-27 00:49:13.432"}
+{"level":"info","message":"📊 Connecting to MongoDB...","service":"backend-api","timestamp":"2025-12-27 00:49:13.433"}
+{"level":"info","message":"✅ MongoDB connected","service":"backend-api","timestamp":"2025-12-27 00:49:13.476"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-27 00:53:14.544"}
+{"level":"info","message":"🚀 Starting OBE Backend Server","service":"backend-api","timestamp":"2025-12-27 00:53:14.545"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-27 00:53:14.546"}
+{"level":"info","message":"📊 Connecting to PostgreSQL...","service":"backend-api","timestamp":"2025-12-27 00:53:14.546"}
+{"level":"warn","message":"⚠️ PostgreSQL connection failed - server will start anyway","service":"backend-api","timestamp":"2025-12-27 00:53:14.606"}
+{"level":"warn","message":"   Some features may not work without database connection","service":"backend-api","timestamp":"2025-12-27 00:53:14.607"}
+{"level":"warn","message":"   To fix: docker-compose up -d postgres mongodb","service":"backend-api","timestamp":"2025-12-27 00:53:14.607"}
+{"level":"info","message":"📊 Connecting to MongoDB...","service":"backend-api","timestamp":"2025-12-27 00:53:14.607"}
+{"level":"info","message":"✅ MongoDB connected","service":"backend-api","timestamp":"2025-12-27 00:53:14.654"}
+{"level":"info","message":"🔌 Initializing Socket.io...","service":"backend-api","timestamp":"2025-12-27 00:53:14.655"}
+{"level":"info","message":"✅ Socket.io initialized","service":"backend-api","timestamp":"2025-12-27 00:53:14.656"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-27 00:53:14.657"}
+{"level":"info","message":"✅ OBE Backend Server Ready!","service":"backend-api","timestamp":"2025-12-27 00:53:14.657"}
+{"level":"info","message":"   - Port: 8080","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - API: http://localhost:8080","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - Health: http://localhost:8080/health","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - Environment: development","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"📚 Available Routes:","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - POST   /api/auth/register","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - POST   /api/auth/login","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - GET    /api/auth/profile","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - GET    /api/courses","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - POST   /api/courses","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - POST   /api/courses/create-or-get","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - GET    /api/courses/:id","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - POST   /api/assessments","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - POST   /api/upload/assessment","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - GET    /api/upload/template","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - GET    /api/students/courses","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"   - GET    /api/students/courses/:courseId/analytics","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-27 00:53:14.658"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/materials/courses/33d4f36f-9930-42ea-8e83-37b60d4b76eb/materials","query":{},"service":"backend-api","timestamp":"2025-12-27 00:59:33.183","type":"request","url":"/api/materials/courses/33d4f36f-9930-42ea-8e83-37b60d4b76eb/materials","user_agent":"curl/8.7.1","user_id":null,"user_role":null}
+{"duration_ms":2,"level":"warn","message":"Response (Client Error)","method":"GET","service":"backend-api","status":403,"timestamp":"2025-12-27 00:59:33.185","type":"response","url":"/courses/33d4f36f-9930-42ea-8e83-37b60d4b76eb/materials","user_id":null,"user_role":null}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-27 01:03:54.728"}
+{"level":"info","message":"🚀 Starting OBE Backend Server","service":"backend-api","timestamp":"2025-12-27 01:03:54.730"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-27 01:03:54.730"}
+{"level":"info","message":"📊 Connecting to PostgreSQL...","service":"backend-api","timestamp":"2025-12-27 01:03:54.730"}
+{"level":"info","message":"✅ PostgreSQL connected","service":"backend-api","timestamp":"2025-12-27 01:03:54.752"}
+{"level":"info","message":"📊 Connecting to MongoDB...","service":"backend-api","timestamp":"2025-12-27 01:03:54.752"}
+{"level":"info","message":"✅ MongoDB connected","service":"backend-api","timestamp":"2025-12-27 01:03:54.775"}
+{"level":"info","message":"🔌 Initializing Socket.io...","service":"backend-api","timestamp":"2025-12-27 01:03:54.775"}
+{"level":"info","message":"✅ Socket.io initialized","service":"backend-api","timestamp":"2025-12-27 01:03:54.776"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-27 01:03:54.778"}
+{"level":"info","message":"✅ OBE Backend Server Ready!","service":"backend-api","timestamp":"2025-12-27 01:03:54.778"}
+{"level":"info","message":"   - Port: 8080","service":"backend-api","timestamp":"2025-12-27 01:03:54.778"}
+{"level":"info","message":"   - API: http://localhost:8080","service":"backend-api","timestamp":"2025-12-27 01:03:54.778"}
+{"level":"info","message":"   - Health: http://localhost:8080/health","service":"backend-api","timestamp":"2025-12-27 01:03:54.778"}
+{"level":"info","message":"   - Environment: development","service":"backend-api","timestamp":"2025-12-27 01:03:54.778"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-27 01:03:54.778"}
+{"level":"info","message":"📚 Available Routes:","service":"backend-api","timestamp":"2025-12-27 01:03:54.778"}
+{"level":"info","message":"   - POST   /api/auth/register","service":"backend-api","timestamp":"2025-12-27 01:03:54.778"}
+{"level":"info","message":"   - POST   /api/auth/login","service":"backend-api","timestamp":"2025-12-27 01:03:54.779"}
+{"level":"info","message":"   - GET    /api/auth/profile","service":"backend-api","timestamp":"2025-12-27 01:03:54.779"}
+{"level":"info","message":"   - GET    /api/courses","service":"backend-api","timestamp":"2025-12-27 01:03:54.779"}
+{"level":"info","message":"   - POST   /api/courses","service":"backend-api","timestamp":"2025-12-27 01:03:54.779"}
+{"level":"info","message":"   - POST   /api/courses/create-or-get","service":"backend-api","timestamp":"2025-12-27 01:03:54.779"}
+{"level":"info","message":"   - GET    /api/courses/:id","service":"backend-api","timestamp":"2025-12-27 01:03:54.779"}
+{"level":"info","message":"   - POST   /api/assessments","service":"backend-api","timestamp":"2025-12-27 01:03:54.779"}
+{"level":"info","message":"   - POST   /api/upload/assessment","service":"backend-api","timestamp":"2025-12-27 01:03:54.779"}
+{"level":"info","message":"   - GET    /api/upload/template","service":"backend-api","timestamp":"2025-12-27 01:03:54.779"}
+{"level":"info","message":"   - GET    /api/students/courses","service":"backend-api","timestamp":"2025-12-27 01:03:54.779"}
+{"level":"info","message":"   - GET    /api/students/courses/:courseId/analytics","service":"backend-api","timestamp":"2025-12-27 01:03:54.779"}
+{"level":"info","message":"================================================================================","service":"backend-api","timestamp":"2025-12-27 01:03:54.779"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","query":{},"service":"backend-api","timestamp":"2025-12-27 01:04:25.428","type":"request","url":"/health","user_agent":"curl/8.7.1","user_id":null,"user_role":null}
+{"duration_ms":1,"level":"info","message":"Response (Success)","method":"GET","service":"backend-api","status":200,"timestamp":"2025-12-27 01:04:25.428","type":"response","url":"/health","user_id":null,"user_role":null}

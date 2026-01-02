@@ -23,22 +23,50 @@ const storage = multer.diskStorage({
   }
 });
 
-// File filter to accept Excel, CSV, and PDF files
+// File filter to accept various document types
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [
+    // Excel and CSV
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'text/csv',
-    'application/pdf'
+    // PDF
+    'application/pdf',
+    // Word documents
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    // PowerPoint
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    // Text files
+    'text/plain',
+    // Archives
+    'application/zip',
+    'application/x-zip-compressed',
+    'application/x-rar-compressed',
+    // Images
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/gif'
   ];
 
-  const allowedExtensions = ['.xlsx', '.xls', '.csv', '.pdf'];
+  const allowedExtensions = [
+    '.xlsx', '.xls', '.csv',           // Excel and CSV
+    '.pdf',                             // PDF
+    '.doc', '.docx',                    // Word
+    '.ppt', '.pptx',                    // PowerPoint
+    '.txt',                             // Text
+    '.zip', '.rar',                     // Archives
+    '.jpg', '.jpeg', '.png', '.gif'     // Images
+  ];
+
   const ext = path.extname(file.originalname).toLowerCase();
 
   if (allowedTypes.includes(file.mimetype) || allowedExtensions.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only Excel (.xlsx, .xls), CSV, and PDF files are allowed.'), false);
+    cb(new Error('Invalid file type. Allowed: documents (.pdf, .doc, .docx), presentations (.ppt, .pptx), spreadsheets (.xlsx, .csv), images (.jpg, .png, .gif), text (.txt), and archives (.zip, .rar)'), false);
   }
 };
 

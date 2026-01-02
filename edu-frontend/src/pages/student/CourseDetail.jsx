@@ -24,6 +24,8 @@ import {
   ChevronDown,
   CheckCircle,
   XCircle,
+  FolderOpen,
+  MessageCircle,
 } from 'lucide-react';
 import { studentAPI, courseAPI } from '../../services/api';
 import PageLayout from '../../components/shared/PageLayout';
@@ -31,10 +33,13 @@ import { PageLoader } from '../../components/shared/Loading';
 import { ErrorState } from '../../components/shared/ErrorState';
 import StatsCard from '../../components/shared/StatsCard';
 import Recommendations from '../../components/student/Recommendations';
+import CourseMaterials from '../../components/course/CourseMaterials';
+import CourseChat from '../../components/course/CourseChat';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { CHART_COLORS } from '../../config/chartColors';
+import { initializeSocket, joinCourse, leaveCourse, disconnectSocket } from '../../services/socket';
 
 const COLORS = [
   CHART_COLORS.primary,
@@ -59,6 +64,16 @@ const CourseDetail = () => {
 
   useEffect(() => {
     loadCourseData();
+  }, [courseId]);
+
+  // Socket initialization and cleanup
+  useEffect(() => {
+    initializeSocket();
+    joinCourse(courseId);
+
+    return () => {
+      leaveCourse(courseId);
+    };
   }, [courseId]);
 
   const loadCourseData = async () => {
@@ -199,6 +214,16 @@ const CourseDetail = () => {
               }`}
             >
               Recommendations
+            </button>
+            <button
+              onClick={() => setTabValue(4)}
+              className={`px-4 py-3 border-b-2 transition-colors ${
+                tabValue === 4
+                  ? 'border-primary-500 dark:border-dark-green-500 text-primary-600 dark:text-dark-green-500 font-semibold'
+                  : 'border-transparent text-neutral-600 dark:text-dark-text-secondary hover:text-neutral-800 dark:hover:text-dark-text-primary'
+              }`}
+            >
+              Materials & Chat
             </button>
           </div>
         </div>
@@ -639,6 +664,33 @@ const CourseDetail = () => {
       {tabValue === 3 && (
         <div>
           <Recommendations courseId={courseId} courseCode={courseInfo?.code} />
+        </div>
+      )}
+
+      {/* Tab 4: Materials & Chat */}
+      {tabValue === 4 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Materials Section */}
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <FolderOpen className="w-5 h-5" />
+                Course Materials
+              </h3>
+              <CourseMaterials courseId={courseId} isTeacher={false} />
+            </CardContent>
+          </Card>
+
+          {/* Chat Section */}
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <MessageCircle className="w-5 h-5" />
+                Course Chat
+              </h3>
+              <CourseChat courseId={courseId} />
+            </CardContent>
+          </Card>
         </div>
       )}
     </PageLayout>

@@ -212,4 +212,26 @@ export const progressionAPI = {
   getDepartmentOverview: (department) => api.get(`/progression/department/${department}/overview`),
 };
 
+// Materials APIs
+export const materialsAPI = {
+  // Folder operations
+  createFolder: (courseId, data) => api.post(`/materials/courses/${courseId}/folders`, data),
+  deleteFolder: (folderId) => api.delete(`/materials/folders/${folderId}`),
+
+  // Material operations
+  getMaterials: (courseId, folderId) => api.get(`/materials/courses/${courseId}/materials`, { params: { folderId } }),
+  uploadMaterial: (courseId, formData) => api.post(`/materials/courses/${courseId}/materials/upload`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  downloadMaterial: (materialId) => api.get(`/materials/materials/${materialId}/download`, { responseType: 'blob' }),
+  deleteMaterial: (materialId) => api.delete(`/materials/materials/${materialId}`),
+};
+
+// Chat APIs
+export const chatAPI = {
+  getMessages: (courseId, params) => api.get(`/chat/courses/${courseId}/messages`, { params }),
+  sendMessage: (courseId, data) => api.post(`/chat/courses/${courseId}/messages`, data),
+  deleteMessage: (messageId) => api.delete(`/chat/messages/${messageId}`),
+};
+
 export default api;

@@ -22,6 +22,8 @@ import {
   BadgeCheck,
   Plus,
   ChevronDown,
+  FolderOpen,
+  MessageCircle,
 } from 'lucide-react';
 import { courseAPI, marksheetAPI, aiCOAPI, courseOutcomesAPI } from '../../services/api';
 import PageLayout from '../../components/shared/PageLayout';
@@ -30,9 +32,12 @@ import { ErrorState, EmptyState } from '../../components/shared/ErrorState';
 import StatsCard from '../../components/shared/StatsCard';
 import COMappingUpload from '../../components/upload/COMappingUpload';
 import ManualCOManager from '../../components/teacher/ManualCOManager';
+import CourseMaterials from '../../components/course/CourseMaterials';
+import CourseChat from '../../components/course/CourseChat';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
+import { initializeSocket, joinCourse, leaveCourse, disconnectSocket } from '../../services/socket';
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -67,6 +72,16 @@ const CourseDetail = () => {
   useEffect(() => {
     loadCourseDetails();
     loadAICOs();
+  }, [id]);
+
+  // Socket initialization and cleanup
+  useEffect(() => {
+    initializeSocket();
+    joinCourse(id);
+
+    return () => {
+      leaveCourse(id);
+    };
   }, [id]);
 
   const loadAICOs = async () => {
@@ -582,6 +597,17 @@ const CourseDetail = () => {
               <FileText className="w-4 h-4" />
               Uploaded Marksheets
             </button>
+            <button
+              onClick={() => setActiveTab(2)}
+              className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
+                activeTab === 2
+                  ? 'border-primary-500 dark:border-dark-green-500 text-primary-600 dark:text-dark-green-500 font-semibold'
+                  : 'border-transparent text-neutral-600 dark:text-dark-text-secondary hover:text-neutral-800 dark:hover:text-dark-text-primary'
+              }`}
+            >
+              <FolderOpen className="w-4 h-4" />
+              Materials & Chat
+            </button>
           </div>
         </div>
 
@@ -775,6 +801,31 @@ const CourseDetail = () => {
                 </div>
               </div>
             )}
+          </CardContent>
+        )}
+
+        {/* Materials & Chat Tab */}
+        {activeTab === 2 && (
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Materials Section */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <FolderOpen className="w-5 h-5" />
+                  Course Materials
+                </h3>
+                <CourseMaterials courseId={id} isTeacher={true} />
+              </div>
+
+              {/* Chat Section */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5" />
+                  Course Chat
+                </h3>
+                <CourseChat courseId={id} />
+              </div>
+            </div>
           </CardContent>
         )}
       </Card>
